@@ -69,8 +69,6 @@ function explosionTick(dt)
 					spark.dir = VecScale(spark.dir, -1)
 				end
 			else
-				-- move and possibly split
-
 				-- heat rise (fallback)
 				if TOOL.heatRiseForceAmount == nil and TOOL.sparkRisingDirChange ~= nil then 
 					spark.dir = VecAdd(spark.dir, Vec(0, TOOL.sparkRisingDirChange.value, 0))
@@ -124,7 +122,7 @@ function explosionTick(dt)
 							ignitionCount = ignitionCount + 1
 							for ign=1, TOOL.ignitionCount.value do
 								local ign_dir = random_vec(1)
-								local ign_hit, ign_dist = QueryRaycast(ign_probe_pos, ign_dir, rad / 2)
+								local ign_hit, ign_dist = QueryRaycast(ign_probe_pos, ign_dir, rad)
 								if ign_hit then 
 									local ign_pos = VecAdd(ign_probe_pos, VecScale(ign_dir, ign_dist))
 									SpawnFire(ign_pos) 
@@ -206,11 +204,6 @@ function explosionTick(dt)
 					local health = GetPlayerHealth()
 					SetPlayerHealth(health - (hurt_n * VALUES.SPARK_HURT_ADJUSTMENT))
 				end
-				
-				-- may impulse stuff
-				-- if math.random(1, TOOL.impulseFreq.value) == 1 then 
-				-- 	impulseTick(explosion, spark)
-				-- end
 			end
 		end
 		if #newSparks > 0 then
@@ -346,6 +339,8 @@ function makeSparkEffect(pos, options)
 	-- fire puff
 	ParticleReset()
 	ParticleType("smoke")
+	ParticleTile(0)
+	ParticleRotation(((math.random() * 2) - 1) * 10)
 	ParticleDrag(0.25)
 	ParticleAlpha(1, 0, "easeout", 0, 0.5)
 	ParticleRadius(math.random(TOOL.sparkTileRadMin.value, TOOL.sparkTileRadMax.value) * 0.1)
@@ -360,7 +355,7 @@ function makeSparkEffect(pos, options)
 end
 
 function makeSmoke(pos, options)
-	local movement = options.movement or random_vec(1)
+	local movement = options.smokeMovement or random_vec(1)
 	local lifetime = TOOL.sparkSmokeLife.value
 	local gravity = options.gravity or 1
 	local smokeSize = options.smokeSize or math.random(2,5) * 0.1
@@ -375,6 +370,8 @@ function makeSmoke(pos, options)
 	-- smoke puff
 	ParticleReset()
 	ParticleType("smoke")
+	ParticleTile(0)
+	ParticleRotation(((math.random() * 2) - 1) * 10)
 	ParticleDrag(drag)
 	ParticleAlpha(alphaStart, alphaEnd, alphaGraph, alphaFadeIn, alphaFadeOut)
 	ParticleRadius(smokeSize)

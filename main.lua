@@ -17,9 +17,7 @@ function init()
 	explosions = {}
 	plantRate = 0.3
 	plantTimer = 0
-	shootTimer = 0
-	shootLock = false
-	
+
 	TOOL = createDefaultOptions()
 	loadOptions(false)
 	editingOptions = false
@@ -55,9 +53,8 @@ end
 -------------------------------------------------
 
 function draw()
-	if GetString("game.player.tool") ~= REG.TOOL_KEY or
-		GetPlayerVehicle() ~= 0 then return end
-	
+	if not canInteract(false, true) then return end
+
 	if editingOptions == true then
 		drawOptionModal()
 	end
@@ -144,14 +141,16 @@ function drawOptionModal()
 				UiText("Press [Return/Enter] to save, [Backspace] to cancel, [Delete] to reset to defaults")
 			UiPop()
 
-			if newOptionValue == "-1" then 
+			if newOptionValue == "back" then 
 				newOptionValue = nil
 				selectedOption = nil
 				selectedIndex = nil
 			elseif newOptionValue ~= nil and 
 				newOptionValue ~= "" and 
 				newOptionValue ~= "." and
-				newOptionValue ~= "-" then 
+				newOptionValue ~= "-" and 
+				newOptionValue ~= "-." and 
+				newOptionValue ~= ".-" then 
 				if selectedOption.type == option_type.color then 
 					selectedOption.value[selectedIndex] = tonumber(newOptionValue)
 				else
@@ -338,7 +337,7 @@ function drawValueEntry()
 			editingValue = ""
 		end
 		if InputPressed("Q") then
-			newOptionValue = "-1"
+			newOptionValue = "back"
 			editingValue = ""
 		end
 
@@ -417,6 +416,9 @@ end
 function tick(dt)
 	handleInput(dt)
 	explosionTick(dt)
+	if not canInteract(true, false) then 
+		plantTimer = 0.5
+	end
 end
 
 -------------------------------------------------
@@ -425,59 +427,58 @@ end
 
 function handleInput(dt)
 	if editingOptions == true then return end
-
 	plantTimer = math.max(plantTimer - dt, 0)
 
-	if GetString("game.player.tool") == REG.TOOL_KEY and
-		GetPlayerVehicle() == 0 then 
+	if GetString("game.player.tool") == REG.TOOL_KEY then
 		-- options menus
-		if InputPressed(KEY.OPTIONS.key) then 
+		if InputPressed(KEY.OPTIONS.key) 
+		and GetPlayerVehicle() == 0 then 
 			editingOptions = true
 		else
-			-- plant bomb
-			if not shootLock and
-				plantTimer == 0 and
-				InputDown(KEY.PLANT_BOMB.key) then
-				-- sticky version
-				local camera = GetPlayerCameraTransform()
-				local shoot_dir = TransformToParentVec(camera, Vec(0, 0, -1))
-				local hit, dist, normal, shape = QueryRaycast(camera.pos, shoot_dir, 100, 0, true)
-				if hit then 
-					local drop_pos = VecAdd(camera.pos, VecScale(shoot_dir, dist))
-					local bomb = Spawn("MOD/prefab/Decoder.xml", Transform(drop_pos), false, true)[2]
-					table.insert(bombs, bomb)
-					plantTimer = plantRate
-				end
-			end
-			
-			-- detonate
-			if not shootLock and
-			GetPlayerGrabShape() == 0 and
-			InputPressed(KEY.DETONATE.key) then
-				detonateAll()
-			end
-		
-			if InputPressed(KEY.STOP_FIRE.key) then
-				-- stop all explosions and cancel bomb
-				for i=1, #explosions do
-					local explosion = explosions[i]
-					explosion.sparks = {} 
-				end	
-			end
-
-			-- plant a group around the map
-			if InputPressed(KEY.PLANT_GROUP.key) then 
-				local player_trans = GetPlayerTransform()
-				PlaySound(spawn_sound, player_trans.pos, 50)
-				for i = 1, 10 do
-					local spawnPos = find_spawn_location()
-					if spawnPos ~= nil then 
-						local trans = Transform(spawnPos) --, QuatEuler(math.random(0,359),math.random(0,359),math.random(0,359)))
-						local bomb = Spawn("MOD/prefab/Decoder.xml", trans, false, true)[2]
+			if GetPlayerVehicle() == 0 then 
+				-- plant bomb
+				if GetPlayerGrabShape() == 0 and
+					plantTimer == 0 and
+					InputDown(KEY.PLANT_BOMB.key) then
+					local camera = GetPlayerCameraTransform()
+					local shoot_dir = TransformToParentVec(camera, Vec(0, 0, -1))
+					local hit, dist, normal, shape = QueryRaycast(camera.pos, shoot_dir, 100, 0, true)
+					if hit then 
+						local drop_pos = VecAdd(camera.pos, VecScale(shoot_dir, dist))
+						local bomb = Spawn("MOD/prefab/Decoder.xml", Transform(drop_pos), false, true)[2]
 						table.insert(bombs, bomb)
-					end					
+						plantTimer = plantRate
+					end
+				end
+
+				if InputPressed(KEY.STOP_FIRE.key) then
+					-- stop all explosions and cancel bomb
+					for i=1, #explosions do
+						local explosion = explosions[i]
+						explosion.sparks = {} 
+					end	
+				end
+
+				-- plant a group around the map
+				if InputPressed(KEY.PLANT_GROUP.key) then 
+					local player_trans = GetPlayerTransform()
+					PlaySound(spawn_sound, player_trans.pos, 50)
+					for i = 1, 10 do
+						local spawnPos = find_spawn_location()
+						if spawnPos ~= nil then 
+							local trans = Transform(spawnPos) --, QuatEuler(math.random(0,359),math.random(0,359),math.random(0,359)))
+							local bomb = Spawn("MOD/prefab/Decoder.xml", trans, false, true)[2]
+							table.insert(bombs, bomb)
+						end					
+					end
 				end
 			end
+		end
+		
+		-- detonate
+		if InputPressed(KEY.DETONATE.key) and
+		GetPlayerGrabShape() == 0 then
+			detonateAll()
 		end
 	end
 end
@@ -486,10 +487,7 @@ end
 -- Support functions
 -------------------------------------------------
 
-
-
 function loadOptions(reset)
-	
 	if reset == true then 
 		option_set_reset()
 	end
@@ -499,6 +497,12 @@ function loadOptions(reset)
 		TOOL = createDefaultOptions()
 		save_option_set(TOOL)
 	end
+end
+
+function canInteract(checkCanUseTool, checkInVehicle)
+	return GetString("game.player.tool") == REG.TOOL_KEY 
+	and (not checkCanUseTool or GetBool("game.player.canusetool"))  
+	and (not checkInVehicle or GetPlayerVehicle() == 0)
 end
 
 

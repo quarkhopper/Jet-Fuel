@@ -136,14 +136,14 @@ function createDefaultOptions()
 
 	oSet.impulsePower = create_mode_option(
 		option_type.numeric, 
-		-10,
+		-5,
 		"impulsePower",
 		"impulse power")
 	oSet.options[#oSet.options + 1] = oSet.impulsePower	
 
 	oSet.impulseRad = create_mode_option(
 		option_type.numeric, 
-		10,
+		6,
 		"impulseRad",
 		"impulse radius")
 	oSet.options[#oSet.options + 1] = oSet.impulseRad	
@@ -166,7 +166,7 @@ function createDefaultOptions()
 
 	oSet.sparkFizzleFreq = create_mode_option(
 		option_type.numeric, 
-		12,
+		14,
 		"sparkFizzleFreq",
 		"Spark fizzle frequency (1 = always, + for less frequent)")
 	oSet.options[#oSet.options + 1] = oSet.sparkFizzleFreq	
@@ -222,7 +222,7 @@ function createDefaultOptions()
 
 	oSet.sparkHitFollowMaxSpeed = create_mode_option(
 		option_type.numeric, 
-		2.5,
+		3,
 		"sparkHitFollowMaxSpeed",
 		"Hit following max spark speed")
 	oSet.options[#oSet.options + 1] = oSet.sparkHitFollowMaxSpeed	
@@ -257,21 +257,21 @@ function createDefaultOptions()
 
 	oSet.sparkAttraction = create_mode_option(
 		option_type.numeric, 
-		0.02,
+		0.03,
 		"sparkAttraction",
 		"Attraction magnitude of one spark on the simulation")
 	oSet.options[#oSet.options + 1] = oSet.sparkAttraction	
 
 	oSet.sparkAttractionRadius = create_mode_option(
 		option_type.numeric, 
-		10,
+		6,
 		"sparkAttractionRadius",
 		"Attraction radius of one spark on the simulation")
 		oSet.options[#oSet.options + 1] = oSet.sparkAttractionRadius	
 		
 	oSet.heatRiseForceAmount = create_mode_option(
 		option_type.numeric, 
-		0.5,
+		0.3,
 		"heatRiseForceAmount",
 		"Heat rise force, multiple of attraction magnitude force")
 	oSet.options[#oSet.options + 1] = oSet.heatRiseForceAmount	
@@ -309,21 +309,21 @@ function createDefaultOptions()
 
 	oSet.sparkTileRadMax = create_mode_option(
 		option_type.numeric, 
-		3,
+		3.5,
 		"sparkTileRadMax",
-		"Spark radius max")
+		"Spark radius hot")
 	oSet.options[#oSet.options + 1] = oSet.sparkTileRadMax	
 
 	oSet.sparkTileRadMin = create_mode_option(
 		option_type.numeric, 
 		2,
 		"sparkTileRadMin",
-		"Spark radius max")
+		"Spark radius cool")
 	oSet.options[#oSet.options + 1] = oSet.sparkTileRadMin	
 
 	oSet.sparkLightIntensity = create_mode_option(
 		option_type.numeric, 
-		2,
+		3,
 		"sparkLightIntensity",
 		"Spark light intensity")
 	oSet.options[#oSet.options + 1] = oSet.sparkLightIntensity	

@@ -81,7 +81,7 @@ function find_suitable_spawn_nearby(test_point)
 			math.random() * 1 - 0.5,
 			math.random() * 1 - 0.5)
 		local hit, dist, normal, shape = QueryRaycast(test_point, dir, test_max_cast_dist)
-		if hit and dist >= 0.2 then
+		if hit and dist >= 0.2 and HasTag(shape, "decoder") ~= true then
             local hit_point = VecAdd(test_point, VecScale(dir, dist - 0.2))
             local mat = GetShapeMaterialAtPosition(shape, hit_point)
 			if allowed_spawn_mats[mat] and 
