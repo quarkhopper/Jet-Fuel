@@ -158,45 +158,20 @@ function explosionTick(dt)
 			end
 		end
 
-		-- spawn fire and ash
+		-- spawn fire
 		for probe=1, TOOL.ignitionProbes.value * #explosion.sparks do
 			local ign_probe_dir = random_vec(1)
-			local ign_probe_hit, ign_probe_dist = QueryRaycast(explosion.center, ign_probe_dir, rad)
+			local ign_probe_hit, ign_probe_dist = QueryRaycast(explosion.center, ign_probe_dir, TOOL.ignitionRadius.value)
 			if ign_probe_hit then 
 				local ign_probe_pos = VecAdd(explosion.center, VecScale(ign_probe_dir, ign_probe_dist))
 				SpawnFire(ign_probe_pos)
 				for ign=1, TOOL.ignitionCount.value do
 					local ign_dir = random_vec(1)
-					local ign_hit, ign_dist = QueryRaycast(ign_probe_pos, ign_dir, rad)
+					local ign_hit, ign_dist = QueryRaycast(ign_probe_pos, ign_dir, TOOL.ignitionRadius.value)
 					if ign_hit then 
 						local ign_pos = VecAdd(ign_probe_pos, VecScale(ign_dir, ign_dist))
 						SpawnFire(ign_pos) 
 					end
-				end
-			end
-		end
-
-		-- create ash
-		for p=1, TOOL.ashProbes.value do
-			local ash_probe_dir = random_vec(1)
-			local ash_hit, ash_dist = QueryRaycast(explosion.center, ash_probe_dir, TOOL.ashRadius.value)
-			if ash_hit and ash_dist >= TOOL.ashMinDist.value then
-				local ash_pos = VecAdd(explosion.center, VecScale(ash_probe_dir, ash_dist))
-				local ash_dir = VecNormalize(VecSub(explosion.center, ash_pos))
-				local dist_n = 1 - (math.min(1, ash_dist/TOOL.ashRadius.value) ^ 0.5)
-				local ash_movement=VecScale(ash_dir, TOOL.ashMaxSpeed.value * dist_n)
-				for ash=1, TOOL.ashSpawns.value do
-					makeSmoke(VecAdd(ash_pos, random_vec(TOOL.ashSpawnJitter.value)), {
-						smokeColor = HSVToRGB(TOOL.ashColor.value), 
-						smokeSize = TOOL.ashTileRadius.value, 
-						smokeLife = TOOL.ashMaxLife.value, 
-						gravity = TOOL.ashGravity.value,
-						drag = TOOL.ashDrag.value, 
-						smokeMovement=ash_movement, 
-						alphaStart=1, 
-						alphaEnd=0.2,
-						alphaFadeIn=0.5,
-						alphaFadeOut=0.5})
 				end
 			end
 		end

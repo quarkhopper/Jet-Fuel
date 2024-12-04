@@ -1,4 +1,4 @@
 name = QBombs Lab
 author = quarkhopper
-description = [h1]Make Anything a bomb![/h1] either attach a bomb or switch modes to 'sabotage' and select anything to explode when it's broken or on command[h1]THIS MOD IS FOR ADVANCED USERS - You can crash your game with it! It is designed for pretty renders, not to help you with your campaign![/h1]Advanced control of the Chain Bombs algorithm with some tweaks and improvements. Use the options for fine control of the simulation, character, and aesthetics of the explosions.
+description = [h1]Make Anything a bomb![/h1] either attach a bomb or switch modes to 'sabotage' and select anything to explode when it's broken or on command[h1][/h1][h1]THIS MOD IS FOR ADVANCED USERS - You can crash your game with it! It is designed for pretty renders, not to help you with your campaign![/h1]Advanced control of the Chain Bombs algorithm with some tweaks and improvements. Use the options for fine control of the simulation, character, and aesthetics of the explosions.
 tags = Tool

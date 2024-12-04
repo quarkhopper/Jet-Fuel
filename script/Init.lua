@@ -24,13 +24,6 @@ function createDefaultOptions()
 		"Smoke color")
 	oSet.options[#oSet.options + 1] = oSet.smokeColor
 
-	oSet.ashColor = create_mode_option(
-		option_type.color,
-		Vec(0, 0, 0.3),
-		"ashColor",
-		"Ash color")
-	oSet.options[#oSet.options + 1] = oSet.ashColor
-
 	-- simulation
 
 	oSet.sparksSimulation = create_mode_option(
@@ -51,14 +44,14 @@ function createDefaultOptions()
 
 	oSet.sparksPerExplosion = create_mode_option(
 		option_type.numeric, 
-		500,
+		300,
 		"sparksPerExplosion",
 		"Sparks limit per explosion")
 	oSet.options[#oSet.options + 1] = oSet.sparksPerExplosion		
 	
 	oSet.sparksAtDetonation = create_mode_option(
 		option_type.numeric, 
-		400,
+		250,
 		"sparksAtDetonation",
 		"Sparks at detonation")
 	oSet.options[#oSet.options + 1] = oSet.sparksAtDetonation
@@ -72,7 +65,7 @@ function createDefaultOptions()
 
 	oSet.blastSpeed = create_mode_option(
 		option_type.numeric, 
-		3,
+		2,
 		"blastSpeed",
 		"Blast speed at detonation (+ for wider initial fireball)")
 	oSet.options[#oSet.options + 1] = oSet.blastSpeed	
@@ -114,14 +107,14 @@ function createDefaultOptions()
 
 	oSet.ignitionProbes = create_mode_option(
 		option_type.numeric, 
-		100,
+		30,
 		"ignitionProbes",
 		"Ignition raycasts per spark per explosion per tick")
 	oSet.options[#oSet.options + 1] = oSet.ignitionProbes
 
 	oSet.ignitionCount = create_mode_option(
 		option_type.numeric, 
-		4,
+		3,
 		"ignitionCount",
 		"Ignitions from secondary raycasts on hit")
 	oSet.options[#oSet.options + 1] = oSet.ignitionCount
@@ -156,21 +149,21 @@ function createDefaultOptions()
 
 	oSet.sparkTorusMag = create_mode_option(
 		option_type.numeric, 
-		0.0005,
+		0.001,
 		"sparkTorusMag",
 		"Cloud torus pressure magnitude per spark")
 	oSet.options[#oSet.options + 1] = oSet.sparkTorusMag
 
 	oSet.sparkVacuumMag = create_mode_option(
 		option_type.numeric, 
-		0.0004,
+		0.0005,
 		"sparkVacuumMag",
 		"Cloud vacuum pressure magnitude per spark")
 	oSet.options[#oSet.options + 1] = oSet.sparkVacuumMag
 
 	oSet.sparkInflateMag = create_mode_option(
 		option_type.numeric, 
-		0.0003,
+		0.0004,
 		"sparkInflateMag",
 		"Cloud inflation pressure magnitude per spark")
 	oSet.options[#oSet.options + 1] = oSet.sparkInflateMag
@@ -202,7 +195,7 @@ function createDefaultOptions()
 
 	oSet.sparkSpawnsLower = create_mode_option(
 		option_type.numeric, 
-		2,
+		5,
 		"sparkSpawnsLower",
 		"Spark spawns min")
 	oSet.options[#oSet.options + 1] = oSet.sparkSpawnsLower	
@@ -277,20 +270,6 @@ function createDefaultOptions()
 		"Spark speed reduction over time")
 	oSet.options[#oSet.options + 1] = oSet.sparkSpeedReduction	
 	
-	-- oSet.heatRiseForceAmount = create_mode_option(
-	-- 	option_type.numeric, 
-	-- 	0.005,
-	-- 	"heatRiseForceAmount",
-	-- 	"Heat rise magnitude")
-	-- oSet.options[#oSet.options + 1] = oSet.heatRiseForceAmount	
-
-	-- oSet.heatRiseFalloffRadius = create_mode_option(
-	-- 	option_type.numeric, 
-	-- 	3,
-	-- 	"heatRiseFalloffRadius",
-	-- 	"Heat rise falloff radius (where heat rise begins to diminish)")
-	-- oSet.options[#oSet.options + 1] = oSet.heatRiseFalloffRadius	
-
 	oSet.sparkJiggle = create_mode_option(
 		option_type.numeric, 
 		0.05,
@@ -342,77 +321,7 @@ function createDefaultOptions()
 		"sparkLightIntensity",
 		"Spark light intensity")
 	oSet.options[#oSet.options + 1] = oSet.sparkLightIntensity	
-
-	oSet.ashMaxLife = create_mode_option(
-		option_type.numeric, 
-		3,
-		"ashMaxLife",
-		"Ash lifetime (secs)")
-	oSet.options[#oSet.options + 1] = oSet.ashMaxLife		
-
-	oSet.ashMaxSpeed = create_mode_option(
-		option_type.numeric, 
-		6,
-		"ashMaxSpeed",
-		"Ash max speed (m/s)")
-	oSet.options[#oSet.options + 1] = oSet.ashMaxSpeed	
-
-	oSet.ashTileRadius = create_mode_option(
-		option_type.numeric, 
-		0.3,
-		"ashTileRadius",
-		"Ash tile radius (m)")
-	oSet.options[#oSet.options + 1] = oSet.ashTileRadius	
-
-	oSet.ashGravity = create_mode_option(
-		option_type.numeric, 
-		0,
-		"ashGravity",
-		"Ash gravity (m/s/s)")
-	oSet.options[#oSet.options + 1] = oSet.ashGravity	
-
-	oSet.ashDrag = create_mode_option(
-		option_type.numeric, 
-		0,
-		"ashDrag",
-		"Ash drag")
-	oSet.options[#oSet.options + 1] = oSet.ashDrag	
-
-	oSet.ashMinDist = create_mode_option(
-		option_type.numeric, 
-		1,
-		"ashMinDist",
-		"Ash min distance from cloud to spawn")
-	oSet.options[#oSet.options + 1] = oSet.ashMinDist	
-
-	oSet.ashRadius = create_mode_option(
-		option_type.numeric, 
-		10,
-		"ashRadius",
-		"Ash radius from spark cloud")
-	oSet.options[#oSet.options + 1] = oSet.ashRadius
-
-	oSet.ashProbes = create_mode_option(
-		option_type.numeric, 
-		50,
-		"ashProbes",
-		"Ash raycast trials per spark per explosion per tick")
-	oSet.options[#oSet.options + 1] = oSet.ashProbes
-
-	oSet.ashSpawns = create_mode_option(
-		option_type.numeric, 
-		4,
-		"ashSpawns",
-		"Ash spawns on successful raycast")
-	oSet.options[#oSet.options + 1] = oSet.ashSpawns
-
-	oSet.ashSpawnJitter = create_mode_option(
-		option_type.numeric, 
-		1,
-		"ashSpawnJitter",
-		"Ash spawn position jitter")
-	oSet.options[#oSet.options + 1] = oSet.ashSpawnJitter
-
+	
 	oSet.smokeFreq = create_mode_option(
 		option_type.numeric, 
 		10,

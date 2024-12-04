@@ -236,14 +236,14 @@ function drawOption(option)
 			UiPush()
 				UiPush()
 					UiTranslate(20,-4)
-					drawBorder(50,20,4)
+					drawBorder(60,20,4)
 				UiPop()
-				if UiTextButton(round_to_place(option.value, 3), 35, 20) then 
+				if UiTextButton(round_to_place(option.value, 4), 35, 20) then 
 					selectedOption = option
 					editingValue = option.value
 				end
 			UiPop()
-			UiTranslate(45,0)
+			UiTranslate(55,0)
 			UiWordWrap(UI.OPTION_CONTROL_WIDTH - 45)
 		end
 		UiText(" = "..option.friendly_name)
