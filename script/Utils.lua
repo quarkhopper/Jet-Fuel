@@ -39,11 +39,6 @@ function string_to_vec(vecString)
 	return Vec(parts[1], parts[2], parts[3])
 end
 
--- function random_vec(scale)
--- 	scale = scale or 1
--- 	return VecScale(VecNormalize(Vec(math.random() - 0.5, math.random() - 0.5, math.random() - 0.5)), scale)
--- end
-
 function random_vec(magnitude)
 	return Vec(random_vec_component(magnitude), random_vec_component(magnitude), random_vec_component(magnitude))
 end
@@ -71,6 +66,11 @@ function range_value_to_fraction(value, min, max)
 	return frac
 end
 
+function get_shape_center(shape)
+	local lower, upper = GetShapeBounds(shape)
+	return VecLerp(lower, upper, 0.5)
+end
+
 function get_keys_and_values(t)
 	keys = {}
 	values = {}
@@ -79,6 +79,13 @@ function get_keys_and_values(t)
 		table.insert(values, v)
 	end
 	return keys, values
+end
+
+function get_index(t, s)
+	for k,v in pairs(t) do
+		if v == s then return k end
+	end
+	return nil
 end
 
 function bracket_value(value, max, min)
@@ -108,6 +115,18 @@ function is_number(value)
 		return true
 	end
     return false
+end
+
+function average_vec(values)
+	local sum_x = 0
+	local sum_y = 0
+	local sum_z = 0
+	for i=1, #values do
+		sum_x = sum_x + values[i][1]
+		sum_y = sum_y + values[i][2]
+		sum_z = sum_z + values[i][3]
+	end
+	return Vec(sum_x / #values, sum_y / #values, sum_z / #values)
 end
 
 stringToBoolean={ ["true"]=true, ["false"]=false }

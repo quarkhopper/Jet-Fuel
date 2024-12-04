@@ -36,6 +36,7 @@ function load_option_set(create_if_not_found)
 	return options
 end
 
+
 function option_set_from_string(ser)
 	local options = create_option_set()
 	options.options = {}

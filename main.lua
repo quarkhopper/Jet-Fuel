@@ -21,6 +21,8 @@ function init()
 	TOOL = createDefaultOptions()
 	loadOptions(false)
 	editingOptions = false
+	sabotageMode = false
+	sabotageActionInProgress = false
 	selectedOption = nil
 	selectedIndex = nil
 	newOptionValue = nil
@@ -63,13 +65,17 @@ function draw()
 		enteredValue = drawValueEntry()
 	end
 
-	UiTranslate(0, UiHeight() - UI.OPTION_TEXT_SIZE * 6)
+	UiTranslate(0, UiHeight() - UI.OPTION_TEXT_SIZE * 8)
 	UiAlign("left")
 	UiFont("bold.ttf", UI.OPTION_TEXT_SIZE)
 	UiTextOutline(0,0,0,1,0.5)
 	UiColor(1,1,1)
-	UiText(KEY.PLANT_BOMB.key.." to plant bomb", true)
-	UiText(KEY.PLANT_GROUP.key.." to plant 10 randomly around (now: "..#bombs+#toDetonate..")", true)
+	UiText(KEY.PLANT_BOMB.key.." to plant bomb / sabotage item", true)
+	UiText(KEY.CLEAR.key.." to clear all bombs / sabotaged items", true)
+	local modeString = 'plant'
+	if sabotageMode then modeString = 'sabotage' end
+	UiText(KEY.MODE.key.." to change between bomb 'plant' and 'sabotage' modes. Now: "..modeString,true)
+	UiText(KEY.PLANT_GROUP.key.." to plant 10 bombs randomly around (now: "..#bombs+#toDetonate..")", true)
 	UiText(KEY.DETONATE.key.." to detonate", true)
 	UiText(KEY.OPTIONS.key.." for options", true)
 	UiText(KEY.STOP_FIRE.key.." to stop all explosions")
@@ -329,10 +335,10 @@ function drawValueEntry()
 			UiFont("bold.ttf", 20)
 			UiTextOutline(0,0,0,1,0.5)
 			UiColor(1,1,1)
-			UiText("Press [Return/Enter] to save, [Q] to cancel")
+			UiText("Press [S] to save, [Q] to cancel")
 		UiPop()
 
-		if InputPressed("return") then 
+		if InputPressed("S") then 
 			newOptionValue = editingValue
 			editingValue = ""
 		end
@@ -417,7 +423,21 @@ function tick(dt)
 	handleInput(dt)
 	explosionTick(dt)
 	if not canInteract(true, false) then 
-		plantTimer = 0.5
+		-- anytime the tool is not available or interactable
+		plantTimer = 0.1
+	end
+
+	if GetString("game.player.tool") == REG.TOOL_KEY then 
+		-- events that can happen only in the tool, 
+		-- but possibly in a vehicle
+		if sabotageMode then 
+			for i=1, #bombs do
+				DrawShapeOutline(bombs[i], 1, 1, 0, 1)
+			end
+			for i=1, #toDetonate do
+				DrawShapeOutline(toDetonate[i], 1, 0, 0, 1)
+			end
+		end
 	end
 end
 
@@ -430,55 +450,113 @@ function handleInput(dt)
 	plantTimer = math.max(plantTimer - dt, 0)
 
 	if GetString("game.player.tool") == REG.TOOL_KEY then
-		-- options menus
-		if InputPressed(KEY.OPTIONS.key) 
-		and GetPlayerVehicle() == 0 then 
-			editingOptions = true
-		else
-			if GetPlayerVehicle() == 0 then 
-				-- plant bomb
-				if GetPlayerGrabShape() == 0 and
-					plantTimer == 0 and
-					InputDown(KEY.PLANT_BOMB.key) then
-					local camera = GetPlayerCameraTransform()
-					local shoot_dir = TransformToParentVec(camera, Vec(0, 0, -1))
-					local hit, dist, normal, shape = QueryRaycast(camera.pos, shoot_dir, 100, 0, true)
-					if hit then 
+		-- commands you can't do in a vehicle
+		if GetPlayerVehicle() == 0 then 
+
+			-- targeting - done every tick for aim highlighting and actions
+			local camera = GetPlayerCameraTransform()
+			local shoot_dir = TransformToParentVec(camera, Vec(0, 0, -1))
+			local hit, dist, normal, shape = QueryRaycast(camera.pos, shoot_dir, 100, 0, true)
+			if sabotageMode and hit then 
+				-- in sabotage mode, highlight what you're about to sabotage
+				if IsShapeBroken(shape) then 
+					DrawShapeHighlight(shape, 0.5)
+				else
+					DrawShapeOutline(shape, 1)
+				end
+			end
+
+			-- options menus
+			if InputPressed(KEY.OPTIONS.key) then
+				editingOptions = true
+			end
+
+			-- plant bomb / sabotage item. NOTE: you can hold it down
+			if InputDown(KEY.PLANT_BOMB.key) and 
+			GetPlayerGrabShape() == 0 
+			and	plantTimer == 0 
+			then
+				if hit then 
+					local bomb = nil
+					if not sabotageMode then 
+						-- planting a bomb
 						local drop_pos = VecAdd(camera.pos, VecScale(shoot_dir, dist))
-						local bomb = Spawn("MOD/prefab/Decoder.xml", Transform(drop_pos), false, true)[2]
+						bomb = Spawn("MOD/prefab/Decoder.xml", Transform(drop_pos), false, true)[2]
 						table.insert(bombs, bomb)
 						plantTimer = plantRate
-					end
-				end
-
-				if InputPressed(KEY.STOP_FIRE.key) then
-					-- stop all explosions and cancel bomb
-					for i=1, #explosions do
-						local explosion = explosions[i]
-						explosion.sparks = {} 
-					end	
-				end
-
-				-- plant a group around the map
-				if InputPressed(KEY.PLANT_GROUP.key) then 
-					local player_trans = GetPlayerTransform()
-					PlaySound(spawn_sound, player_trans.pos, 50)
-					for i = 1, 10 do
-						local spawnPos = find_spawn_location()
-						if spawnPos ~= nil then 
-							local trans = Transform(spawnPos) --, QuatEuler(math.random(0,359),math.random(0,359),math.random(0,359)))
-							local bomb = Spawn("MOD/prefab/Decoder.xml", trans, false, true)[2]
-							table.insert(bombs, bomb)
-						end					
+					elseif sabotageActionInProgress == false then -- unlocked on key up
+						-- sabotaging a shape
+						local existingIndex = get_index(bombs, shape)
+						if existingIndex == nil then
+							if not IsShapeBroken(shape) then 
+								-- sabotage it
+								table.insert(bombs, shape)
+								sabotageActionInProgress = true
+							end
+						else 
+							-- un-sabotage it
+							local removeBomb = bombs[existingIndex]
+							if HasTag(removeBomb, "decoder") then 
+								Delete(removeBomb)
+							end
+							table.remove(bombs, existingIndex)
+							sabotageActionInProgress = true
+						end
 					end
 				end
 			end
+
+			if InputPressed(KEY.STOP_FIRE.key) then
+				-- stop all explosions and cancel bomb
+				for i=1, #explosions do
+					local explosion = explosions[i]
+					explosion.sparks = {} 
+				end	
+			end
+
+			if InputPressed(KEY.CLEAR.key) then
+				-- clear all bombs
+				local shapes = FindShapes("decoder", true)
+				for i=1, #shapes do
+					local shape = shapes[i]
+					Delete(shape)
+				end
+				bombs = {}
+				toDetonate = {}
+			end
+
+			-- plant a group around the map
+			if InputPressed(KEY.PLANT_GROUP.key) then 
+				local player_trans = GetPlayerTransform()
+				PlaySound(spawn_sound, player_trans.pos, 50)
+				for i = 1, 10 do
+					local spawnPos = find_spawn_location()
+					if spawnPos ~= nil then 
+						local trans = Transform(spawnPos) --, QuatEuler(math.random(0,359),math.random(0,359),math.random(0,359)))
+						local bomb = Spawn("MOD/prefab/Decoder.xml", trans, false, true)[2]
+						table.insert(bombs, bomb)
+					end					
+				end
+			end
+
+
 		end
-		
+		-- commands you CAN do in a vehicle
+
+		-- change modes between bomb plant and sabotage
+		-- In sabotage mode, you can see what's already been sabotaged
+		if InputPressed(KEY.MODE.key) then
+			sabotageMode = not sabotageMode
+		end
+
 		-- detonate
 		if InputPressed(KEY.DETONATE.key) and
 		GetPlayerGrabShape() == 0 then
 			detonateAll()
+		end
+
+		if InputReleased(KEY.PLANT_BOMB.key) then 
+			sabotageActionInProgress = false
 		end
 	end
 end
@@ -497,6 +575,7 @@ function loadOptions(reset)
 		TOOL = createDefaultOptions()
 		save_option_set(TOOL)
 	end
+	if TOOL.version ~= CURRENT_VERSION then TOOL = createDefaultOptions() end
 end
 
 function canInteract(checkCanUseTool, checkInVehicle)

@@ -1,4 +1,4 @@
-CURRENT_VERSION = "1.0"
+CURRENT_VERSION = "2.0"
 TOOL_NAME = "QBombs Lab"
 
 -- delimeters
@@ -36,14 +36,19 @@ KEY.PLANT_GROUP = setup_keybind("Plant 50 bombs", "plant_group", "M")
 KEY.DETONATE = setup_keybind("Detonate bombs", "detonate", "X")
 KEY.STOP_FIRE = setup_keybind("Stop fire", "stop_fire", "MMB")
 KEY.OPTIONS = setup_keybind("Options", "options", "O")
+KEY.MODE = setup_keybind("Change modes (plant / sabotage)", "mode", "B")
+KEY.CLEAR = setup_keybind("Clear all bombs / sabotage", "clear", "V")
+
 
 -- set on init
 TOOL = {}
 VALUES = {}
 
 VALUES.SPARK_HURT_ADJUSTMENT = 0.005
+VALUES.FIZZLE_FALLOFF_CONSTANT = 6 -- bigger falls off over a wider area
 VALUES.SUCTION_IMPULSE_ADJUSTMENT = 0.005 -- times the power
-VALUES.DEFAULT_SMOKE_COLOR = Vec(0, 0, 0.1)
+VALUES.DEFAULT_SMOKE_COLOR = Vec(0, 0, 0.2)
+VALUES.DEFAULT_PUFF_COLOR = Vec(0, 0, 0.7)
 
 -- UI 
 UI = {}

@@ -3,7 +3,9 @@
 
 function init()
     keybind_options = {
-        KEY.PLANT_BOMB, 
+        KEY.PLANT_BOMB,
+        KEY.CLEAR, 
+        KEY.MODE,
         KEY.PLANT_GROUP,
         KEY.DETONATE, 
         KEY.STOP_FIRE, 
@@ -28,7 +30,7 @@ function draw()
             UiTranslate(0, 40)
         end
         
-        local ser = GetString(REG.PREFIX_TOOL_OPTIONS..".general")
+        local ser = GetString(REG.PREFIX_TOOL_OPTIONS)
         if ser ~= "" then 
             UiAlign("center middle")
             UiFont("bold.ttf", 20)
