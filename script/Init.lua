@@ -19,7 +19,7 @@ function createDefaultOptions()
 
 	oSet.smokeColor = create_mode_option(
 		option_type.color,
-		Vec(0, 0, 0.14),
+		Vec(0, 0, 0.2),
 		"smokeColor",
 		"Smoke color")
 	oSet.options[#oSet.options + 1] = oSet.smokeColor
@@ -58,7 +58,7 @@ function createDefaultOptions()
 
 	oSet.blastSpeed = create_mode_option(
 		option_type.numeric, 
-		2,
+		1,
 		"blastSpeed",
 		"Blast speed at detonation (+ for wider initial fireball)")
 	oSet.options[#oSet.options + 1] = oSet.blastSpeed	
@@ -149,14 +149,14 @@ function createDefaultOptions()
 
 	oSet.sparkVacuumMag = create_mode_option(
 		option_type.numeric, 
-		0.5,
+		0.49,
 		"sparkVacuumMag",
 		"Cloud vacuum pressure magnitude per spark x 10^-4")
 	oSet.options[#oSet.options + 1] = oSet.sparkVacuumMag
 
 	oSet.sparkInflateMag = create_mode_option(
 		option_type.numeric, 
-		0.47,
+		0.46,
 		"sparkInflateMag",
 		"Cloud inflation pressure magnitude per spark x 10^-4")
 	oSet.options[#oSet.options + 1] = oSet.sparkInflateMag
@@ -167,14 +167,14 @@ function createDefaultOptions()
 
 	oSet.sparkFizzleFreq = create_mode_option(
 		option_type.numeric, 
-		14,
+		12,
 		"sparkFizzleFreq",
 		"Spark fizzle frequency (1 = always, + for less frequent)")
 	oSet.options[#oSet.options + 1] = oSet.sparkFizzleFreq	
 
 	oSet.sparkFizzleFalloffRadius = create_mode_option(
 		option_type.numeric, 
-		3,
+		1,
 		"sparkFizzleFalloffRadius",
 		"Spark fizzle falloff radius (where fizzles start to become more frequent)")
 	oSet.options[#oSet.options + 1] = oSet.sparkFizzleFalloffRadius	
@@ -195,14 +195,14 @@ function createDefaultOptions()
 
 	oSet.sparkSplitFreqStart = create_mode_option(
 		option_type.numeric, 
-		8,
+		6,
 		"sparkSplitFreqStart",
 		"Spark split frequency start (1 = always, + for less frequent)")
 	oSet.options[#oSet.options + 1] = oSet.sparkSplitFreqStart	
 
 	oSet.sparkSplitFreqEnd = create_mode_option(
 		option_type.numeric, 
-		200,
+		175,
 		"sparkSplitFreqEnd",
 		"Spark split frequency end (1 = always, + for less frequent)")
 	oSet.options[#oSet.options + 1] = oSet.sparkSplitFreqEnd	
@@ -237,21 +237,21 @@ function createDefaultOptions()
 
 	oSet.sparkDeathSpeed = create_mode_option(
 		option_type.numeric, 
-		0.01,
+		0.001,
 		"sparkDeathSpeed",
 		"Spark dead at speed")
 	oSet.options[#oSet.options + 1] = oSet.sparkDeathSpeed	
 
 	oSet.sparkSplitSpeed = create_mode_option(
 		option_type.numeric, 
-		0.3,
+		0.4,
 		"sparkSplitSpeed",
 		"Spark speed at split")
 	oSet.options[#oSet.options + 1] = oSet.sparkSplitSpeed	
 
 	oSet.sparkSplitSpeedVariation = create_mode_option(
 		option_type.numeric, 
-		0.2,
+		0.3,
 		"sparkSplitSpeedVariation",
 		"Spark split speed variation")
 	oSet.options[#oSet.options + 1] = oSet.sparkSplitSpeedVariation	
@@ -263,12 +263,12 @@ function createDefaultOptions()
 		"Spark speed reduction over time")
 	oSet.options[#oSet.options + 1] = oSet.sparkSpeedReduction	
 	
-	oSet.sparkJiggle = create_mode_option(
+	oSet.sparkJitter = create_mode_option(
 		option_type.numeric, 
-		0.05,
-		"sparkJiggle",
+		0.1,
+		"sparkJitter",
 		"Spark dir jitter")
-	oSet.options[#oSet.options + 1] = oSet.sparkJiggle	
+	oSet.options[#oSet.options + 1] = oSet.sparkJitter	
 
 	oSet.sparkBlastPushAmount = create_mode_option(
 		option_type.numeric, 
@@ -287,12 +287,26 @@ function createDefaultOptions()
 
 -- aesthetics
 
+	oSet.sparkPuffLife = create_mode_option(
+		option_type.numeric, 
+		0.8,
+		"sparkPuffLife",
+		"Spark puff particle life (glowing fire particles)")
+	oSet.options[#oSet.options + 1] = oSet.sparkPuffLife	
+
 	oSet.sparkSmokeLife = create_mode_option(
 		option_type.numeric, 
-		2,
+		0.5,
 		"sparkSmokeLife",
-		"Spark smoke life")
+		"Spark smoke particle life (lingering dark particles)")
 	oSet.options[#oSet.options + 1] = oSet.sparkSmokeLife	
+
+	oSet.sparkSmokeSimLife = create_mode_option(
+		option_type.numeric, 
+		1.6,
+		"sparkSmokeSimLife",
+		"Spark smoke simulation life (total life)")
+	oSet.options[#oSet.options + 1] = oSet.sparkSmokeSimLife	
 
 	oSet.sparkTileRadMax = create_mode_option(
 		option_type.numeric, 
@@ -300,6 +314,13 @@ function createDefaultOptions()
 		"sparkTileRadMax",
 		"Spark radius hot")
 	oSet.options[#oSet.options + 1] = oSet.sparkTileRadMax	
+
+	oSet.sparkSmokeTileRadius = create_mode_option(
+		option_type.numeric, 
+		0.4,
+		"sparkSmokeTileRadius",
+		"Spark smoke tile radius")
+	oSet.options[#oSet.options + 1] = oSet.sparkSmokeTileRadius	
 
 	oSet.sparkTileRadMin = create_mode_option(
 		option_type.numeric, 
@@ -315,12 +336,5 @@ function createDefaultOptions()
 		"Spark light intensity")
 	oSet.options[#oSet.options + 1] = oSet.sparkLightIntensity	
 	
-	oSet.smokeFreq = create_mode_option(
-		option_type.numeric, 
-		10,
-		"smokeFreq",
-		"Smoke partical frequency (1 = always, + for less frequent)")
-	oSet.options[#oSet.options + 1] = oSet.smokeFreq	
-
     return oSet
 end

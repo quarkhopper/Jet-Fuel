@@ -32,23 +32,40 @@ function explosionTick(dt)
 		local positions = {}
 		local dirs = {}
 		local dists = {}
-		local newSparks = {}
 		local sparkSpeeds = {}
-		for s = 1, #explosion.sparks do
-			-- evolve the spark if it hasn't fizzled randomly
-			-- Fizzling verses splitting is what mostly determines the
-			-- length of the explosion.
-			local spark = explosion.sparks[s]
-			local forceSplit = false
+		
+		local newSmoke = {}
+		for s = 1, #explosion.smoke do 
+			local spark = explosion.smoke[s]
 			local hitPoint = nil
 			local hit, dist, normal, shape = QueryRaycast(spark.pos, spark.dir, spark.speed + 0.1, 0.025)
+			if not hit then 
+				makeSmoke(spark)
+				spark.smokeLife = math.max(0, spark.smokeLife - dt)
+				if spark.smokeLife > 0 then 
+					table.insert(newSmoke, spark)
+				end
+			end
+		end
+		explosion.smoke = newSmoke
+		
+		local newSparks = {}
+		for s = 1, #explosion.sparks do
+			local spark = explosion.sparks[s]
 			local sparkStillAlive = true
-
+			local forceSplit = false
 			spark.deltaFromOrigin = VecSub(spark.pos, explosion.center)
 			spark.distanceFromOrigin = VecLength(spark.deltaFromOrigin)
 			spark.distance_n = math.min(1, 1/(1 + spark.distanceFromOrigin))
 			spark.inverseDelta = VecScale(spark.deltaFromOrigin, -1)
 			spark.lookOriginDir = VecNormalize(spark.inverseDelta)
+			local hitPoint = nil
+			local hit, dist, normal, shape = QueryRaycast(spark.pos, spark.dir, spark.speed + 0.1, 0.025)
+
+			-- Evolve the spark
+
+			-- Fizzling verses splitting is what mostly determines the
+			-- length of the explosion.
 			
 			-- fizzling, when a spark dies spontaneously
 			-- the sparks further away from the center of the cloud will die out
@@ -86,8 +103,11 @@ function explosionTick(dt)
 			else
 				-- spark survives
 
-				-- other explosion shocks
-				spark.dir = VecAdd(spark.dir, random_vec(TOOL.sparkJiggle.value))
+				-- spark slows down
+				spark.speed = math.max(spark.speed * (1 - TOOL.sparkSpeedReduction.value), TOOL.sparkDeathSpeed.value)
+
+				-- Pushed by other explosion shocks
+				spark.dir = VecNormalize(VecAdd(spark.dir, random_vec(TOOL.sparkJitter.value)))
 				if blastEffectOrigin ~= nil then
 					pushSparkFromOrigin(spark, 
 					blastEffectOrigin, 
@@ -95,9 +115,6 @@ function explosionTick(dt)
 					TOOL.blastSpeed.value,
 					0.5) 
 				end
-
-				spark.dir = VecNormalize(spark.dir)
-				spark.speed = math.max(spark.speed * (1 - TOOL.sparkSpeedReduction.value), TOOL.sparkDeathSpeed.value)
 
 				-- pressure effects. 
 				-- Torus effects - Pulling from behind the cloud and pushing from the front
@@ -118,6 +135,16 @@ function explosionTick(dt)
 				local inflate_vector = VecScale(spark.lookOriginDir, inflate_mag)
 				pushSparkUniform(spark, inflate_vector)
 
+				-- hurt the player if too close
+				local player_pos = GetPlayerTransform().pos
+				local dist = VecLength(VecSub(player_pos, spark.pos))
+				local dist_n = dist / TOOL.ignitionRadius.value
+				local hurt_n = 1 - math.min(1, dist_n) ^ 0.5
+				if hurt_n > TOOL.sparkHurt.value then
+					local health = GetPlayerHealth()
+					SetPlayerHealth(health - (hurt_n * VALUES.SPARK_HURT_ADJUSTMENT))
+				end
+
 				-- splitting into new sparks
 				if math.random(1, explosion.splitFreq) == 1 or forceSplit then
 					for i=1, math.random(TOOL.sparkSpawnsLower.value, TOOL.sparkSpawnsUpper.value) do
@@ -134,36 +161,23 @@ function explosionTick(dt)
 						end
 					end
 				end
-
-				-- hurt the player if too close
-				local player_pos = GetPlayerTransform().pos
-				local dist = VecLength(VecSub(player_pos, spark.pos))
-				local dist_n = dist / TOOL.ignitionRadius.value
-				local hurt_n = 1 - math.min(1, dist_n) ^ 0.5
-				if hurt_n > TOOL.sparkHurt.value then
-					local health = GetPlayerHealth()
-					SetPlayerHealth(health - (hurt_n * VALUES.SPARK_HURT_ADJUSTMENT))
-				end
 			end
 			
-			if sparkStillAlive then
+			if sparkStillAlive and spark.speed > TOOL.sparkDeathSpeed.value then
 				spark.pos = VecAdd(spark.pos, VecScale(spark.dir, spark.speed))
 				table.insert(newSparks, spark)
 				local smokeVelocity = VecScale(spark.lookOriginDir, TOOL.blastSpeed.value)
-				makeSparkEffect(
-					spark.pos, 
-					{
-						color=spark.sparkColor, 
-						smokeSize=0.5, 
-						smokeMovement=smokeVelocity
-					}
-				)
+				makeSparkEffect(spark)
 				table.insert(sparkSpeeds, spark.speed)
 				table.insert(positions, spark.pos)
 				table.insert(dirs, spark.dir)
 				table.insert(dists, spark.distanceFromOrigin)
+			else
+				-- dies into a puff of trailing smoke
+				table.insert(newSmoke, spark)
 			end
 		end
+		explosion.sparks = newSparks
 
 		-- spawn fire
 		for probe=1, TOOL.ignitionProbes.value * #explosion.sparks do
@@ -183,25 +197,25 @@ function explosionTick(dt)
 			end
 		end
 
-		if #newSparks > 0 then
-			explosion.sparks = newSparks
-			explosion.life_n = bracket_value(#explosion.sparks / TOOL.sparksPerExplosion.value, 1, 0)
-			explosion.center = average_vec(positions)
-			explosion.averageDist = 0
-			for j=1, #dists do
-				explosion.averageDist = explosion.averageDist + dists[j]
+		if (#explosion.sparks + #explosion.smoke) > 0 then
+			if #explosion.sparks > 0 then 
+				explosion.life_n = bracket_value(#explosion.sparks / TOOL.sparksPerExplosion.value, 1, 0)
+				explosion.center = average_vec(positions)
+				explosion.averageDist = 0
+				for j=1, #dists do
+					explosion.averageDist = explosion.averageDist + dists[j]
+				end
+				explosion.averageDist = explosion.averageDist / #dists
+				explosion.dir = VecNormalize(average_vec(dirs))
+				explosion.splitFreq = math.floor(math.min(explosion.splitFreq + TOOL.sparkSplitFreqInc.value, TOOL.sparkSplitFreqEnd.value))
 			end
-			explosion.averageDist = explosion.averageDist / #dists
-			explosion.dir = VecNormalize(average_vec(dirs))
 
 			table.insert(newExplosions, explosion)
 		end
-		explosion.splitFreq = math.floor(math.min(explosion.splitFreq + TOOL.sparkSplitFreqInc.value, TOOL.sparkSplitFreqEnd.value))
 	end
 
 	impulseTick()
 	explosions = newExplosions
-
 end
 
 function pushSparkFromOrigin(spark, origin, radius, maxAmount, falloffExponent)
@@ -311,16 +325,15 @@ function impulseTick()
 	end
 end
 
-function makeSparkEffect(pos, options)
-	options = options or {}
+function makeSparkEffect(spark)
 	local movement = random_vec(1)
-	local gravity = options.gravity or 0
-	local colorHSV = options.color or TOOL.sparkColor.value
+	local gravity = 0
+	local colorHSV = spark.sparkColor
 	local color = HSVToRGB(colorHSV)
 	local intensity = TOOL.sparkLightIntensity.value
-	local lifetime = TOOL.sparkSmokeLife.value
+	local lifetime = TOOL.sparkPuffLife.value
 	local puffColor = HSVToRGB(VALUES.DEFAULT_PUFF_COLOR)
-	PointLight(pos, color[1], color[2], color[3], intensity)
+	PointLight(spark.pos, color[1], color[2], color[3], intensity)
 
 	-- fire puff
 	ParticleReset()
@@ -332,38 +345,21 @@ function makeSparkEffect(pos, options)
 	ParticleRadius(math.random(TOOL.sparkTileRadMin.value, TOOL.sparkTileRadMax.value) * 0.1)
 	ParticleColor(puffColor[1], puffColor[2], puffColor[3])
 	ParticleGravity(gravity)
-	SpawnParticle(pos, movement, lifetime)
-
-	if math.random(1, TOOL.smokeFreq.value) == 1 then 
-		options.smokeColor = HSVToRGB(TOOL.smokeColor.value)
-		makeSmoke(pos, options)
-	end
+	SpawnParticle(spark.pos, movement, lifetime)
 end
 
-function makeSmoke(pos, options)
-	local movement = options.smokeMovement or random_vec(1)
-	local lifetime = TOOL.sparkSmokeLife.value
-	local gravity = options.gravity or 0
-	local smokeSize = options.smokeSize or math.random(2,5) * 0.1
-	local smokeColor = options.smokeColor or HSVToRGB(VALUES.DEFAULT_SMOKE_COLOR)
-	local alphaStart = options.alphaStart or 0
-	local alphaEnd = options.alphaEnd or 0.8
-	local alphaGraph = options.alphaFunction or "easeout"
-	local alphaFadeIn = options.alphaFadeIn or 0
-	local alphaFadeOut = options.alphaFadeOut or 1
-	local drag = 0
-
-	-- smoke puff
+function makeSmoke(spark)
+	local smokeColor = HSVToRGB(TOOL.smokeColor.value)
 	ParticleReset()
 	ParticleType("smoke")
 	ParticleTile(0)
 	ParticleRotation(((math.random() * 2) - 1) * 10)
-	ParticleDrag(drag)
-	ParticleAlpha(alphaStart, alphaEnd, alphaGraph, alphaFadeIn, alphaFadeOut)
-	ParticleRadius(smokeSize)
+	ParticleDrag(0)
+	ParticleAlpha(0.8, 0, "easeout", 0, 1)
+	ParticleRadius(TOOL.sparkSmokeTileRadius.value)
 	ParticleColor(smokeColor[1], smokeColor[2], smokeColor[3])
-	ParticleGravity(gravity)
-	SpawnParticle(VecAdd(pos, random_vec(TOOL.sparkJiggle.value)), movement, lifetime)
+	ParticleGravity(0)
+	SpawnParticle(VecAdd(spark.pos, random_vec(0.2)), VecScale(spark.dir, spark.speed), TOOL.sparkSmokeLife.value)
 end
 
 function totalSparks()
@@ -378,6 +374,7 @@ function createExplosionInst(options, pos)
 	local inst = {}
 	inst.options = options or createOptionSetInst()
 	inst.sparks = {}
+	inst.smoke = {}
 	-- this value gets deincremented over time
 	if pos ~= nil then
 		table.insert(inst.sparks, pos)
@@ -402,6 +399,7 @@ function createSparkInst(options, pos, dir, speed)
 	inst.distance_n = 1
 	inst.deltaFromOrigin = 0
 	inst.inverseDelta = 0
+	inst.smokeLife = TOOL.sparkPuffLife.value
 	return inst
 end
 
