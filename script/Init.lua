@@ -209,7 +209,7 @@ function createDefaultOptions()
 
 	oSet.sparkSplitFreqEnd = create_mode_option(
 		option_type.numeric, 
-		150,
+		200,
 		"sparkSplitFreqEnd",
 		"Spark split frequency end (1 = always, + for less frequent)")
 	oSet.options[#oSet.options + 1] = oSet.sparkSplitFreqEnd	
@@ -251,7 +251,7 @@ function createDefaultOptions()
 
 	oSet.sparkSplitSpeed = create_mode_option(
 		option_type.numeric, 
-		0.4,
+		0.3,
 		"sparkSplitSpeed",
 		"Spark speed at split")
 	oSet.options[#oSet.options + 1] = oSet.sparkSplitSpeed	
