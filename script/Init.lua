@@ -107,7 +107,7 @@ function createDefaultOptions()
 
 	oSet.ignitionProbes = create_mode_option(
 		option_type.numeric, 
-		30,
+		10,
 		"ignitionProbes",
 		"Ignition raycasts per spark per explosion per tick")
 	oSet.options[#oSet.options + 1] = oSet.ignitionProbes
@@ -296,7 +296,7 @@ function createDefaultOptions()
 
 	oSet.sparkSmokeLife = create_mode_option(
 		option_type.numeric, 
-		3,
+		2,
 		"sparkSmokeLife",
 		"Spark smoke life")
 	oSet.options[#oSet.options + 1] = oSet.sparkSmokeLife	
