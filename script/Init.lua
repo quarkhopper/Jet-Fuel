@@ -44,14 +44,14 @@ function createDefaultOptions()
 
 	oSet.sparksPerExplosion = create_mode_option(
 		option_type.numeric, 
-		300,
+		500,
 		"sparksPerExplosion",
 		"Sparks limit per explosion")
 	oSet.options[#oSet.options + 1] = oSet.sparksPerExplosion		
 	
 	oSet.sparksAtDetonation = create_mode_option(
 		option_type.numeric, 
-		250,
+		400,
 		"sparksAtDetonation",
 		"Sparks at detonation")
 	oSet.options[#oSet.options + 1] = oSet.sparksAtDetonation
@@ -149,23 +149,23 @@ function createDefaultOptions()
 
 	oSet.sparkTorusMag = create_mode_option(
 		option_type.numeric, 
-		0.001,
+		0.3,
 		"sparkTorusMag",
-		"Cloud torus pressure magnitude per spark")
+		"Cloud torus pressure magnitude per spark x 10^-4")
 	oSet.options[#oSet.options + 1] = oSet.sparkTorusMag
 
 	oSet.sparkVacuumMag = create_mode_option(
 		option_type.numeric, 
-		0.0005,
+		0.5,
 		"sparkVacuumMag",
-		"Cloud vacuum pressure magnitude per spark")
+		"Cloud vacuum pressure magnitude per spark x 10^-4")
 	oSet.options[#oSet.options + 1] = oSet.sparkVacuumMag
 
 	oSet.sparkInflateMag = create_mode_option(
 		option_type.numeric, 
-		0.0004,
+		0.45,
 		"sparkInflateMag",
-		"Cloud inflation pressure magnitude per spark")
+		"Cloud inflation pressure magnitude per spark x 10^-4")
 	oSet.options[#oSet.options + 1] = oSet.sparkInflateMag
 
 
@@ -195,7 +195,7 @@ function createDefaultOptions()
 
 	oSet.sparkSpawnsLower = create_mode_option(
 		option_type.numeric, 
-		5,
+		6,
 		"sparkSpawnsLower",
 		"Spark spawns min")
 	oSet.options[#oSet.options + 1] = oSet.sparkSpawnsLower	
@@ -296,7 +296,7 @@ function createDefaultOptions()
 
 	oSet.sparkSmokeLife = create_mode_option(
 		option_type.numeric, 
-		3,
+		2,
 		"sparkSmokeLife",
 		"Spark smoke life")
 	oSet.options[#oSet.options + 1] = oSet.sparkSmokeLife	

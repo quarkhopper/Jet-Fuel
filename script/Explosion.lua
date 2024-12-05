@@ -43,18 +43,24 @@ function explosionTick(dt)
 			local hitPoint = nil
 			local hit, dist, normal, shape = QueryRaycast(spark.pos, spark.dir, spark.speed + 0.1, 0.025)
 			local sparkStillAlive = true
-			local chance = TOOL.sparkFizzleFreq.value
+
+			spark.deltaFromOrigin = VecSub(spark.pos, explosion.center)
+			spark.distanceFromOrigin = VecLength(spark.deltaFromOrigin)
+			spark.distance_n = math.min(1, 1/(1 + spark.distanceFromOrigin))
+			spark.inverseDelta = VecScale(spark.deltaFromOrigin, -1)
+			spark.lookOriginDir = VecNormalize(spark.inverseDelta)
+			
+			-- fizzling, when a spark dies spontaneously
 			-- the sparks further away from the center of the cloud will die out
 			-- faster than the closer ones
-			local distance = VecLength(VecSub(explosion.center, spark.pos))
-			local distance_n = math.min((1 + TOOL.sparkFizzleFalloffRadius.value)/(1 + distance), 1) ^ 0.5 
-			chance = math.max(math.ceil(chance * distance_n), 1)
+			local fizzleDistance_n = math.min((1 + TOOL.sparkFizzleFalloffRadius.value)/(1 + spark.distanceFromOrigin), 1) ^ 0.5 
+			local chance = TOOL.sparkFizzleFreq.value
+			chance = math.max(math.ceil(chance * fizzleDistance_n), 1)
 			if math.random(1, chance) == 1 then
-				-- fizzle
+				-- fizzled
 				sparkStillAlive = false
 			elseif hit then
-
-				-- make hole
+				-- hit something, make hole
 				MakeHole(spark.pos, TOOL.sparkHoleSoftRad.value, TOOL.sparkHoleMediumRad.value, TOOL.sparkHoleHardRad.value)
 
 				-- hit following
@@ -78,6 +84,8 @@ function explosionTick(dt)
 					spark.dir = VecScale(spark.dir, -1)
 				end
 			else
+				-- spark survives
+
 				-- other explosion shocks
 				spark.dir = VecAdd(spark.dir, random_vec(TOOL.sparkJiggle.value))
 				if blastEffectOrigin ~= nil then
@@ -93,34 +101,23 @@ function explosionTick(dt)
 
 				-- pressure effects. 
 				-- Torus effects - Pulling from behind the cloud and pushing from the front
-
-				local deltaFromOrigin = VecSub(spark.pos, explosion.center)
-				local distFromOrigin = VecLength(deltaFromOrigin)
-				table.insert(dists, distFromOrigin)
-				local distance_n = math.min(1, 1/(1 + distFromOrigin)) * 0.5
-				-- positive if behind the origin
-				local inverseDelta = VecScale(deltaFromOrigin, -1)
-				local lookOriginDir = VecNormalize(inverseDelta)
-				local angleDot_n = VecDot(lookOriginDir, Vec(0,1,0))
-				local torus_n = distance_n * angleDot_n
-				local torus_mag = TOOL.sparkTorusMag.value * #explosion.sparks * torus_n
-				local torus_vector = VecScale(lookOriginDir, torus_mag)
-				-- DebugLine(spark.pos, VecScale(VecAdd(spark.pos, torus_vector), 1))
+				local pressureDistance_n = spark.distance_n ^ 0.5
+				local angleDot_n = VecDot(spark.lookOriginDir, Vec(0,1,0))
+				local torus_n = pressureDistance_n * angleDot_n
+				local torus_mag = TOOL.sparkTorusMag.value * VALUES.PRESSURE_EFFECT_SCALE * #explosion.sparks * torus_n
+				local torus_vector = VecScale(spark.lookOriginDir, torus_mag)
 				pushSparkUniform(spark, torus_vector)
 
 				-- pulling into the center
-				local vacuum_mag = TOOL.sparkVacuumMag.value * #explosion.sparks * distance_n
-				local vacuum_vector = VecScale(lookOriginDir, vacuum_mag)
+				local vacuum_mag = TOOL.sparkVacuumMag.value * VALUES.PRESSURE_EFFECT_SCALE * #explosion.sparks * pressureDistance_n
+				local vacuum_vector = VecScale(spark.lookOriginDir, vacuum_mag)
 				pushSparkUniform(spark, vacuum_vector)
 
 				-- pushing out
-				local inflate_mag = TOOL.sparkInflateMag.value * #explosion.sparks * distance_n * -1
-				local inflate_vector = VecScale(lookOriginDir, inflate_mag)
+				local inflate_mag = TOOL.sparkInflateMag.value * VALUES.PRESSURE_EFFECT_SCALE * #explosion.sparks * pressureDistance_n * -1
+				local inflate_vector = VecScale(spark.lookOriginDir, inflate_mag)
 				pushSparkUniform(spark, inflate_vector)
 
-
-				spark.pos = VecAdd(spark.pos, VecScale(spark.dir, spark.speed))
-	
 				-- splitting into new sparks
 				if math.random(1, explosion.splitFreq) == 1 or forceSplit then
 					for i=1, math.random(TOOL.sparkSpawnsLower.value, TOOL.sparkSpawnsUpper.value) do
@@ -137,14 +134,6 @@ function explosionTick(dt)
 						end
 					end
 				end
-			end
-			
-			if sparkStillAlive then
-				makeSparkEffect(spark.pos, {color=spark.sparkColor, smokeSize=0.5})
-				table.insert(newSparks, spark)
-				table.insert(sparkSpeeds, spark.speed)
-				table.insert(positions, spark.pos)
-				table.insert(dirs, spark.dir)
 
 				-- hurt the player if too close
 				local player_pos = GetPlayerTransform().pos
@@ -155,6 +144,24 @@ function explosionTick(dt)
 					local health = GetPlayerHealth()
 					SetPlayerHealth(health - (hurt_n * VALUES.SPARK_HURT_ADJUSTMENT))
 				end
+			end
+			
+			if sparkStillAlive then
+				spark.pos = VecAdd(spark.pos, VecScale(spark.dir, spark.speed))
+				table.insert(newSparks, spark)
+
+				makeSparkEffect(
+					spark.pos, 
+					{
+						color=spark.sparkColor, 
+						smokeSize=0.5, 
+						smokeMovement=VecScale(spark.dir, spark.speed * 0.9)
+					}
+				)
+				table.insert(sparkSpeeds, spark.speed)
+				table.insert(positions, spark.pos)
+				table.insert(dirs, spark.dir)
+				table.insert(dists, spark.distanceFromOrigin)
 			end
 		end
 
@@ -186,14 +193,6 @@ function explosionTick(dt)
 			end
 			explosion.averageDist = explosion.averageDist / #dists
 			explosion.dir = VecNormalize(average_vec(dirs))
-
-			-- -- heat rise effect. Move the center up 
-			-- local SPARK_HEAT_CONTRIBUTION = 0.001
-			-- -- local SPARK_HEAT_FALLOFF_RAD = 1
-			-- -- local HEAT_EXPONENT = 1
-			-- -- local heat_n = math.min(1, (1 + SPARK_HEAT_FALLOFF_RAD)/(1 + explosion.averageDist)) ^ HEAT_EXPONENT
-			-- local heat_mag = SPARK_HEAT_CONTRIBUTION * #explosion.sparks -- * heat_n
-			-- explosion.center = VecAdd(explosion.center, Vec(0, heat_mag, 0))
 
 			table.insert(newExplosions, explosion)
 		end
@@ -399,6 +398,11 @@ function createSparkInst(options, pos, dir, speed)
 	inst.dir = dir
 	inst.speed = speed or vary_by_percentage(TOOL.sparkSplitSpeed.value, TOOL.sparkSplitSpeedVariation.value)
 	inst.sparkColor = options.sparkColor.value
+	inst.lookOriginDir = nil
+	inst.distanceFromOrigin = 0
+	inst.distance_n = 1
+	inst.deltaFromOrigin = 0
+	inst.inverseDelta = 0
 	return inst
 end
 
