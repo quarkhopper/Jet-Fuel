@@ -155,7 +155,7 @@ function explosionTick(dt)
 					{
 						color=spark.sparkColor, 
 						smokeSize=0.5, 
-						smokeMovement=VecScale(spark.dir, spark.speed * 0.9)
+						smokeMovement=VecScale(spark.lookOriginDir, (spark.distance_n ^ 0.5) * TOOL.blastSpeed.value * 10)
 					}
 				)
 				table.insert(sparkSpeeds, spark.speed)
@@ -335,7 +335,6 @@ function makeSparkEffect(pos, options)
 	SpawnParticle(pos, movement, lifetime)
 
 	if math.random(1, TOOL.smokeFreq.value) == 1 then 
-		options.smokeColor = HSVToRGB(VALUES.DEFAULT_SMOKE_COLOR)
 		options.smokeColor = HSVToRGB(TOOL.smokeColor.value)
 		makeSmoke(pos, options)
 	end
@@ -344,7 +343,7 @@ end
 function makeSmoke(pos, options)
 	local movement = options.smokeMovement or random_vec(1)
 	local lifetime = TOOL.sparkSmokeLife.value
-	local gravity = options.gravity or 1
+	local gravity = options.gravity or 0
 	local smokeSize = options.smokeSize or math.random(2,5) * 0.1
 	local smokeColor = options.smokeColor or HSVToRGB(VALUES.DEFAULT_SMOKE_COLOR)
 	local alphaStart = options.alphaStart or 0
@@ -352,7 +351,7 @@ function makeSmoke(pos, options)
 	local alphaGraph = options.alphaFunction or "easeout"
 	local alphaFadeIn = options.alphaFadeIn or 0
 	local alphaFadeOut = options.alphaFadeOut or 1
-	local drag = options.drag or 0.5
+	local drag = 0
 
 	-- smoke puff
 	ParticleReset()
@@ -363,7 +362,7 @@ function makeSmoke(pos, options)
 	ParticleAlpha(alphaStart, alphaEnd, alphaGraph, alphaFadeIn, alphaFadeOut)
 	ParticleRadius(smokeSize)
 	ParticleColor(smokeColor[1], smokeColor[2], smokeColor[3])
-	ParticleGravity(gravity * 0.25)
+	ParticleGravity(gravity)
 	SpawnParticle(VecAdd(pos, random_vec(TOOL.sparkJiggle.value)), movement, lifetime)
 end
 
