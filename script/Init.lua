@@ -296,7 +296,7 @@ function createDefaultOptions()
 
 	oSet.sparkSmokeLife = create_mode_option(
 		option_type.numeric, 
-		2,
+		3,
 		"sparkSmokeLife",
 		"Spark smoke life")
 	oSet.options[#oSet.options + 1] = oSet.sparkSmokeLife	

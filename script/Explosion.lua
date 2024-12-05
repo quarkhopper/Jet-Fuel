@@ -149,13 +149,13 @@ function explosionTick(dt)
 			if sparkStillAlive then
 				spark.pos = VecAdd(spark.pos, VecScale(spark.dir, spark.speed))
 				table.insert(newSparks, spark)
-
+				local smokeVelocity = VecScale(spark.lookOriginDir, TOOL.blastSpeed.value)
 				makeSparkEffect(
 					spark.pos, 
 					{
 						color=spark.sparkColor, 
 						smokeSize=0.5, 
-						smokeMovement=VecScale(spark.lookOriginDir, (spark.distance_n ^ 0.5) * TOOL.blastSpeed.value * 10)
+						smokeMovement=smokeVelocity
 					}
 				)
 				table.insert(sparkSpeeds, spark.speed)
