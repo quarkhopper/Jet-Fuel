@@ -273,7 +273,7 @@ end
 
 function createExplosion(pos)
 	local explosion = createExplosionInst(TOOL)
-	for a = 1, TOOL.sparksAtDetonation.value do
+	for a = 1, TOOL.sparksPerExplosion.value do
 		local newSpark = createSparkInst(TOOL, 
 		VecAdd(pos, random_vec(0.1)), 
 		VecNormalize(random_vec(1)), 

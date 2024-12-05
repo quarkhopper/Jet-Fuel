@@ -48,14 +48,7 @@ function createDefaultOptions()
 		"sparksPerExplosion",
 		"Sparks limit per explosion")
 	oSet.options[#oSet.options + 1] = oSet.sparksPerExplosion		
-	
-	oSet.sparksAtDetonation = create_mode_option(
-		option_type.numeric, 
-		400,
-		"sparksAtDetonation",
-		"Sparks at detonation")
-	oSet.options[#oSet.options + 1] = oSet.sparksAtDetonation
-	
+
 	oSet.blastPowerPrimary = create_mode_option(
 		option_type.numeric, 
 		3,
@@ -188,14 +181,14 @@ function createDefaultOptions()
 
 	oSet.sparkSpawnsUpper = create_mode_option(
 		option_type.numeric, 
-		15,
+		14,
 		"sparkSpawnsUpper",
 		"Spark spawns max")
 	oSet.options[#oSet.options + 1] = oSet.sparkSpawnsUpper	
 
 	oSet.sparkSpawnsLower = create_mode_option(
 		option_type.numeric, 
-		6,
+		7,
 		"sparkSpawnsLower",
 		"Spark spawns min")
 	oSet.options[#oSet.options + 1] = oSet.sparkSpawnsLower	
