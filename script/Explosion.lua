@@ -79,6 +79,7 @@ function explosionTick(dt)
 			elseif hit then
 				-- hit something, make hole
 				MakeHole(spark.pos, TOOL.sparkHoleSoftRad.value, TOOL.sparkHoleMediumRad.value, TOOL.sparkHoleHardRad.value)
+				Paint(spark.pos, 0.8, "explosion")
 
 				-- hit following
 				local body = GetShapeBody(shape)
@@ -182,16 +183,21 @@ function explosionTick(dt)
 		-- spawn fire
 		for probe=1, TOOL.ignitionProbes.value * #explosion.sparks do
 			local ign_probe_dir = random_vec(1)
-			local ign_probe_hit, ign_probe_dist = QueryRaycast(explosion.center, ign_probe_dir, TOOL.ignitionRadius.value)
+			local ign_probe_hit, ign_probe_dist, ign_probe_normal, ign_probe_shape = QueryRaycast(explosion.center, ign_probe_dir, TOOL.ignitionRadius.value)
 			if ign_probe_hit then 
 				local ign_probe_pos = VecAdd(explosion.center, VecScale(ign_probe_dir, ign_probe_dist))
-				SpawnFire(ign_probe_pos)
-				for ign=1, TOOL.ignitionCount.value do
-					local ign_dir = random_vec(1)
-					local ign_hit, ign_dist = QueryRaycast(ign_probe_pos, ign_dir, TOOL.ignitionRadius.value)
-					if ign_hit then 
-						local ign_pos = VecAdd(ign_probe_pos, VecScale(ign_dir, ign_dist))
-						SpawnFire(ign_pos) 
+				local mat = GetShapeMaterialAtPosition(ign_probe_shape, ign_probe_pos)
+				if mat == "glass" then 
+					MakeHole(ign_probe_pos, 0.2)
+				else
+					SpawnFire(ign_probe_pos)
+					for ign=1, TOOL.ignitionCount.value do
+						local ign_dir = random_vec(1)
+						local ign_hit, ign_dist = QueryRaycast(ign_probe_pos, ign_dir, TOOL.ignitionRadius.value)
+						if ign_hit then 
+							local ign_pos = VecAdd(ign_probe_pos, VecScale(ign_dir, ign_dist))
+							SpawnFire(ign_pos) 
+						end
 					end
 				end
 			end

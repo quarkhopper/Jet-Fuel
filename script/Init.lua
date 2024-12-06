@@ -296,14 +296,14 @@ function createDefaultOptions()
 
 	oSet.sparkSmokeLife = create_mode_option(
 		option_type.numeric, 
-		0.8,
+		0.5,
 		"sparkSmokeLife",
 		"Spark smoke particle life (lingering dark particles)")
 	oSet.options[#oSet.options + 1] = oSet.sparkSmokeLife	
 
 	oSet.sparkSmokeSimLife = create_mode_option(
 		option_type.numeric, 
-		2,
+		1,
 		"sparkSmokeSimLife",
 		"Spark smoke simulation life (total life)")
 	oSet.options[#oSet.options + 1] = oSet.sparkSmokeSimLife	
