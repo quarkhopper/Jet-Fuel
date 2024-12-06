@@ -128,7 +128,7 @@ function explosionTick(dt)
 
 				-- pulling into the center
 				local vacuum_mag = TOOL.sparkVacuumMag.value * VALUES.PRESSURE_EFFECT_SCALE * #explosion.sparks * pressureDistance_n
-				local vacuum_vector = VecScale(spark.lookOriginDir, vacuum_mag)
+				local vacuum_vector = VecScale(spark.lookOriginDir, vacuum_mag ^ 0.5)
 				pushSparkUniform(spark, vacuum_vector)
 
 				-- pushing out

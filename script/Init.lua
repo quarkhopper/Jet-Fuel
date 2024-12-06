@@ -149,7 +149,7 @@ function createDefaultOptions()
 
 	oSet.sparkVacuumMag = create_mode_option(
 		option_type.numeric, 
-		0.45,
+		0.05,
 		"sparkVacuumMag",
 		"Cloud vacuum pressure magnitude per spark x 10^-4")
 	oSet.options[#oSet.options + 1] = oSet.sparkVacuumMag
@@ -237,21 +237,21 @@ function createDefaultOptions()
 
 	oSet.sparkDeathSpeed = create_mode_option(
 		option_type.numeric, 
-		0.001,
+		0.0008,
 		"sparkDeathSpeed",
 		"Spark dead at speed")
 	oSet.options[#oSet.options + 1] = oSet.sparkDeathSpeed	
 
 	oSet.sparkSplitSpeed = create_mode_option(
 		option_type.numeric, 
-		0.5,
+		0.6,
 		"sparkSplitSpeed",
 		"Spark speed at split")
 	oSet.options[#oSet.options + 1] = oSet.sparkSplitSpeed	
 
 	oSet.sparkSplitSpeedVariation = create_mode_option(
 		option_type.numeric, 
-		0.3,
+		0.5,
 		"sparkSplitSpeedVariation",
 		"Spark split speed variation")
 	oSet.options[#oSet.options + 1] = oSet.sparkSplitSpeedVariation	
@@ -296,14 +296,14 @@ function createDefaultOptions()
 
 	oSet.sparkSmokeLife = create_mode_option(
 		option_type.numeric, 
-		0.5,
+		0.4,
 		"sparkSmokeLife",
 		"Spark smoke particle life (lingering dark particles)")
 	oSet.options[#oSet.options + 1] = oSet.sparkSmokeLife	
 
 	oSet.sparkSmokeSimLife = create_mode_option(
 		option_type.numeric, 
-		1,
+		0.8,
 		"sparkSmokeSimLife",
 		"Spark smoke simulation life (total life)")
 	oSet.options[#oSet.options + 1] = oSet.sparkSmokeSimLife	
