@@ -355,11 +355,11 @@ function makeSmoke(spark)
 	ParticleTile(0)
 	ParticleRotation(((math.random() * 2) - 1) * 10)
 	ParticleDrag(0)
-	ParticleAlpha(0.8, 0, "easeout", 0, 1)
+	ParticleAlpha(0.9, 0, "easeout", 0, 1)
 	ParticleRadius(TOOL.sparkSmokeTileRadius.value)
 	ParticleColor(smokeColor[1], smokeColor[2], smokeColor[3])
 	ParticleGravity(0)
-	SpawnParticle(VecAdd(spark.pos, random_vec(0.2)), VecScale(spark.dir, spark.speed), TOOL.sparkSmokeLife.value)
+	SpawnParticle(VecAdd(spark.pos, random_vec(0.2)), VecScale(VecAdd(spark.dir, random_vec(0.5)), spark.speed), TOOL.sparkSmokeLife.value)
 end
 
 function totalSparks()

@@ -244,7 +244,7 @@ function drawOption(option)
 				end
 			UiPop()
 			UiTranslate(55,0)
-			UiWordWrap(UI.OPTION_CONTROL_WIDTH - 45)
+			UiWordWrap(UI.OPTION_CONTROL_WIDTH - 50)
 		end
 		UiText(" = "..option.friendly_name)
 	UiPop()

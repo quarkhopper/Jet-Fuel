@@ -142,21 +142,21 @@ function createDefaultOptions()
 
 	oSet.sparkTorusMag = create_mode_option(
 		option_type.numeric, 
-		0.3,
+		0.35,
 		"sparkTorusMag",
 		"Cloud torus pressure magnitude per spark x 10^-4")
 	oSet.options[#oSet.options + 1] = oSet.sparkTorusMag
 
 	oSet.sparkVacuumMag = create_mode_option(
 		option_type.numeric, 
-		0.49,
+		0.45,
 		"sparkVacuumMag",
 		"Cloud vacuum pressure magnitude per spark x 10^-4")
 	oSet.options[#oSet.options + 1] = oSet.sparkVacuumMag
 
 	oSet.sparkInflateMag = create_mode_option(
 		option_type.numeric, 
-		0.46,
+		0.47,
 		"sparkInflateMag",
 		"Cloud inflation pressure magnitude per spark x 10^-4")
 	oSet.options[#oSet.options + 1] = oSet.sparkInflateMag
@@ -188,7 +188,7 @@ function createDefaultOptions()
 
 	oSet.sparkSpawnsLower = create_mode_option(
 		option_type.numeric, 
-		7,
+		3,
 		"sparkSpawnsLower",
 		"Spark spawns min")
 	oSet.options[#oSet.options + 1] = oSet.sparkSpawnsLower	
@@ -244,7 +244,7 @@ function createDefaultOptions()
 
 	oSet.sparkSplitSpeed = create_mode_option(
 		option_type.numeric, 
-		0.4,
+		0.5,
 		"sparkSplitSpeed",
 		"Spark speed at split")
 	oSet.options[#oSet.options + 1] = oSet.sparkSplitSpeed	
@@ -258,7 +258,7 @@ function createDefaultOptions()
 
 	oSet.sparkSpeedReduction = create_mode_option(
 		option_type.numeric, 
-		0.4,
+		0.5,
 		"sparkSpeedReduction",
 		"Spark speed reduction over time")
 	oSet.options[#oSet.options + 1] = oSet.sparkSpeedReduction	
@@ -289,21 +289,21 @@ function createDefaultOptions()
 
 	oSet.sparkPuffLife = create_mode_option(
 		option_type.numeric, 
-		0.8,
+		1,
 		"sparkPuffLife",
 		"Spark puff particle life (glowing fire particles)")
 	oSet.options[#oSet.options + 1] = oSet.sparkPuffLife	
 
 	oSet.sparkSmokeLife = create_mode_option(
 		option_type.numeric, 
-		0.5,
+		0.8,
 		"sparkSmokeLife",
 		"Spark smoke particle life (lingering dark particles)")
 	oSet.options[#oSet.options + 1] = oSet.sparkSmokeLife	
 
 	oSet.sparkSmokeSimLife = create_mode_option(
 		option_type.numeric, 
-		1.6,
+		2,
 		"sparkSmokeSimLife",
 		"Spark smoke simulation life (total life)")
 	oSet.options[#oSet.options + 1] = oSet.sparkSmokeSimLife	
@@ -317,7 +317,7 @@ function createDefaultOptions()
 
 	oSet.sparkSmokeTileRadius = create_mode_option(
 		option_type.numeric, 
-		0.4,
+		0.45,
 		"sparkSmokeTileRadius",
 		"Spark smoke tile radius")
 	oSet.options[#oSet.options + 1] = oSet.sparkSmokeTileRadius	
