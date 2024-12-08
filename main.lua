@@ -65,7 +65,7 @@ function draw()
 		enteredValue = drawValueEntry()
 	end
 
-	UiTranslate(0, UiHeight() - UI.OPTION_TEXT_SIZE * 8)
+	UiTranslate(0, UiHeight() - UI.OPTION_TEXT_SIZE * 9)
 	UiAlign("left")
 	UiFont("bold.ttf", UI.OPTION_TEXT_SIZE)
 	UiTextOutline(0,0,0,1,0.5)
@@ -77,6 +77,7 @@ function draw()
 	UiText(KEY.MODE.key.." to change between bomb 'plant' and 'sabotage' modes. Now: "..modeString,true)
 	UiText(KEY.PLANT_GROUP.key.." to plant 10 bombs randomly around (now: "..#bombs+#toDetonate..")", true)
 	UiText(KEY.DETONATE.key.." to detonate", true)
+	UiText(KEY.DETONATE_LAST.key.." to detonate last bomb planted / item sabotaged", true)
 	UiText(KEY.OPTIONS.key.." for options", true)
 	UiText(KEY.STOP_FIRE.key.." to stop all explosions")
 end
@@ -553,6 +554,15 @@ function handleInput(dt)
 		if InputPressed(KEY.DETONATE.key) and
 		GetPlayerGrabShape() == 0 then
 			detonateAll()
+		end
+
+		-- detonate last
+		if InputPressed(KEY.DETONATE_LAST.key)
+		and GetPlayerGrabShape() == 0 
+		and #bombs > 0 then
+			local bomb = bombs[#bombs]
+			detonate(bomb)
+			table.remove(bombs, #bombs)
 		end
 
 		if InputReleased(KEY.PLANT_BOMB.key) then 

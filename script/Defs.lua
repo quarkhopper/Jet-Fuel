@@ -1,4 +1,4 @@
-CURRENT_VERSION = "2.1"
+CURRENT_VERSION = "2.4"
 TOOL_NAME = "QBombs Lab"
 
 -- delimeters
@@ -34,10 +34,12 @@ KEY = {}
 KEY.PLANT_BOMB = setup_keybind("Plant bomb", "plant_bomb", "LMB")
 KEY.PLANT_GROUP = setup_keybind("Plant 50 bombs", "plant_group", "M")
 KEY.DETONATE = setup_keybind("Detonate bombs", "detonate", "X")
+KEY.DETONATE_LAST = setup_keybind("Detonate last bomb", "detonate_last", "L")
 KEY.STOP_FIRE = setup_keybind("Stop fire", "stop_fire", "MMB")
 KEY.OPTIONS = setup_keybind("Options", "options", "O")
 KEY.MODE = setup_keybind("Change modes (plant / sabotage)", "mode", "B")
 KEY.CLEAR = setup_keybind("Clear all bombs / sabotage", "clear", "V")
+
 
 
 -- set on init

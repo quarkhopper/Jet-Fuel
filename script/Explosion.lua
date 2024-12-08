@@ -41,13 +41,8 @@ function explosionTick(dt)
 			local hit, dist, normal, shape = QueryRaycast(spark.pos, spark.dir, spark.speed + 0.1, 0.025)
 			if not hit then 
 				makeSmoke(spark)
-				spark.smokeLife = math.max(0, spark.smokeLife - dt)
-				if spark.smokeLife > 0 then 
-					table.insert(newSmoke, spark)
-				end
 			end
 		end
-		explosion.smoke = newSmoke
 		
 		local newSparks = {}
 		for s = 1, #explosion.sparks do
@@ -73,7 +68,7 @@ function explosionTick(dt)
 			local fizzleDistance_n = math.min((1 + TOOL.sparkFizzleFalloffRadius.value)/(1 + spark.distanceFromOrigin), 1) ^ 0.5 
 			local chance = TOOL.sparkFizzleFreq.value
 			chance = math.max(math.ceil(chance * fizzleDistance_n), 1)
-			if math.random(1, chance) == 1 then
+			if chance >= 1 and math.random(1, chance) == 1 then -- there's a bug, that's the only reason for the >= 1 check
 				-- fizzled
 				sparkStillAlive = false
 			elseif hit then
@@ -179,6 +174,7 @@ function explosionTick(dt)
 			end
 		end
 		explosion.sparks = newSparks
+		explosion.smoke = newSmoke
 
 		-- spawn fire
 		for probe=1, TOOL.ignitionProbes.value * #explosion.sparks do
@@ -279,6 +275,7 @@ function detonateAll()
 end
 
 function detonate(bomb)
+	if GetShapeBody(bomb) == GetWorldBody() then return end
 	local position = get_shape_center(bomb)
 	createExplosion(position)
 	Explosion(position, TOOL.blastPowerPrimary.value)
@@ -347,7 +344,7 @@ function makeSparkEffect(spark)
 	ParticleTile(0)
 	ParticleRotation(((math.random() * 2) - 1) * 10)
 	ParticleDrag(0.25)
-	ParticleAlpha(1, 0, "easeout", 0, 0.5)
+	ParticleAlpha(1, 0, "easeout")
 	ParticleRadius(math.random(TOOL.sparkTileRadMin.value, TOOL.sparkTileRadMax.value) * 0.1)
 	ParticleColor(puffColor[1], puffColor[2], puffColor[3])
 	ParticleGravity(gravity)
@@ -361,7 +358,7 @@ function makeSmoke(spark)
 	ParticleTile(0)
 	ParticleRotation(((math.random() * 2) - 1) * 10)
 	ParticleDrag(0)
-	ParticleAlpha(0.9, 0, "easeout", 0, 1)
+	ParticleAlpha(1, 0, "easeout", 0.1, 0.5)
 	ParticleRadius(TOOL.sparkSmokeTileRadius.value)
 	ParticleColor(smokeColor[1], smokeColor[2], smokeColor[3])
 	ParticleGravity(0)

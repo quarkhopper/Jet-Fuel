@@ -8,6 +8,7 @@ function init()
         KEY.MODE,
         KEY.PLANT_GROUP,
         KEY.DETONATE, 
+        KEY.DETONATE_LAST,
         KEY.STOP_FIRE, 
         KEY.OPTIONS}
     updating_key = nil
