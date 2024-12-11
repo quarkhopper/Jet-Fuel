@@ -275,8 +275,8 @@ function detonateAll()
 end
 
 function detonate(bomb)
-	if GetShapeBody(bomb) == GetWorldBody() then return end
 	local position = get_shape_center(bomb)
+	if position == nil then return end -- shape totally destroyed
 	createExplosion(position)
 	Explosion(position, TOOL.blastPowerPrimary.value)
 	PlaySound(boomSound, position, 5)
@@ -411,3 +411,10 @@ function getSparkLife(sparkSpeedValue)
 	local value = delta/(TOOL.sparkSplitSpeed.value - TOOL.sparkDeathSpeed.value)
 	return bracket_value(value, 1, 0)
 end
+
+-- function createBombInst(pos)
+-- 	local inst = {}
+-- 	inst.trans = Transform(pos) --, QuatEuler(math.random(0,359),math.random(0,359),math.random(0,359)))
+-- 	inst.shape = Spawn("MOD/prefab/Decoder.xml", trans, false, true)[2]
+-- 	return inst
+-- end

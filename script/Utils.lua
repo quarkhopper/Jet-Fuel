@@ -66,7 +66,14 @@ function range_value_to_fraction(value, min, max)
 	return frac
 end
 
+function vecs_equal(a, b)
+	return a[1] == b[1] 
+	and a[2] == b[2]
+	and a[3] == b[3]
+end 
+
 function get_shape_center(shape)
+	if GetShapeVoxelCount(shape) == 0 then return nil end
 	local lower, upper = GetShapeBounds(shape)
 	return VecLerp(lower, upper, 0.5)
 end
