@@ -149,14 +149,14 @@ function createDefaultOptions()
 
 	oSet.sparkVacuumMag = create_mode_option(
 		option_type.numeric, 
-		0.049,
+		0.05,
 		"sparkVacuumMag",
 		"Cloud vacuum pressure magnitude per spark x 10^-4")
 	oSet.options[#oSet.options + 1] = oSet.sparkVacuumMag
 
 	oSet.sparkInflateMag = create_mode_option(
 		option_type.numeric, 
-		0.46,
+		0.45,
 		"sparkInflateMag",
 		"Cloud inflation pressure magnitude per spark x 10^-4")
 	oSet.options[#oSet.options + 1] = oSet.sparkInflateMag
@@ -174,7 +174,7 @@ function createDefaultOptions()
 
 	oSet.sparkFizzleFalloffRadius = create_mode_option(
 		option_type.numeric, 
-		1,
+		0,
 		"sparkFizzleFalloffRadius",
 		"Spark fizzle falloff radius (where fizzles start to become more frequent)")
 	oSet.options[#oSet.options + 1] = oSet.sparkFizzleFalloffRadius	
