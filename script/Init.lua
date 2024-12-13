@@ -44,7 +44,7 @@ function createDefaultOptions()
 
 	oSet.sparksPerExplosion = create_mode_option(
 		option_type.numeric, 
-		400,
+		600,
 		"sparksPerExplosion",
 		"Sparks limit per explosion")
 	oSet.options[#oSet.options + 1] = oSet.sparksPerExplosion		
@@ -149,7 +149,7 @@ function createDefaultOptions()
 
 	oSet.sparkVacuumMag = create_mode_option(
 		option_type.numeric, 
-		0.049,
+		0.05,
 		"sparkVacuumMag",
 		"Cloud vacuum pressure magnitude per spark x 10^-4")
 	oSet.options[#oSet.options + 1] = oSet.sparkVacuumMag
