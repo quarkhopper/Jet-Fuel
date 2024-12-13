@@ -156,7 +156,7 @@ function createDefaultOptions()
 
 	oSet.sparkInflateMag = create_mode_option(
 		option_type.numeric, 
-		0.47,
+		0.46,
 		"sparkInflateMag",
 		"Cloud inflation pressure magnitude per spark x 10^-4")
 	oSet.options[#oSet.options + 1] = oSet.sparkInflateMag
