@@ -108,18 +108,18 @@ function drawOptionModal()
 				UiRect(box.width, box.height)
 			UiPop()
 			UiPush()
-				UiTranslate(UiCenter(), 100)
+				UiTranslate(UiCenter(), 200)
 				UiFont("bold.ttf", 24)
 				UiTextOutline(0,0,0,1,0.5)
 				UiColor(1,1,1)
-				UiAlign("micenter middle")
+				UiAlign("center middle")
 				UiText("QBomb Options", true)
 				UiFont("bold.ttf", 18)
 				UiText("Click a number to change it")
 			UiPop()
 			UiPush()
 				-- options
-				UiTranslate(200, 180)
+				UiTranslate(200, 300)
 				UiFont("bold.ttf", UI.OPTION_TEXT_SIZE)
 				UiTextOutline(0,0,0,1,0.5)
 				UiColor(1,1,1)
@@ -187,7 +187,8 @@ function drawOptionModal()
 	UiPop()
 end
 
-function drawOption(option)
+function drawOption(option, borderColor)
+	borderColor = borderColor or Vec()
 	UiPush()
 		UiAlign("left")
 		UiFont("bold.ttf", UI.OPTION_TEXT_SIZE)
@@ -237,7 +238,8 @@ function drawOption(option)
 			UiPush()
 				UiPush()
 					UiTranslate(20,-4)
-					drawBorder(60,20,4)
+					local doHighlight = option.key == "sparksPerExplosion"
+					drawBorder(60,20,4,doHighlight)
 				UiPop()
 				if UiTextButton(round_to_place(option.value, 4), 35, 20) then 
 					selectedOption = option
@@ -251,10 +253,14 @@ function drawOption(option)
 	UiPop()
 end
 
-function drawBorder(width, height, thickness)
+function drawBorder(width, height, thickness, doHighlight)
 	UiPush()
 	UiAlign("center middle")
-	UiColor(0.5,0.5,0.5)
+	if doHighlight then 
+		UiColor(1, 1, 0)
+	else
+		UiColor(0.5,0.5,0.5)
+	end
 	UiRect(width, height)
 	UiColor(0.3, 0.3, 0.3)
 	UiRect(width - thickness, height - thickness)
