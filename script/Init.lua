@@ -149,7 +149,7 @@ function createDefaultOptions()
 
 	oSet.sparkVacuumMag = create_mode_option(
 		option_type.numeric, 
-		0.05,
+		0.049,
 		"sparkVacuumMag",
 		"Cloud vacuum pressure magnitude per spark x 10^-4")
 	oSet.options[#oSet.options + 1] = oSet.sparkVacuumMag
