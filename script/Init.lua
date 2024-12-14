@@ -35,7 +35,7 @@ function createDefaultOptions()
 
 	oSet.sparkSimSpace = create_mode_option(
 		option_type.numeric, 
-		1900,
+		1800,
 		"sparkSimSpace",
 		"Sim space requried to trigger next explosion")
 	oSet.options[#oSet.options + 1] = oSet.sparkSimSpace	
@@ -156,7 +156,7 @@ function createDefaultOptions()
 
 	oSet.sparkInflateMag = create_mode_option(
 		option_type.numeric, 
-		0.455,
+		0.46,
 		"sparkInflateMag",
 		"Cloud inflation pressure magnitude per spark x 10^-4")
 	oSet.options[#oSet.options + 1] = oSet.sparkInflateMag
