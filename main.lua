@@ -141,7 +141,7 @@ function drawOptionModal()
 			UiPush()
 				-- instructions
 				UiAlign("center middle")
-				UiTranslate(UiCenter(), UiHeight() - 180)
+				UiTranslate(UiCenter(), UiHeight() - 100)
 				UiFont("bold.ttf", 24)
 				UiTextOutline(0,0,0,1,0.5)
 				UiColor(1,1,1)
