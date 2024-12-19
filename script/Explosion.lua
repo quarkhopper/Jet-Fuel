@@ -114,7 +114,7 @@ function explosionTick(dt)
 
 				-- pressure effects. 
 				-- Torus effects - Pulling from behind the cloud and pushing from the front
-				local pressureDistance_n = spark.distance_n ^ 0.5
+				local pressureDistance_n = spark.distance_n  ^ 0.8
 				local angleDot_n = VecDot(spark.lookOriginDir, Vec(0,1,0))
 				local torus_n = pressureDistance_n * angleDot_n
 				local torus_mag = TOOL.sparkTorusMag.value * VALUES.PRESSURE_EFFECT_SCALE * #explosion.sparks * torus_n
@@ -341,7 +341,7 @@ function makeSparkEffect(spark)
 	-- fire puff
 	ParticleReset()
 	ParticleType("smoke")
-	ParticleTile(0)
+	ParticleTile(math.random(0,1))
 	ParticleRotation(((math.random() * 2) - 1) * 10)
 	ParticleDrag(0.25)
 	ParticleAlpha(1, 0, "easeout")
@@ -355,7 +355,7 @@ function makeSmoke(spark)
 	local smokeColor = HSVToRGB(TOOL.smokeColor.value)
 	ParticleReset()
 	ParticleType("smoke")
-	ParticleTile(0)
+	ParticleTile(math.random(0,1))
 	ParticleRotation(((math.random() * 2) - 1) * 10)
 	ParticleDrag(0)
 	ParticleAlpha(1, 0, "easeout", 0.1, 0.5)
