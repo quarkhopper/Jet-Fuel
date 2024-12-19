@@ -40,8 +40,6 @@ KEY.OPTIONS = setup_keybind("Options", "options", "O")
 KEY.MODE = setup_keybind("Change modes (plant / sabotage)", "mode", "B")
 KEY.CLEAR = setup_keybind("Clear all bombs / sabotage", "clear", "V")
 
-
-
 -- set on init
 TOOL = {}
 VALUES = {}

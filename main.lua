@@ -77,7 +77,7 @@ function draw()
 	UiText(KEY.MODE.key.." to change between bomb 'plant' and 'sabotage' modes. Now: "..modeString,true)
 	UiText(KEY.PLANT_GROUP.key.." to plant 10 bombs randomly around (now: "..#bombs+#toDetonate..")", true)
 	UiText(KEY.DETONATE.key.." to detonate", true)
-	UiText(KEY.DETONATE_LAST.key.." to detonate last bomb planted / item sabotaged", true)
+	UiText(KEY.DETONATE_LAST.key.." to detonate last bomb planted / item sabotaged (Shift for closest to player)", true)
 	UiText(KEY.OPTIONS.key.." for options", true)
 	UiText(KEY.STOP_FIRE.key.." to stop all explosions")
 end
@@ -566,9 +566,27 @@ function handleInput(dt)
 		if InputPressed(KEY.DETONATE_LAST.key)
 		and GetPlayerGrabShape() == 0 
 		and #bombs > 0 then
-			local bomb = bombs[#bombs]
+			local index = #bombs
+			local bomb = bombs[index]
+			if InputDown("shift") then
+				local playerTrans = GetPlayerTransform()
+				local closestIndex = -1
+				local closestDist = 1000000
+				for bb=1, #bombs do
+					local bombTrans = GetShapeWorldTransform(bombs[bb])
+					local dist = VecLength(VecSub(playerTrans.pos, bombTrans.pos))
+					if dist < closestDist then 
+						closestDist = dist
+						closestIndex = bb 
+					end 
+				end 
+				if closestIndex > 0 then 
+					index = closestIndex
+					bomb = bombs[index]
+				end
+			end
 			detonate(bomb)
-			table.remove(bombs, #bombs)
+			table.remove(bombs, index)
 		end
 
 		if InputReleased(KEY.PLANT_BOMB.key) then 
