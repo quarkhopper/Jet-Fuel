@@ -115,7 +115,7 @@ function explosionTick(dt)
 				-- pressure effects. 
 				-- Torus effects - Pulling from behind the cloud and pushing from the front
 				local pressureDistance_n = spark.distance_n  ^ 0.8
-				local angleDot_n = VecDot(spark.lookOriginDir, Vec(0,1,0))
+				local angleDot_n = VecDot(spark.lookOriginDir, VALUES.DIRECTIONAL_VECTOR)
 				local torus_n = pressureDistance_n * angleDot_n
 				local torus_mag = TOOL.sparkTorusMag.value * VALUES.PRESSURE_EFFECT_SCALE * #explosion.sparks * torus_n
 				local torus_vector = VecScale(spark.lookOriginDir, torus_mag)
