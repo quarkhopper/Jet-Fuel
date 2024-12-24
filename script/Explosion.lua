@@ -82,8 +82,14 @@ function explosionTick(dt)
 					local velocity = GetProperty(body, "velocity")
 					if VecLength(velocity) < TOOL.sparkDeathSpeed.value then 
 						-- stationary object or it slowed down too much
-						spark.dir = VecScale(spark.dir, -1)
-						forceSplit = true
+						-- if the angle is shallow allow a split, otherwise end the spark
+						local dot = math.abs(VecDot(normal, spark.dir))
+						if (dot < 0.5) then 
+							spark.dir = VecScale(spark.dir, -1)
+							forceSplit = true
+						else
+							sparkStillAlive = false
+						end
 					else
 						-- moving object, match the speed plus a little
 						local maxSpeedProperty = TOOL.sparkHitFollowMaxSpeed or TOOL.blastSpeed 

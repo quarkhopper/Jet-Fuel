@@ -44,7 +44,7 @@ function createDefaultOptions()
 
 	oSet.sparksPerExplosion = create_mode_option(
 		option_type.numeric, 
-		600,
+		800,
 		"sparksPerExplosion",
 		"Sparks limit per explosion")
 	oSet.options[#oSet.options + 1] = oSet.sparksPerExplosion		
