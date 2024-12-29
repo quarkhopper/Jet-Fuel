@@ -58,7 +58,7 @@ function createDefaultOptions()
 
 	oSet.blastSpeed = create_mode_option(
 		option_type.numeric, 
-		2,
+		0.5,
 		"blastSpeed",
 		"Blast speed at detonation (+ for wider initial fireball)")
 	oSet.options[#oSet.options + 1] = oSet.blastSpeed	
