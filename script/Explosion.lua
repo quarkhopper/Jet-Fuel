@@ -298,9 +298,9 @@ function createExplosion(pos)
 	local explosion = createExplosionInst(TOOL)
 	for a = 1, TOOL.sparksPerExplosion.value do
 		local newSpark = createSparkInst(TOOL, 
-		VecAdd(pos, random_vec(0.2)), 
+		VecAdd(pos, random_vec(0.5)), 
 		VecNormalize(random_vec(1)), 
-		math.random() * TOOL.blastSpeed.value + 0.1)
+		TOOL.blastSpeed.value)
 		table.insert(explosion.sparks, newSpark)
 	end
 	table.insert(explosions, explosion)
