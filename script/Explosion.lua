@@ -3,16 +3,30 @@
 #include "Defs.lua"
 #include "HSVRGB.lua"
 
+-- sounds used. Don't ask about the toilet.
 boomSound = LoadSound("MOD/snd/toiletBoom.ogg")
 rumbleSound = LoadSound("MOD/snd/rumble.ogg")
+
+-- any shape ready to explode
 bombs = {}
+
+-- shapes actually waiting to be detonated when appropriate
 toDetonate = {}
+
+-- if true, don't wait for the simulation to have room, blow it up NOW
 rushDetonate = false
+
+-- ONLY used as the position of the last blast in order to push around the 
+-- sparks of other explosions. 
 blastEffectOrigin = nil
 
 
 function explosionTick(dt)
 	local totalSparkNum = totalSparks()
+
+	-- bombs that are still alive (intact shapes). If bombs
+	-- are found to be broken shapes, they're added to the 
+	-- toDetonate table 
 	local stillAlive = {}
 	for i=1, #bombs do
 		local bomb = bombs[i]
@@ -24,6 +38,7 @@ function explosionTick(dt)
 	end
 	bombs = stillAlive
 	
+	-- blow things up that are ready to be blown up. 
 	detonationTick(dt)
 	
 	local newExplosions = {}
@@ -152,7 +167,7 @@ function explosionTick(dt)
 					for i=1, math.random(TOOL.sparkSpawnsLower.value, TOOL.sparkSpawnsUpper.value) do
 						if totalSparkNum <= TOOL.sparksSimulation.value and
 						spark.splitsRemaining ~= 0 and
-						#explosion.sparks < TOOL.sparksPerExplosion.value then
+						#explosion.sparks < explosion.maxSparks then
 							local newDir = VecAdd(spark.dir, random_vec(TOOL.sparkSplitDirVariation.value))
 							newDir = VecNormalize(newDir)
 							local newSpark = createSparkInst(spark.options, 
@@ -207,7 +222,7 @@ function explosionTick(dt)
 
 		if (#explosion.sparks + #explosion.smoke) > 0 then
 			if #explosion.sparks > 0 then 
-				explosion.life_n = bracket_value(#explosion.sparks / TOOL.sparksPerExplosion.value, 1, 0)
+				explosion.life_n = bracket_value(#explosion.sparks / explosion.maxSparks, 1, 0)
 				explosion.center = average_vec(positions)
 				explosion.averageDist = 0
 				for j=1, #dists do
@@ -295,14 +310,13 @@ function detonate(bomb)
 end
 
 function createExplosion(pos)
-	local explosion = createExplosionInst(TOOL)
-	for a = 1, TOOL.sparksPerExplosion.value do
-		local newSpark = createSparkInst(TOOL, 
-		VecAdd(pos, random_vec(0.5)), 
-		VecNormalize(random_vec(1)), 
-		TOOL.blastSpeed.value)
-		table.insert(explosion.sparks, newSpark)
+	local sparkCount = 0
+	if TOOL.sparksPerExplosionMax ~= nil then 
+		sparkCount = math.random(TOOL.sparksPerExplosionMin.value, TOOL.sparksPerExplosionMax.value)
+	elseif TOOL.sparksPerExplosion ~= nil then
+		sparkCount = TOOL.sparksPerExplosion.value
 	end
+	local explosion = createExplosionInst(TOOL, pos, sparkCount)
 	table.insert(explosions, explosion)
 end
 
@@ -379,15 +393,20 @@ function totalSparks()
 	return sum
 end
 
-function createExplosionInst(options, pos)
+function createExplosionInst(options, pos, maxSparks)
 	local inst = {}
 	inst.options = options or createOptionSetInst()
+	inst.maxSparks = maxSparks
 	inst.sparks = {}
+	for a = 1, inst.maxSparks do
+		local newSpark = createSparkInst(TOOL, 
+		VecAdd(pos, random_vec(0.5)), 
+		VecNormalize(random_vec(1)), 
+		TOOL.blastSpeed.value)
+		table.insert(inst.sparks, newSpark)
+	end
 	inst.smoke = {}
 	-- this value gets deincremented over time
-	if pos ~= nil then
-		table.insert(inst.sparks, pos)
-	end
 	inst.splitFreq = TOOL.sparkSplitFreqStart.value
 	inst.life_n = 1
 	inst.center = pos

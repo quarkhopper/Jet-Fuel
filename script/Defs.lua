@@ -1,4 +1,4 @@
-CURRENT_VERSION = "2.4"
+CURRENT_VERSION = "2.5"
 TOOL_NAME = "QBombs Lab"
 
 -- delimeters

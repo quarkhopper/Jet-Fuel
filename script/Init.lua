@@ -35,19 +35,26 @@ function createDefaultOptions()
 
 	oSet.sparkSimSpace = create_mode_option(
 		option_type.numeric, 
-		1800,
+		1500,
 		"sparkSimSpace",
 		"Sim space requried to trigger next explosion")
 	oSet.options[#oSet.options + 1] = oSet.sparkSimSpace	
 
 	-- blast effects
 
-	oSet.sparksPerExplosion = create_mode_option(
+	oSet.sparksPerExplosionMin = create_mode_option(
 		option_type.numeric, 
 		800,
-		"sparksPerExplosion",
-		"Sparks limit per explosion")
-	oSet.options[#oSet.options + 1] = oSet.sparksPerExplosion		
+		"sparksPerExplosionMin",
+		"Sparks limit per explosion, minimum")
+	oSet.options[#oSet.options + 1] = oSet.sparksPerExplosionMin		
+
+	oSet.sparksPerExplosionMax = create_mode_option(
+		option_type.numeric, 
+		800,
+		"sparksPerExplosionMax",
+		"Sparks limit per explosion, maximum")
+	oSet.options[#oSet.options + 1] = oSet.sparksPerExplosionMax	
 
 	oSet.blastPowerPrimary = create_mode_option(
 		option_type.numeric, 
