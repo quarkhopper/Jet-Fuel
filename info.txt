@@ -1,4 +1,4 @@
 name = Jet Fuel
 author = quarkhopper
-description = [h1]Make Anything a bomb![/h1] either attach a bomb or switch modes to 'sabotage' and select anything to explode when it's broken or on command[h1][/h1][h1]Add to the discussion, share you favorite settings.[/h1]Use the options for fine control of the simulation, character, and aesthetics of the explosions.
+description = [h1]Stick a fuel can anywhere, or click to infuse any shape with explosive power when broken![/h1] either attach a canister or switch modes to 'infuse' and select anything to fill it with explosive jet fuel - it will explode when it's broken or on command.[h1][/h1][h1]Add to the discussion, share you favorite settings.[/h1]Use the options for fine control of the simulation, character, and aesthetics of the explosions.
 tags = Tool

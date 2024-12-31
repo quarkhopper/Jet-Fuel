@@ -1,5 +1,5 @@
-CURRENT_VERSION = "2.5"
-TOOL_NAME = "QBombs Lab"
+CURRENT_VERSION = "3.0"
+TOOL_NAME = "Jet Fuel"
 
 -- delimeters
 DELIM = {}
@@ -12,7 +12,7 @@ DELIM.OPTION = ";"
 -- registry related delimeters and strings
 REG = {}
 REG.DELIM = "."
-REG.TOOL_KEY = "qbombslab"
+REG.TOOL_KEY = "jetfuel"
 REG.TOOL_NAME = "savegame.mod.tool." .. REG.TOOL_KEY .. ".quarkhopper"
 REG.TOOL_OPTION = "option"
 REG.PREFIX_TOOL_OPTIONS = REG.TOOL_NAME .. REG.DELIM .. REG.TOOL_OPTION
@@ -31,14 +31,14 @@ function setup_keybind(name, reg, default_key)
 end
 
 KEY = {}
-KEY.PLANT_BOMB = setup_keybind("Plant bomb", "plant_bomb", "LMB")
-KEY.PLANT_GROUP = setup_keybind("Plant 50 bombs", "plant_group", "M")
-KEY.DETONATE = setup_keybind("Detonate bombs", "detonate", "X")
-KEY.DETONATE_LAST = setup_keybind("Detonate last bomb", "detonate_last", "L")
+KEY.PLANT_BOMB = setup_keybind("Plant canister", "plant_bomb", "LMB")
+KEY.PLANT_GROUP = setup_keybind("Plant 10 canisters", "plant_group", "M")
+KEY.DETONATE = setup_keybind("Detonate jet fuel", "detonate", "X")
+KEY.DETONATE_LAST = setup_keybind("Detonate last", "detonate_last", "L")
 KEY.STOP_FIRE = setup_keybind("Stop fire", "stop_fire", "MMB")
 KEY.OPTIONS = setup_keybind("Options", "options", "O")
-KEY.MODE = setup_keybind("Change modes (plant / sabotage)", "mode", "B")
-KEY.CLEAR = setup_keybind("Clear all bombs / sabotage", "clear", "V")
+KEY.MODE = setup_keybind("Change modes (plant / infuse)", "mode", "B")
+KEY.CLEAR = setup_keybind("Clear all jet fuel from map", "clear", "V")
 
 -- set on init
 TOOL = {}
