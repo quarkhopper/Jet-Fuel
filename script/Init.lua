@@ -284,14 +284,6 @@ function createDefaultOptions()
 		"Max blast speed transfer to existing sparks (multiple at nearest)")
 	oSet.options[#oSet.options + 1] = oSet.sparkBlastPushAmount	
 
-	oSet.sparkBlastPushRadius = create_mode_option(
-		option_type.numeric, 
-		5,
-		"sparkBlastPushRadius",
-		"Max radius sparks are pushed by other blasts")
-	oSet.options[#oSet.options + 1] = oSet.sparkBlastPushRadius	
-
-
 -- aesthetics
 
 	oSet.sparkPuffLife = create_mode_option(
