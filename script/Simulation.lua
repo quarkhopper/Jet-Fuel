@@ -10,32 +10,79 @@ rumbleSound = LoadSound("MOD/snd/rumble.ogg")
 -- any shape ready to explode
 bombs = {}
 
+-- heat centers with sparks assigned to them. One center potentialy forms one torus.
+fireballs = {}
+
 -- shapes actually waiting to be detonated when appropriate
 toDetonate = {}
 
 -- if true, don't wait for the simulation to have room, blow it up NOW
 rushDetonate = false
 
-function explosionTick(dt)
-	local totalSparkNum = totalSparks()
+function detonateAll()
+	if #bombs == 0 then 
+		rushDetonate = true
+	else
+		for i=1, #bombs do
+			local bomb = bombs[i]
+			table.insert(toDetonate, bomb)
+		end
+	end
+	bombs = {}
+end
 
+function detonate(bomb)
+	local position = get_shape_center(bomb)
+	if position == nil then return end -- shape totally destroyed
+	createExplosion(position)
+	Explosion(position, TOOL.blastPowerPrimary.value)
+	PlaySound(boomSound, position, 5)
+	PlaySound(rumbleSound, position, 5)
+end
+
+function scanBombsTick(dt)
 	-- bombs that are still alive (intact shapes). If bombs
 	-- are found to be broken shapes, they're added to the 
 	-- toDetonate table 
-	local stillAlive = {}
+	local unbroken = {}
 	for i=1, #bombs do
 		local bomb = bombs[i]
 		if IsShapeBroken(bomb) then
 			table.insert(toDetonate, bomb)
 		else
-			table.insert(stillAlive, bomb)
+			table.insert(unbroken, bomb)
 		end
 	end
-	bombs = stillAlive
-	
-	-- blow things up that are ready to be blown up. 
-	detonationTick(dt)
-	
+	bombs = unbroken
+end
+
+function detonationTick(dt)
+	if rushDetonate == false then 
+		local totalSparkCount = totalSparks()
+		local simSpace = TOOL.sparksSimulation.value - totalSparkCount
+		if simSpace < TOOL.sparkSimSpace.value then 
+			return
+		end
+	else
+		rushDetonate = false
+	end
+	local newDetonate = {}
+	for i=1, #toDetonate do
+		local bomb = toDetonate[i]
+		if i == 1 then 
+			detonate(bomb)
+		else
+			table.insert(newDetonate, bomb)
+		end
+	end
+	toDetonate = {}
+	for i=0, #newDetonate do
+		table.insert(toDetonate, newDetonate[i])
+	end
+end
+
+function simulationTick(dt)
+	local totalSparkNum = totalSparks()
 	local newExplosions = {}
 	for e= 1, #explosions do 
 		local explosion = explosions[e]
@@ -148,7 +195,7 @@ function explosionTick(dt)
 				end
 
 				-- splitting into new sparks
-				if math.random(1, explosion.splitFreq) == 1 or forceSplit then
+				if math.random(1, spark.splitFreq) == 1 or forceSplit then
 					for i=1, math.random(TOOL.sparkSpawnsLower.value, TOOL.sparkSpawnsUpper.value) do
 						if totalSparkNum <= TOOL.sparksSimulation.value and
 						spark.splitsRemaining ~= 0 and
@@ -159,6 +206,7 @@ function explosionTick(dt)
 							spark.pos, 
 							newDir, 
 							vary_by_percentage(TOOL.sparkSplitSpeed.value, TOOL.sparkSplitSpeedVariation.value))
+							newSpark.splitFreq = spark.splitFreq
 							table.insert(newSparks, newSpark)
 						end
 					end
@@ -167,6 +215,7 @@ function explosionTick(dt)
 			
 			if sparkStillAlive and spark.speed > TOOL.sparkDeathSpeed.value then
 				spark.pos = VecAdd(spark.pos, VecScale(spark.dir, spark.speed))
+				spark.splitFreq = math.floor(math.min(spark.splitFreq + TOOL.sparkSplitFreqInc.value, TOOL.sparkSplitFreqEnd.value))
 				table.insert(newSparks, spark)
 				local smokeVelocity = VecScale(spark.lookOriginDir, TOOL.blastSpeed.value)
 				makeSparkEffect(spark)
@@ -215,7 +264,6 @@ function explosionTick(dt)
 				end
 				explosion.averageDist = explosion.averageDist / #dists
 				explosion.dir = VecNormalize(average_vec(dirs))
-				explosion.splitFreq = math.floor(math.min(explosion.splitFreq + TOOL.sparkSplitFreqInc.value, TOOL.sparkSplitFreqEnd.value))
 			end
 
 			table.insert(newExplosions, explosion)
@@ -226,78 +274,7 @@ function explosionTick(dt)
 	explosions = newExplosions
 end
 
-function pushSparkFromOrigin(spark, origin, radius, maxAmount, falloffExponent)
-	local distance = VecLength(VecSub(origin, spark.pos))
-	if distance < radius and distance > 0 then 
-		local effect_n = (1 - (distance / radius)) ^ falloffExponent
-		local effectVector = VecScale(VecNormalize(VecSub(spark.pos, origin)), maxAmount * effect_n)
-		pushSparkUniform(spark, effectVector)
-	end
-end
 
-function pushSparkUniform(spark, effectVector)
-	local sparkVector = VecScale(spark.dir, spark.speed)
-	local newSparkVector = VecAdd(sparkVector, effectVector)
-	spark.dir = VecNormalize(newSparkVector)
-	spark.speed = VecLength(newSparkVector)
-end
-
-function detonationTick(dt)
-	if rushDetonate == false then 
-		local totalSparkCount = totalSparks()
-		local simSpace = TOOL.sparksSimulation.value - totalSparkCount
-		if simSpace < TOOL.sparkSimSpace.value then 
-			return
-		end
-	else
-		rushDetonate = false
-	end
-	local newDetonate = {}
-	for i=1, #toDetonate do
-		local bomb = toDetonate[i]
-		if i == 1 then 
-			detonate(bomb)
-		else
-			table.insert(newDetonate, bomb)
-		end
-	end
-	toDetonate = {}
-	for i=0, #newDetonate do
-		table.insert(toDetonate, newDetonate[i])
-	end
-end
-
-function detonateAll()
-	if #bombs == 0 then 
-		rushDetonate = true
-	else
-		for i=1, #bombs do
-			local bomb = bombs[i]
-			table.insert(toDetonate, bomb)
-		end
-	end
-	bombs = {}
-end
-
-function detonate(bomb)
-	local position = get_shape_center(bomb)
-	if position == nil then return end -- shape totally destroyed
-	createExplosion(position)
-	Explosion(position, TOOL.blastPowerPrimary.value)
-	PlaySound(boomSound, position, 5)
-	PlaySound(rumbleSound, position, 5)
-end
-
-function createExplosion(pos)
-	local sparkCount = 0
-	if TOOL.sparksPerExplosionMax ~= nil then 
-		sparkCount = math.random(TOOL.sparksPerExplosionMin.value, TOOL.sparksPerExplosionMax.value)
-	elseif TOOL.sparksPerExplosion ~= nil then
-		sparkCount = TOOL.sparksPerExplosion.value
-	end
-	local explosion = createExplosionInst(TOOL, pos, sparkCount)
-	table.insert(explosions, explosion)
-end
 
 function impulseTick()
 	-- impulse the closest 100 shapes
@@ -325,6 +302,78 @@ function impulseTick()
 			end
 		end
 	end
+end
+
+function createExplosion(pos)
+	local sparkCount = 0
+	if TOOL.sparksPerExplosionMax ~= nil then 
+		sparkCount = math.random(TOOL.sparksPerExplosionMin.value, TOOL.sparksPerExplosionMax.value)
+	elseif TOOL.sparksPerExplosion ~= nil then
+		sparkCount = TOOL.sparksPerExplosion.value
+	end
+	local explosion = createFireballInst(TOOL, pos, sparkCount)
+	table.insert(explosions, explosion)
+end
+
+function createFireballInst(options, pos, maxSparks)
+	local inst = {}
+	inst.options = options or createOptionSetInst()
+	inst.maxSparks = maxSparks
+	-- all sparks assigned to this fireball
+	inst.sparks = {}
+	for a = 1, inst.maxSparks do
+		local newSpark = createSparkInst(TOOL, 
+		VecAdd(pos, random_vec(0.5)), 
+		VecNormalize(random_vec(1)), 
+		TOOL.blastSpeed.value)
+		table.insert(inst.sparks, newSpark)
+	end
+	inst.smoke = {}
+	inst.life_n = 1
+	inst.center = pos
+	inst.dir = Vec()
+	inst.averageDist = 0
+	return inst
+end
+
+function createSparkInst(options, pos, dir, speed)
+	local inst = {}
+	inst.options = options or createOptionSetInst()
+	inst.pos = pos
+	inst.dir = dir
+	inst.speed = speed or vary_by_percentage(TOOL.sparkSplitSpeed.value, TOOL.sparkSplitSpeedVariation.value)
+	inst.sparkColor = options.sparkColor.value
+	inst.lookOriginDir = nil
+	inst.distanceFromOrigin = 0
+	inst.distance_n = 1
+	inst.deltaFromOrigin = 0
+	inst.inverseDelta = 0
+	inst.smokeLife = TOOL.sparkPuffLife.value
+	-- this value gets deincremented over time
+	inst.splitFreq = TOOL.sparkSplitFreqStart.value
+	return inst
+end
+
+function pushSparkUniform(spark, effectVector)
+	local sparkVector = VecScale(spark.dir, spark.speed)
+	local newSparkVector = VecAdd(sparkVector, effectVector)
+	spark.dir = VecNormalize(newSparkVector)
+	spark.speed = VecLength(newSparkVector)
+end
+
+function pushSparkFromOrigin(spark, origin, radius, maxAmount, falloffExponent)
+	local distance = VecLength(VecSub(origin, spark.pos))
+	if distance < radius and distance > 0 then 
+		local effect_n = (1 - (distance / radius)) ^ falloffExponent
+		local effectVector = VecScale(VecNormalize(VecSub(spark.pos, origin)), maxAmount * effect_n)
+		pushSparkUniform(spark, effectVector)
+	end
+end
+
+function getSparkLife(sparkSpeedValue)
+	local delta = TOOL.sparkSplitSpeed.value - sparkSpeedValue
+	local value = delta/(TOOL.sparkSplitSpeed.value - TOOL.sparkDeathSpeed.value)
+	return bracket_value(value, 1, 0)
 end
 
 function makeSparkEffect(spark)
@@ -371,54 +420,3 @@ function totalSparks()
 	end
 	return sum
 end
-
-function createExplosionInst(options, pos, maxSparks)
-	local inst = {}
-	inst.options = options or createOptionSetInst()
-	inst.maxSparks = maxSparks
-	inst.sparks = {}
-	for a = 1, inst.maxSparks do
-		local newSpark = createSparkInst(TOOL, 
-		VecAdd(pos, random_vec(0.5)), 
-		VecNormalize(random_vec(1)), 
-		TOOL.blastSpeed.value)
-		table.insert(inst.sparks, newSpark)
-	end
-	inst.smoke = {}
-	-- this value gets deincremented over time
-	inst.splitFreq = TOOL.sparkSplitFreqStart.value
-	inst.life_n = 1
-	inst.center = pos
-	inst.dir = Vec()
-	inst.averageDist = 0
-	return inst
-end
-
-function createSparkInst(options, pos, dir, speed)
-	local inst = {}
-	inst.options = options or createOptionSetInst()
-	inst.pos = pos
-	inst.dir = dir
-	inst.speed = speed or vary_by_percentage(TOOL.sparkSplitSpeed.value, TOOL.sparkSplitSpeedVariation.value)
-	inst.sparkColor = options.sparkColor.value
-	inst.lookOriginDir = nil
-	inst.distanceFromOrigin = 0
-	inst.distance_n = 1
-	inst.deltaFromOrigin = 0
-	inst.inverseDelta = 0
-	inst.smokeLife = TOOL.sparkPuffLife.value
-	return inst
-end
-
-function getSparkLife(sparkSpeedValue)
-	local delta = TOOL.sparkSplitSpeed.value - sparkSpeedValue
-	local value = delta/(TOOL.sparkSplitSpeed.value - TOOL.sparkDeathSpeed.value)
-	return bracket_value(value, 1, 0)
-end
-
--- function createBombInst(pos)
--- 	local inst = {}
--- 	inst.trans = Transform(pos) --, QuatEuler(math.random(0,359),math.random(0,359),math.random(0,359)))
--- 	inst.shape = Spawn("MOD/prefab/Decoder.xml", trans, false, true)[2]
--- 	return inst
--- end
