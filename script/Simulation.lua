@@ -16,11 +16,6 @@ toDetonate = {}
 -- if true, don't wait for the simulation to have room, blow it up NOW
 rushDetonate = false
 
--- ONLY used as the position of the last blast in order to push around the 
--- sparks of other explosions. 
-blastEffectOrigin = nil
-
-
 function explosionTick(dt)
 	local totalSparkNum = totalSparks()
 
@@ -122,16 +117,6 @@ function explosionTick(dt)
 
 				-- spark slows down
 				spark.speed = math.max(spark.speed * (1 - TOOL.sparkSpeedReduction.value), TOOL.sparkDeathSpeed.value)
-
-				-- Pushed by other explosion shocks
-				spark.dir = VecNormalize(VecAdd(spark.dir, random_vec(TOOL.sparkJitter.value)))
-				if blastEffectOrigin ~= nil then
-					pushSparkFromOrigin(spark, 
-					blastEffectOrigin, 
-					TOOL.sparkBlastPushRadius.value, 
-					TOOL.blastSpeed.value,
-					0.5) 
-				end
 
 				-- pressure effects. 
 				-- Torus effects - Pulling from behind the cloud and pushing from the front
@@ -258,7 +243,6 @@ function pushSparkUniform(spark, effectVector)
 end
 
 function detonationTick(dt)
-	blastEffectOrigin = nil
 	if rushDetonate == false then 
 		local totalSparkCount = totalSparks()
 		local simSpace = TOOL.sparksSimulation.value - totalSparkCount
@@ -302,11 +286,6 @@ function detonate(bomb)
 	Explosion(position, TOOL.blastPowerPrimary.value)
 	PlaySound(boomSound, position, 5)
 	PlaySound(rumbleSound, position, 5)
-	if blastEffectOrigin == nil then 
-		blastEffectOrigin = position
-	else
-		blastEffectOrigin = VecLerp(blastEffectOrigin, position)
-	end
 end
 
 function createExplosion(pos)

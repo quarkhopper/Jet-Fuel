@@ -3,7 +3,7 @@
 #include "script/Types.lua"
 #include "script/GameOptions.lua"
 #include "script/Init.lua"
-#include "script/Explosion.lua"
+#include "script/Simulation.lua"
 #include "script/Mapping.lua"
 
 ------------------------------------------------
