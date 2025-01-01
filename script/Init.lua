@@ -28,7 +28,7 @@ function createDefaultOptions()
 
 	oSet.sparksSimulation = create_mode_option(
 		option_type.numeric, 
-		1800,
+		1000,
 		"sparksSimulation",
 		"Sparks simulation limit, all fireballs together")
 	oSet.options[#oSet.options + 1] = oSet.sparksSimulation	
@@ -37,16 +37,16 @@ function createDefaultOptions()
 
 	oSet.bombEnergy = create_mode_option(
 		option_type.numeric, 
-		100,
+		50,
 		"bombEnergy",
 		"Bomb energy at detonation (affects lifespan)")
 	oSet.options[#oSet.options + 1] = oSet.bombEnergy		
 
 	oSet.bombSparks = create_mode_option(
 		option_type.numeric, 
-		600,
+		100,
 		"bombSparks",
-		"Bomb sparks at detonation (roughly size)")
+		"Bomb sparks at detonation (affects size)")
 	oSet.options[#oSet.options + 1] = oSet.bombSparks		
 	
 	oSet.detonationTrigger = create_mode_option(
@@ -74,7 +74,7 @@ function createDefaultOptions()
 		option_type.numeric, 
 		6,
 		"fireballRadius",
-		"Fireball radius (Distance between sparks before they're assigned a different torus)")
+		"Torus radius (affects lumpiness)")
 	oSet.options[#oSet.options + 1] = oSet.fireballRadius
 
 	oSet.blastPowerPrimary = create_mode_option(
@@ -88,7 +88,7 @@ function createDefaultOptions()
 		option_type.numeric, 
 		0.5,
 		"blastSpeed",
-		"Blast speed at detonation (+ for wider initial fireball)")
+		"Blast speed at detonation (affects size)")
 	oSet.options[#oSet.options + 1] = oSet.blastSpeed	
 
 	oSet.sparkHurt = create_mode_option(
@@ -102,21 +102,21 @@ function createDefaultOptions()
 		option_type.numeric, 
 		0.5,
 		"sparkHoleSoftRad",
-		"Spark hole radius, soft materials")
+		"Spark erosion, soft materials (0.1 per voxel)")
 	oSet.options[#oSet.options + 1] = oSet.sparkHoleSoftRad
 
 	oSet.sparkHoleMediumRad = create_mode_option(
 		option_type.numeric, 
 		0.3,
 		"sparkHoleMediumRad",
-		"Spark hole radius, medium materials")
+		"Spark erosion, medium materials (0.1 per voxel)")
 	oSet.options[#oSet.options + 1] = oSet.sparkHoleMediumRad
 
 	oSet.sparkHoleHardRad = create_mode_option(
 		option_type.numeric, 
 		0.1,
 		"sparkHoleHardRad",
-		"Spark hole radius, hard materials")
+		"Spark erosion, hard materials (0.1 per voxel)")
 	oSet.options[#oSet.options + 1] = oSet.sparkHoleHardRad
 
 	oSet.ignitionRadius = create_mode_option(
