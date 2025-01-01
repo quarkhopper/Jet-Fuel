@@ -294,8 +294,9 @@ end
 
 function createExplosion(bomb)
 	for a=1, bomb.sparkCount do
+		local pos = get_shape_center(bomb.shape)
 		local newSpark = createSparkInst(TOOL,
-		VecAdd(bomb.pos, random_vec(0.5)),
+		VecAdd(pos, random_vec(0.5)),
 		VecNormalize(random_vec(1)),
 		TOOL.blastSpeed.value)
 		table.insert(allSparks, newSpark)
@@ -332,7 +333,6 @@ end
 function createBombInst(shape)
 	local inst = {}
 	inst.shape = shape
-	inst.pos = get_shape_center(shape)
 	inst.sparkCount = math.random(TOOL.sparksPerExplosionMin.value, TOOL.sparksPerExplosionMax.value)
 	return inst
 end

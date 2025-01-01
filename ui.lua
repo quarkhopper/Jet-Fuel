@@ -29,7 +29,7 @@ function drawLegend()
 	local orderString = 'first'
 	if reverseMode then orderString = 'last' end
 
-	UiTranslate(0, UiHeight())
+	UiTranslate(0, UiHeight() - 2)
 	UiFont("bold.ttf", UI.LEGEND_TEXT_SIZE)
 	UiTextOutline(0,0,0,1,0.5)
 	UiColor(1,1,1)

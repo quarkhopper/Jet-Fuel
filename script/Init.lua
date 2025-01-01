@@ -72,7 +72,7 @@ function createDefaultOptions()
 
 	oSet.fireballRadius = create_mode_option(
 		option_type.numeric, 
-		6,
+		5,
 		"fireballRadius",
 		"Fireball radius (Distance between sparks before they're assigned a different torus)")
 	oSet.options[#oSet.options + 1] = oSet.fireballRadius

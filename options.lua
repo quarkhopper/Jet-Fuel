@@ -1,5 +1,8 @@
+#include "script/Utils.lua"
 #include "script/Defs.lua"
+#include "script/Types.lua"
 #include "script/GameOptions.lua"
+#include "script/Init.lua"
 
 local TOOL = nil
 
@@ -23,7 +26,7 @@ function draw()
         UiTranslate(UiCenter(), 200)
         UiAlign("center middle")
         UiFont("bold.ttf", 40)
-        UiText("QBombs Lab Keybinds", true)
+        UiText("Jet Fuel Keybinds", true)
         UiText("Press a key to change the binding", true)
         UiText("Press esc to exit")
 

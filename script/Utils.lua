@@ -146,9 +146,8 @@ end
 
 function reverseTable(t)
 	local reversed = {}
-	while #t > 0 do
-		table.insert(reversed, t[#t])
-		table.remove(t, #t)
+	for i=1, #t do
+		table.insert(reversed, 1, t[i])
 	end
 	return reversed
 end

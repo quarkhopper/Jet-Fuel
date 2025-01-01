@@ -53,13 +53,15 @@ function option_set_from_string(ser)
 end
 
 function reset_all_options()
-	-- This is an emergency reset that the main menu option screen uses.
-	-- it does not rely on the TOOL globals being loaded.
 	option_set_reset()
 end
 
 function option_set_reset()
 	ClearKey(REG.PREFIX_TOOL_OPTIONS)
+	for i=1, #keybind_options do
+		local keybind = keybind_options[i]
+		ClearKey(REG.PREFIX_TOOL_KEYBIND..REG.DELIM..keybind.reg)
+	end
 end
 
 function create_mode_option(o_type, value, key, friendly_name)

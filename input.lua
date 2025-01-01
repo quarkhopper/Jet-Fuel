@@ -64,18 +64,16 @@ function handleInput(dt)
 			GetPlayerGrabShape() == 0 
 			and	plantTimer == 0 
 			then
-				if hit then 
+				if not stickyMode then
+					local drop_pos = VecAdd(camera.pos, VecScale(shoot_dir, 2))
+					bomb = createBombInst(Spawn("MOD/prefab/Decoder.xml", Transform(drop_pos), false, false)[2])
+					table.insert(bombs, bomb)
+					plantTimer = plantRate
+				elseif hit then 
 					local bomb = nil
 					if not infuseMode then 
-						-- planting a bomb / dropping it
-						local bomb = nil
-						if stickyMode then 
-							local drop_pos = VecAdd(camera.pos, VecScale(shoot_dir, dist))
-							bomb = createBombInst(Spawn("MOD/prefab/Decoder.xml", Transform(drop_pos), false, true)[2])
-						else
-							local drop_pos = VecAdd(camera.pos, VecScale(shoot_dir, 2))
-							bomb = createBombInst(Spawn("MOD/prefab/Decoder.xml", Transform(drop_pos), false, false)[2])
-						end
+						local drop_pos = VecAdd(camera.pos, VecScale(shoot_dir, dist))
+						bomb = createBombInst(Spawn("MOD/prefab/Decoder.xml", Transform(drop_pos), false, true)[2])
 						table.insert(bombs, bomb)
 						plantTimer = plantRate
 					elseif infuseInProgress == false then -- unlocked on key up
@@ -109,6 +107,7 @@ function handleInput(dt)
 					Delete(shape)
 				end
 				bombs = {}
+				allSparks = {}
 				toDetonate = {}
 			end
 		end
