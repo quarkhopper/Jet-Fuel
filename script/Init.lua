@@ -37,7 +37,7 @@ function createDefaultOptions()
 
 	oSet.bombEnergy = create_mode_option(
 		option_type.numeric, 
-		50,
+		200,
 		"bombEnergy",
 		"Bomb energy at detonation (affects lifespan)")
 	oSet.options[#oSet.options + 1] = oSet.bombEnergy		
