@@ -14,7 +14,6 @@ function init()
 	SetBool("game.tool."..REG.TOOL_KEY..".enabled", true)
 	SetFloat("game.tool."..REG.TOOL_KEY..".ammo", 1000)
 
-	explosions = {}
 	plantRate = 0.3
 	plantTimer = 0
 
@@ -430,7 +429,7 @@ function tick(dt)
 	handleInput(dt)
 	scanBombsTick(dt)
 	detonationTick(dt)
-	analysisTick(dt)
+	fireballCalcTick(dt)
 	smokeTick(dt)
 	simulationTick(dt)
 	impulseTick(dt)
@@ -444,10 +443,10 @@ function tick(dt)
 		-- but possibly in a vehicle
 		if sabotageMode then 
 			for i=1, #bombs do
-				DrawShapeOutline(bombs[i], 1, 1, 0, 1)
+				DrawShapeOutline(bombs[i].shape, 1, 1, 0, 1)
 			end
 			for i=1, #toDetonate do
-				DrawShapeOutline(toDetonate[i], 1, 0, 0, 1)
+				DrawShapeOutline(toDetonate[i].shape, 1, 0, 0, 1)
 			end
 		end
 	end
@@ -493,16 +492,17 @@ function handleInput(dt)
 					if not sabotageMode then 
 						-- planting a bomb
 						local drop_pos = VecAdd(camera.pos, VecScale(shoot_dir, dist))
-						bomb = Spawn("MOD/prefab/Decoder.xml", Transform(drop_pos), false, true)[2]
+						bomb = createBombInst(Spawn("MOD/prefab/Decoder.xml", Transform(drop_pos), false, true)[2])
 						table.insert(bombs, bomb)
 						plantTimer = plantRate
 					elseif sabotageActionInProgress == false then -- unlocked on key up
 						-- sabotaging a shape
-						local existingIndex = get_index(bombs, shape)
+						local existingIndex = getBombIndex(shape)
 						if existingIndex == nil then
 							if not IsShapeBroken(shape) then 
 								-- sabotage it
-								table.insert(bombs, shape)
+								bomb = createBombInst(shape)
+								table.insert(bombs, bomb)
 								sabotageActionInProgress = true
 							end
 						else 
@@ -519,11 +519,8 @@ function handleInput(dt)
 			end
 
 			if InputPressed(KEY.STOP_FIRE.key) then
-				-- stop all explosions and cancel bomb
-				for i=1, #explosions do
-					local explosion = explosions[i]
-					explosion.sparks = {} 
-				end	
+				-- stop all fire effects and cancel bomb
+				allSparks = {}
 			end
 
 			if InputPressed(KEY.CLEAR.key) then
@@ -603,6 +600,14 @@ end
 -------------------------------------------------
 -- Support functions
 -------------------------------------------------
+
+function getBombIndex(shape)
+	for i=1, #bombs do
+		local bomb = bombs[i]
+		if bomb.shape == shape then return i end
+	end
+	return nil
+end
 
 function loadOptions(reset)
 	if reset == true then 

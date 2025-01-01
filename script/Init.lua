@@ -28,33 +28,54 @@ function createDefaultOptions()
 
 	oSet.sparksSimulation = create_mode_option(
 		option_type.numeric, 
-		2000,
+		800,
 		"sparksSimulation",
-		"Sparks entire simulation")
+		"Sparks simulation, all fireballs together")
 	oSet.options[#oSet.options + 1] = oSet.sparksSimulation	
 
-	oSet.sparkSimSpace = create_mode_option(
+	oSet.detonationTrigger = create_mode_option(
 		option_type.numeric, 
-		1500,
-		"sparkSimSpace",
-		"Sim space requried to trigger next explosion")
-	oSet.options[#oSet.options + 1] = oSet.sparkSimSpace	
+		400,
+		"detonationTrigger",
+		"Number of sparks in simulation when next detonation occurs")
+	oSet.options[#oSet.options + 1] = oSet.detonationTrigger	
 
 	-- blast effects
 
 	oSet.sparksPerExplosionMin = create_mode_option(
 		option_type.numeric, 
-		800,
+		600,
 		"sparksPerExplosionMin",
-		"Sparks limit per explosion, minimum")
+		"Sparks created at detonation, minimum")
 	oSet.options[#oSet.options + 1] = oSet.sparksPerExplosionMin		
 
 	oSet.sparksPerExplosionMax = create_mode_option(
 		option_type.numeric, 
 		800,
 		"sparksPerExplosionMax",
-		"Sparks limit per explosion, maximum")
+		"Sparks created at detonation, maximum")
 	oSet.options[#oSet.options + 1] = oSet.sparksPerExplosionMax	
+
+	oSet.fireballSparksMin = create_mode_option(
+		option_type.numeric, 
+		20,
+		"fireballSparksMin",
+		"Minimum sparks below which fireball dies")
+	oSet.options[#oSet.options + 1] = oSet.fireballSparksMin	
+
+	oSet.fireballSparksMax = create_mode_option(
+		option_type.numeric, 
+		600,
+		"fireballSparksMax",
+		"Maximum number of sparks per one fireball")
+	oSet.options[#oSet.options + 1] = oSet.fireballSparksMax	
+
+	oSet.fireballRadius = create_mode_option(
+		option_type.numeric, 
+		4,
+		"fireballRadius",
+		"Fireball radius (Distance between sparks before they're assigned a different torus)")
+	oSet.options[#oSet.options + 1] = oSet.fireballRadius
 
 	oSet.blastPowerPrimary = create_mode_option(
 		option_type.numeric, 
@@ -114,7 +135,7 @@ function createDefaultOptions()
 
 	oSet.ignitionCount = create_mode_option(
 		option_type.numeric, 
-		3,
+		1,
 		"ignitionCount",
 		"Ignitions from secondary raycasts on hit")
 	oSet.options[#oSet.options + 1] = oSet.ignitionCount
@@ -149,14 +170,14 @@ function createDefaultOptions()
 
 	oSet.sparkTorusMag = create_mode_option(
 		option_type.numeric, 
-		0.4,
+		0.8,
 		"sparkTorusMag",
 		"Cloud torus pressure magnitude per spark x 10^-4")
 	oSet.options[#oSet.options + 1] = oSet.sparkTorusMag
 
 	oSet.sparkVacuumMag = create_mode_option(
 		option_type.numeric, 
-		0.05,
+		0.04,
 		"sparkVacuumMag",
 		"Cloud vacuum pressure magnitude per spark x 10^-4")
 	oSet.options[#oSet.options + 1] = oSet.sparkVacuumMag
@@ -168,8 +189,6 @@ function createDefaultOptions()
 		"Cloud inflation pressure magnitude per spark x 10^-4")
 	oSet.options[#oSet.options + 1] = oSet.sparkInflateMag
 
-
-
 	-- explosion character
 
 	oSet.sparkFizzleFreq = create_mode_option(
@@ -178,13 +197,6 @@ function createDefaultOptions()
 		"sparkFizzleFreq",
 		"Spark fizzle frequency (1 = always, + for less frequent)")
 	oSet.options[#oSet.options + 1] = oSet.sparkFizzleFreq	
-
-	oSet.sparkFizzleFalloffRadius = create_mode_option(
-		option_type.numeric, 
-		0,
-		"sparkFizzleFalloffRadius",
-		"Spark fizzle falloff radius (where fizzles start to become more frequent)")
-	oSet.options[#oSet.options + 1] = oSet.sparkFizzleFalloffRadius	
 
 	oSet.sparkSpawnsUpper = create_mode_option(
 		option_type.numeric, 

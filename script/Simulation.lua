@@ -23,29 +23,19 @@ fireballs = {}
 -- shapes actually waiting to be detonated when appropriate
 toDetonate = {}
 
--- if true, don't wait for the simulation to have room, blow it up NOW
-rushDetonate = false
-
 -- schedule all bombs for detonation
 function detonateAll()
-	if #bombs == 0 then
-		rushDetonate = true
-	else
-		for i=1, #bombs do
-			local bomb = bombs[i]
-			table.insert(toDetonate, bomb)
-		end
-	end
+	toDetonate = copyTable(bombs)
 	bombs = {}
 end
 
 -- create an explosion at the location of the bomb - creates a bunch of new
 -- sparks
 function detonate(bomb)
-	local position = get_shape_center(bomb)
+	local position = get_shape_center(bomb.shape)
 	if position == nil then return end -- shape totally destroyed - no explosion
 	-- inject sparks into the simulation at this position
-	createExplosion(position)
+	createExplosion(bomb)
 	-- actual Teardown concussion
 	Explosion(position, TOOL.blastPowerPrimary.value)
 	-- BOOM!
@@ -60,7 +50,7 @@ function scanBombsTick(dt)
 	local unbroken = {}
 	for i=1, #bombs do
 		local bomb = bombs[i]
-		if IsShapeBroken(bomb) then
+		if IsShapeBroken(bomb.shape) then
 			table.insert(toDetonate, bomb)
 		else
 			table.insert(unbroken, bomb)
@@ -72,34 +62,18 @@ end
 -- determine whether it is appropriate to detonate the next bomb
 -- schedule for detonation
 function detonationTick(dt)
-	if rushDetonate == false then
-		-- detonate the next bomb regardless of simulation room
-		local simSpace = TOOL.sparksSimulation.value - #allSparks
-		if simSpace < TOOL.sparkSimSpace.value then
-			return
-		end
-	else
-		rushDetonate = false
+	if #toDetonate == 0 then return end
+	while #toDetonate > 0 and #allSparks <= TOOL.detonationTrigger.value do 
+		local bomb = toDetonate[1]
+		detonate(bomb)
+		table.remove(toDetonate, 1)
 	end
-
-	local newDetonate = {}
-	for i=1, #toDetonate do
-		local bomb = toDetonate[i]
-		if i == 1 then
-			-- detonate the first bomb
-			detonate(bomb)
-		else
-			-- put everything else in the queue for maybe next tick
-			table.insert(newDetonate, bomb)
-		end
-	end
-
-	toDetonate = copyTable(newDetonate)
 end
 
 -- analyze all sparks to determine fireball centers
-function analysisTick(dt)
+function fireballCalcTick(dt)
 	fireballs = {}
+	newSparks = {}
 	local unassignedSparks = copyTable(allSparks)
 	while #unassignedSparks > 0 do
 		local fireball = createFireballInst()
@@ -113,7 +87,8 @@ function analysisTick(dt)
 			end
 			spark.vectorFromOrigin = VecSub(spark.pos, fireball.center)
 			spark.distanceFromOrigin = VecLength(spark.vectorFromOrigin)
-			if spark.distanceFromOrigin < VALUES.FIREBALL_SPLIT_DIST then 
+			if #fireball.sparks <= TOOL.fireballSparksMax.value and
+			spark.distanceFromOrigin < TOOL.fireballRadius.value then 
 				spark.distance_n = math.min(1, 1/(1 + spark.distanceFromOrigin))
 				spark.inverseVector = VecScale(spark.vectorFromOrigin, -1)
 				spark.lookOriginDir = VecNormalize(spark.inverseVector)
@@ -124,14 +99,17 @@ function analysisTick(dt)
 				table.insert(newUnassigned, spark)
 			end
 		end
-		if #fireball.sparks > 0 then 
+		if #fireball.sparks > TOOL.fireballSparksMin.value then 
 			fireball.center = average_vec(positions)
 			fireball.dir = VecNormalize(average_vec(dirs))
 			table.insert(fireballs, fireball)
+			for s=1, #fireball.sparks do
+				table.insert(newSparks, fireball.sparks[s])
+			end
 		end
 		unassignedSparks = newUnassigned
 	end
-	DebugPrint(#fireballs)
+	allSparks = newSparks
 end
 
 function smokeTick(dt)
@@ -160,9 +138,8 @@ function simulationTick(dt)
 			-- fizzling, when a spark dies spontaneously
 			-- the sparks further away from the center of the fireball center will die out
 			-- faster than the closer ones
-			local fizzleDistance_n = math.min((1 + TOOL.sparkFizzleFalloffRadius.value)/(1 + spark.distanceFromOrigin), 1) ^ 0.5
-			local chance = TOOL.sparkFizzleFreq.value
-			chance = math.max(math.ceil(chance * fizzleDistance_n), 1)
+			local fizzleDistance_n = math.min(1/(1 + spark.distanceFromOrigin), 1) ^ 0.5
+			local chance = math.max(math.ceil(TOOL.sparkFizzleFreq.value * fizzleDistance_n), 1)
 			if chance >= 1 and math.random(1, chance) == 1 then -- there's a bug, that's the only reason for the >= 1 check
 				-- fizzled
 				sparkStillAlive = false
@@ -315,11 +292,10 @@ function impulseTick(dt)
 	end
 end
 
-function createExplosion(pos)
-	local sparkCount = math.random(TOOL.sparksPerExplosionMin.value, TOOL.sparksPerExplosionMax.value)
-	for a=1, sparkCount do
+function createExplosion(bomb)
+	for a=1, bomb.sparkCount do
 		local newSpark = createSparkInst(TOOL,
-		VecAdd(pos, random_vec(0.5)),
+		VecAdd(bomb.pos, random_vec(0.5)),
 		VecNormalize(random_vec(1)),
 		TOOL.blastSpeed.value)
 		table.insert(allSparks, newSpark)
@@ -350,6 +326,14 @@ function createSparkInst(options, pos, dir, speed)
 	-- this value gets deincremented over time
 	inst.splitFreq = TOOL.sparkSplitFreqStart.value
 	-- inst.life_n = 1
+	return inst
+end
+
+function createBombInst(shape)
+	local inst = {}
+	inst.shape = shape
+	inst.pos = get_shape_center(shape)
+	inst.sparkCount = math.random(TOOL.sparksPerExplosionMin.value, TOOL.sparksPerExplosionMax.value)
 	return inst
 end
 
