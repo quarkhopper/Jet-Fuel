@@ -32,6 +32,7 @@ end
 -- create an explosion at the location of the bomb - creates a bunch of new
 -- sparks
 function detonate(bomb)
+	if bomb == nil then return end
 	local position = get_shape_center(bomb.shape)
 	if position == nil then return end -- shape totally destroyed - no explosion
 	-- inject sparks into the simulation at this position
@@ -63,7 +64,8 @@ end
 -- schedule for detonation
 function detonationTick(dt)
 	if #toDetonate == 0 then return end
-	while #toDetonate > 0 and #allSparks <= TOOL.detonationTrigger.value do 
+	while #toDetonate > 0 and 
+		(TOOL.detonationTrigger.value == -1 or #allSparks <= TOOL.detonationTrigger.value) do 
 		local bomb = toDetonate[1]
 		detonate(bomb)
 		table.remove(toDetonate, 1)
@@ -72,6 +74,8 @@ end
 
 -- analyze all sparks to determine fireball centers
 function fireballCalcTick(dt)
+
+
 	fireballs = {}
 	newSparks = {}
 	local unassignedSparks = copyTable(allSparks)
@@ -132,18 +136,16 @@ function simulationTick(dt)
 			local hitPoint = nil
 			local hit, dist, normal, shape = QueryRaycast(spark.pos, spark.dir, spark.speed + 0.1, 0.025)
 			-- Evolve the spark
-
 			-- Fizzling verses splitting are the fundimental opposing lifespan forces
-
 			-- fizzling, when a spark dies spontaneously
 			-- the sparks further away from the center of the fireball center will die out
 			-- faster than the closer ones
-			local fizzleDistance_n = math.min(1/(1 + spark.distanceFromOrigin), 1) ^ 0.5
-			local chance = math.max(math.ceil(TOOL.sparkFizzleFreq.value * fizzleDistance_n), 1)
-			if chance >= 1 and math.random(1, chance) == 1 then -- there's a bug, that's the only reason for the >= 1 check
-				-- fizzled
+			local chance = math.max(math.ceil(TOOL.sparkFizzleFreq.value * (spark.distance_n ^ 0.5)), 1)
+			if chance >= 1 and math.random(1, chance) == 1 then
 				sparkStillAlive = false
-			elseif hit then
+			end
+			
+			if hit then
 				-- hit something, make hole
 				MakeHole(spark.pos, TOOL.sparkHoleSoftRad.value, TOOL.sparkHoleMediumRad.value, TOOL.sparkHoleHardRad.value)
 				Paint(spark.pos, 0.8, "explosion")
@@ -175,8 +177,6 @@ function simulationTick(dt)
 					spark.dir = VecScale(spark.dir, -1)
 				end
 			else
-				-- spark survives
-
 				-- spark slows down
 				spark.speed = math.max(spark.speed * (1 - TOOL.sparkSpeedReduction.value), TOOL.sparkDeathSpeed.value)
 
@@ -209,10 +209,12 @@ function simulationTick(dt)
 				end
 
 				-- splitting into new sparks
-				if math.random(1, spark.splitFreq) == 1 or forceSplit then
+				if spark.splitsRemaining < 1 then 
+					sparkStillAlive = false
+				elseif math.random(1, spark.splitFreq) == 1 or forceSplit then
 					for i=1, math.random(TOOL.sparkSpawnsLower.value, TOOL.sparkSpawnsUpper.value) do
-						if #allSparks <= TOOL.sparksSimulation.value and
-						spark.splitsRemaining ~= 0 then
+						if spark.splitsRemaining > 0 then
+							spark.splitsRemaining = spark.splitsRemaining - 1
 							local newDir = VecAdd(spark.dir, random_vec(TOOL.sparkSplitDirVariation.value))
 							newDir = VecNormalize(newDir)
 							local newSpark = createSparkInst(spark.options,
@@ -220,10 +222,16 @@ function simulationTick(dt)
 							newDir,
 							vary_by_percentage(TOOL.sparkSplitSpeed.value, TOOL.sparkSplitSpeedVariation.value))
 							newSpark.splitFreq = spark.splitFreq
+							newSpark.splitsRemaining = spark.splitsRemaining
 							table.insert(newSparks, newSpark) -- will be assigned to a fireball next tick
 						end
 					end
 				end
+			end
+
+			-- do some culling
+			while #newSparks > TOOL.sparksSimulation.value do
+				table.remove(newSparks, math.random(1, #newSparks))
 			end
 
 			if sparkStillAlive and spark.speed > TOOL.sparkDeathSpeed.value then
@@ -299,6 +307,7 @@ function createExplosion(bomb)
 		VecAdd(pos, random_vec(0.5)),
 		VecNormalize(random_vec(1)),
 		TOOL.blastSpeed.value)
+		newSpark.splitsRemaining = bomb.splitCount
 		table.insert(allSparks, newSpark)
 	end
 end
@@ -326,14 +335,15 @@ function createSparkInst(options, pos, dir, speed)
 	inst.smokeLife = TOOL.sparkPuffLife.value
 	-- this value gets deincremented over time
 	inst.splitFreq = TOOL.sparkSplitFreqStart.value
-	-- inst.life_n = 1
+	inst.splitsRemaining = 0
 	return inst
 end
 
 function createBombInst(shape)
 	local inst = {}
 	inst.shape = shape
-	inst.sparkCount = math.random(TOOL.sparksPerExplosionMin.value, TOOL.sparksPerExplosionMax.value)
+	inst.splitCount = TOOL.bombEnergy.value
+	inst.sparkCount = TOOL.bombSparks.value
 	return inst
 end
 

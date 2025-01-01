@@ -26,30 +26,49 @@ function drawLegend()
 	if singleMode then singleString = 'on' end
 	local stickyString = 'off'
 	if stickyMode then stickyString = 'on' end
-	local orderString = 'first'
-	if reverseMode then orderString = 'last' end
+	local orderString = 'normal'
+	if reverseMode then orderString = 'reverse' end
 
-	UiTranslate(0, UiHeight() - 2)
 	UiFont("bold.ttf", UI.LEGEND_TEXT_SIZE)
 	UiTextOutline(0,0,0,1,0.5)
 	UiColor(1,1,1)
 
 	UiPush()
-	UiAlign("left")
-	for i=1, #keybind_options do
-		option = keybind_options[i]
-		local keybindString = "["..option.key.." "..option.name.."]"
-		local textWidth = UiGetTextSize(keybindString)
-		UiText(keybindString)
-		UiTranslate(textWidth + 5, 0)
-	end
+		UiTranslate(0, UI.LEGEND_TEXT_SIZE + 2)
+
+		UiPush()
+			UiAlign("left")
+			for i=1, #keybind_options do
+				option = keybind_options[i]
+				local keybindString = "["..option.key.." "..option.name.."]"
+				local textWidth = UiGetTextSize(keybindString)
+				UiText(keybindString, true)
+				-- UiTranslate(textWidth + 5, 0)
+			end
+		UiPop()
+
+		UiPush()
+			UiAlign("right")
+			UiTranslate(UiWidth() - 5, 0)
+			UiText("[INFUSE: "..infuseString.."]", true)
+			UiText("[SINGLE: "..singleString.."]", true)
+			UiText("[ORDER:"..orderString.."]", true)
+			UiText("[STICKY: "..stickyString.."]", true)
+		UiPop()
 	UiPop()
 
 	UiPush()
-	UiAlign("right")
-	UiTranslate(UiWidth() - 5, 0)
-	UiText("[INFUSE: "..infuseString.."] [SINGLE: "..singleString.."] [ORDER:"..orderString.."] [STICKY: "..stickyString.."]")
+		UiTranslate(0, UiHeight() - 2)
+		UiAlign("left")
+		UiText("Total sparks: "..#allSparks, true)
 	UiPop()
+
+	UiPush()
+		UiTranslate(UiWidth() - 5, UiHeight() - 2)
+		UiAlign("right")
+	UiText("Explosive count: "..#bombs)
+UiPop()
+
 end
 
 function drawOptionModal()
@@ -111,7 +130,7 @@ function drawOptionModal()
 			UiPush()
 				-- instructions
 				UiAlign("center middle")
-				UiTranslate(UiCenter(), UiHeight() - 100)
+				UiTranslate(UiCenter(), UiMiddle() + (box.height / 2 - 50))
 				UiFont("bold.ttf", 24)
 				UiTextOutline(0,0,0,1,0.5)
 				UiColor(1,1,1)
@@ -208,7 +227,7 @@ function drawOption(option, borderColor)
 			UiPush()
 				UiPush()
 					UiTranslate(20,-4)
-					local doHighlight = option.key == "sparksPerExplosion"
+					local doHighlight = option.key == "bombSparks" or option.key == "bombEnergy" or option.key == "sparksSimulation"
 					drawBorder(60,20,4,doHighlight)
 				UiPop()
 				if UiTextButton(round_to_place(option.value, 4), 35, 20) then 

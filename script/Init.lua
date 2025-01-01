@@ -28,33 +28,33 @@ function createDefaultOptions()
 
 	oSet.sparksSimulation = create_mode_option(
 		option_type.numeric, 
-		800,
+		1800,
 		"sparksSimulation",
-		"Sparks simulation, all fireballs together")
+		"Sparks simulation limit, all fireballs together")
 	oSet.options[#oSet.options + 1] = oSet.sparksSimulation	
-
-	oSet.detonationTrigger = create_mode_option(
-		option_type.numeric, 
-		400,
-		"detonationTrigger",
-		"Number of sparks in simulation when next detonation occurs")
-	oSet.options[#oSet.options + 1] = oSet.detonationTrigger	
 
 	-- blast effects
 
-	oSet.sparksPerExplosionMin = create_mode_option(
+	oSet.bombEnergy = create_mode_option(
+		option_type.numeric, 
+		100,
+		"bombEnergy",
+		"Bomb energy at detonation (affects lifespan)")
+	oSet.options[#oSet.options + 1] = oSet.bombEnergy		
+
+	oSet.bombSparks = create_mode_option(
 		option_type.numeric, 
 		600,
-		"sparksPerExplosionMin",
-		"Sparks created at detonation, minimum")
-	oSet.options[#oSet.options + 1] = oSet.sparksPerExplosionMin		
-
-	oSet.sparksPerExplosionMax = create_mode_option(
+		"bombSparks",
+		"Bomb sparks at detonation (roughly size)")
+	oSet.options[#oSet.options + 1] = oSet.bombSparks		
+	
+	oSet.detonationTrigger = create_mode_option(
 		option_type.numeric, 
-		800,
-		"sparksPerExplosionMax",
-		"Sparks created at detonation, maximum")
-	oSet.options[#oSet.options + 1] = oSet.sparksPerExplosionMax	
+		-1,
+		"detonationTrigger",
+		"Spark when next detonation (-1 for simultaneous explosions)")
+	oSet.options[#oSet.options + 1] = oSet.detonationTrigger
 
 	oSet.fireballSparksMin = create_mode_option(
 		option_type.numeric, 
@@ -72,7 +72,7 @@ function createDefaultOptions()
 
 	oSet.fireballRadius = create_mode_option(
 		option_type.numeric, 
-		5,
+		6,
 		"fireballRadius",
 		"Fireball radius (Distance between sparks before they're assigned a different torus)")
 	oSet.options[#oSet.options + 1] = oSet.fireballRadius
