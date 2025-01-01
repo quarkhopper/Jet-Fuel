@@ -1,17 +1,20 @@
 #include "script/Defs.lua"
 #include "script/GameOptions.lua"
 
+local TOOL = nil
+
 function init()
-    keybind_options = {
-        KEY.PLANT_BOMB,
-        KEY.CLEAR, 
-        KEY.MODE,
-        KEY.PLANT_GROUP,
-        KEY.DETONATE, 
-        KEY.DETONATE_LAST,
-        KEY.STOP_FIRE, 
-        KEY.OPTIONS}
     updating_key = nil
+
+    TOOL = load_option_set()
+	if TOOL == nil then
+		TOOL = createDefaultOptions()
+		save_option_set(TOOL)
+	end
+	if TOOL.version ~= CURRENT_VERSION then 
+        TOOL = createDefaultOptions() 
+        reset_all_options()
+    end
 end
 
 function draw()

@@ -144,6 +144,14 @@ function copyTable(t)
 	return copy
 end
 
+function reverseTable(t)
+	local reversed = {}
+	while #t > 0 do
+		table.insert(reversed, t[#t])
+		table.remove(t, #t)
+	end
+	return reversed
+end
 
 stringToBoolean={ ["true"]=true, ["false"]=false }
 

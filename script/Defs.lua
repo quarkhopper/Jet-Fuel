@@ -1,4 +1,4 @@
-CURRENT_VERSION = "3.5"
+CURRENT_VERSION = "3.7"
 TOOL_NAME = "Jet Fuel"
 
 -- delimeters
@@ -31,28 +31,29 @@ function setup_keybind(name, reg, default_key)
 end
 
 KEY = {}
-KEY.PLANT_BOMB = setup_keybind("Plant canister", "plant_bomb", "LMB")
-KEY.PLANT_GROUP = setup_keybind("Plant 10 canisters", "plant_group", "M")
-KEY.DETONATE = setup_keybind("Detonate jet fuel", "detonate", "X")
-KEY.DETONATE_LAST = setup_keybind("Detonate last", "detonate_last", "L")
-KEY.STOP_FIRE = setup_keybind("Stop fire", "stop_fire", "MMB")
-KEY.OPTIONS = setup_keybind("Options", "options", "O")
-KEY.MODE = setup_keybind("Change modes (plant / infuse)", "mode", "B")
-KEY.CLEAR = setup_keybind("Clear all jet fuel from map", "clear", "V")
+KEY.DETONATE = setup_keybind("detonate", "detonate", "X")
+KEY.PLANT = setup_keybind("plant/infuse", "plant", "LMB")
+KEY.CLEAR = setup_keybind("clear all", "clear", "U")
+KEY.OPTIONS = setup_keybind("options", "options", "O")
+KEY.INFUSE_MODE = setup_keybind("infuse on/off", "infuse_mode", "V")
+KEY.SINGLE_MODE = setup_keybind("single on/off", "single_mode", "B")
+KEY.REVERSE_MODE = setup_keybind("reverse on/off", "reverse_mode", "N")
+KEY.STICKY_MODE = setup_keybind("sticky on/off", "sticky_mode", "M")
+
+keybind_options = {KEY.DETONATE, KEY.PLANT, KEY.CLEAR, KEY.OPTIONS, KEY.INFUSE_MODE, KEY.SINGLE_MODE, KEY.REVERSE_MODE, KEY.STICKY_MODE }
 
 -- set on init
 TOOL = {}
 VALUES = {}
 
 VALUES.SPARK_HURT_ADJUSTMENT = 0.005
-VALUES.SUCTION_IMPULSE_ADJUSTMENT = 0.005 -- times the power
+VALUES.SUCTION_IMPULSE_ADJUSTMENT = 0.005
 VALUES.DEFAULT_PUFF_COLOR = Vec(0, 0, 0.7)
 VALUES.PRESSURE_EFFECT_SCALE = 10^-3
 VALUES.DIRECTIONAL_VECTOR = Vec(0,1,0)
-VALUES.FIREBALL_SPLIT_DIST = 10
 
 -- UI 
 UI = {}
+UI.LEGEND_TEXT_SIZE = 20
 UI.OPTION_TEXT_SIZE = 14
 UI.OPTION_CONTROL_WIDTH = 300
-UI.OPTION_BUMP_BUTTON_WIDTH = 4
