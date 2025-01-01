@@ -7,8 +7,15 @@
 boomSound = LoadSound("MOD/snd/toiletBoom.ogg")
 rumbleSound = LoadSound("MOD/snd/rumble.ogg")
 
--- any shape ready to explode
+-- any shape that can explode
 bombs = {}
+
+-- all sparks in the simulation, regardless of where they're assigned
+allSparks = {}
+
+-- dead sparks that are simulated as smoke puffs separate from the rest of the sim 
+-- for performance. The "crust" on the fireball
+smoke = {}
 
 -- heat centers with sparks assigned to them. One center potentialy forms one torus.
 fireballs = {}
@@ -19,8 +26,9 @@ toDetonate = {}
 -- if true, don't wait for the simulation to have room, blow it up NOW
 rushDetonate = false
 
+-- schedule all bombs for detonation
 function detonateAll()
-	if #bombs == 0 then 
+	if #bombs == 0 then
 		rushDetonate = true
 	else
 		for i=1, #bombs do
@@ -31,19 +39,24 @@ function detonateAll()
 	bombs = {}
 end
 
+-- create an explosion at the location of the bomb - creates a bunch of new
+-- sparks
 function detonate(bomb)
 	local position = get_shape_center(bomb)
-	if position == nil then return end -- shape totally destroyed
+	if position == nil then return end -- shape totally destroyed - no explosion
+	-- inject sparks into the simulation at this position
 	createExplosion(position)
+	-- actual Teardown concussion
 	Explosion(position, TOOL.blastPowerPrimary.value)
+	-- BOOM!
 	PlaySound(boomSound, position, 5)
 	PlaySound(rumbleSound, position, 5)
 end
 
+-- bombs that are still alive (intact shapes). If bombs
+-- are found to be broken shapes, they're added to the
+-- toDetonate table
 function scanBombsTick(dt)
-	-- bombs that are still alive (intact shapes). If bombs
-	-- are found to be broken shapes, they're added to the 
-	-- toDetonate table 
 	local unbroken = {}
 	for i=1, #bombs do
 		local bomb = bombs[i]
@@ -56,73 +69,98 @@ function scanBombsTick(dt)
 	bombs = unbroken
 end
 
+-- determine whether it is appropriate to detonate the next bomb
+-- schedule for detonation
 function detonationTick(dt)
-	if rushDetonate == false then 
-		local totalSparkCount = totalSparks()
-		local simSpace = TOOL.sparksSimulation.value - totalSparkCount
-		if simSpace < TOOL.sparkSimSpace.value then 
+	if rushDetonate == false then
+		-- detonate the next bomb regardless of simulation room
+		local simSpace = TOOL.sparksSimulation.value - #allSparks
+		if simSpace < TOOL.sparkSimSpace.value then
 			return
 		end
 	else
 		rushDetonate = false
 	end
+
 	local newDetonate = {}
 	for i=1, #toDetonate do
 		local bomb = toDetonate[i]
-		if i == 1 then 
+		if i == 1 then
+			-- detonate the first bomb
 			detonate(bomb)
 		else
+			-- put everything else in the queue for maybe next tick
 			table.insert(newDetonate, bomb)
 		end
 	end
-	toDetonate = {}
-	for i=0, #newDetonate do
-		table.insert(toDetonate, newDetonate[i])
-	end
+
+	toDetonate = copyTable(newDetonate)
 end
 
-function simulationTick(dt)
-	local totalSparkNum = totalSparks()
-	local newExplosions = {}
-	for e= 1, #explosions do 
-		local explosion = explosions[e]
+-- analyze all sparks to determine fireball centers
+function analysisTick(dt)
+	fireballs = {}
+	local unassignedSparks = copyTable(allSparks)
+	while #unassignedSparks > 0 do
+		local fireball = createFireballInst()
 		local positions = {}
 		local dirs = {}
-		local dists = {}
-		local sparkSpeeds = {}
-		
-		local newSmoke = {}
-		for s = 1, #explosion.smoke do 
-			local spark = explosion.smoke[s]
-			local hitPoint = nil
-			local hit, dist, normal, shape = QueryRaycast(spark.pos, spark.dir, spark.speed + 0.1, 0.025)
-			if not hit then 
-				makeSmoke(spark)
+		local newUnassigned = {}
+		for i=1, #unassignedSparks do
+			local spark = unassignedSparks[i]
+			if #fireball.sparks == 0 then 
+				fireball.center = spark.pos
+			end
+			spark.vectorFromOrigin = VecSub(spark.pos, fireball.center)
+			spark.distanceFromOrigin = VecLength(spark.vectorFromOrigin)
+			if spark.distanceFromOrigin < VALUES.FIREBALL_SPLIT_DIST then 
+				spark.distance_n = math.min(1, 1/(1 + spark.distanceFromOrigin))
+				spark.inverseVector = VecScale(spark.vectorFromOrigin, -1)
+				spark.lookOriginDir = VecNormalize(spark.inverseVector)
+				table.insert(fireball.sparks, spark)
+				table.insert(positions, spark.pos)
+				table.insert(dirs, spark.dir)
+			else
+				table.insert(newUnassigned, spark)
 			end
 		end
-		
-		local newSparks = {}
-		for s = 1, #explosion.sparks do
-			local spark = explosion.sparks[s]
+		if #fireball.sparks > 0 then 
+			fireball.center = average_vec(positions)
+			fireball.dir = VecNormalize(average_vec(dirs))
+			table.insert(fireballs, fireball)
+		end
+		unassignedSparks = newUnassigned
+	end
+	DebugPrint(#fireballs)
+end
+
+function smokeTick(dt)
+	for s = 1, #smoke do
+		makeSmoke(smoke[s])
+	end
+	smoke = {}
+end
+
+-- simlate all interative effects with sparks and fireballs
+function simulationTick(dt)
+	local newSparks = {}
+	local player_pos = GetPlayerTransform().pos
+	for e=1, #fireballs do
+		local fireball = fireballs[e]
+		for s = 1, #fireball.sparks do
+			local spark = fireball.sparks[s]
 			local sparkStillAlive = true
 			local forceSplit = false
-			spark.deltaFromOrigin = VecSub(spark.pos, explosion.center)
-			spark.distanceFromOrigin = VecLength(spark.deltaFromOrigin)
-			spark.distance_n = math.min(1, 1/(1 + spark.distanceFromOrigin))
-			spark.inverseDelta = VecScale(spark.deltaFromOrigin, -1)
-			spark.lookOriginDir = VecNormalize(spark.inverseDelta)
 			local hitPoint = nil
 			local hit, dist, normal, shape = QueryRaycast(spark.pos, spark.dir, spark.speed + 0.1, 0.025)
-
 			-- Evolve the spark
 
-			-- Fizzling verses splitting is what mostly determines the
-			-- length of the explosion.
-			
+			-- Fizzling verses splitting are the fundimental opposing lifespan forces
+
 			-- fizzling, when a spark dies spontaneously
-			-- the sparks further away from the center of the cloud will die out
+			-- the sparks further away from the center of the fireball center will die out
 			-- faster than the closer ones
-			local fizzleDistance_n = math.min((1 + TOOL.sparkFizzleFalloffRadius.value)/(1 + spark.distanceFromOrigin), 1) ^ 0.5 
+			local fizzleDistance_n = math.min((1 + TOOL.sparkFizzleFalloffRadius.value)/(1 + spark.distanceFromOrigin), 1) ^ 0.5
 			local chance = TOOL.sparkFizzleFreq.value
 			chance = math.max(math.ceil(chance * fizzleDistance_n), 1)
 			if chance >= 1 and math.random(1, chance) == 1 then -- there's a bug, that's the only reason for the >= 1 check
@@ -135,13 +173,13 @@ function simulationTick(dt)
 
 				-- hit following
 				local body = GetShapeBody(shape)
-				if body ~= nil then 
+				if body ~= nil then
 					local velocity = GetProperty(body, "velocity")
-					if VecLength(velocity) < TOOL.sparkDeathSpeed.value then 
+					if VecLength(velocity) < TOOL.sparkDeathSpeed.value then
 						-- stationary object or it slowed down too much
 						-- if the angle is shallow allow a split, otherwise end the spark
 						local dot = math.abs(VecDot(normal, spark.dir))
-						if (dot < 0.5) then 
+						if (dot < 0.5) then
 							spark.dir = VecScale(spark.dir, -1)
 							forceSplit = true
 						else
@@ -149,7 +187,7 @@ function simulationTick(dt)
 						end
 					else
 						-- moving object, match the speed plus a little
-						local maxSpeedProperty = TOOL.sparkHitFollowMaxSpeed or TOOL.blastSpeed 
+						local maxSpeedProperty = TOOL.sparkHitFollowMaxSpeed or TOOL.blastSpeed
 						local newSpeed = math.min(VecLength(velocity) + 0.1, maxSpeedProperty.value)
 						spark.dir = VecNormalize(velocity)
 						spark.speed = newSpeed
@@ -165,27 +203,26 @@ function simulationTick(dt)
 				-- spark slows down
 				spark.speed = math.max(spark.speed * (1 - TOOL.sparkSpeedReduction.value), TOOL.sparkDeathSpeed.value)
 
-				-- pressure effects. 
+				-- pressure effects.
 				-- Torus effects - Pulling from behind the cloud and pushing from the front
 				local pressureDistance_n = spark.distance_n  ^ 0.8
 				local angleDot_n = VecDot(spark.lookOriginDir, VALUES.DIRECTIONAL_VECTOR)
 				local torus_n = pressureDistance_n * angleDot_n
-				local torus_mag = TOOL.sparkTorusMag.value * VALUES.PRESSURE_EFFECT_SCALE * #explosion.sparks * torus_n
+				local torus_mag = TOOL.sparkTorusMag.value * VALUES.PRESSURE_EFFECT_SCALE * #fireball.sparks * torus_n
 				local torus_vector = VecScale(spark.lookOriginDir, torus_mag)
 				pushSparkUniform(spark, torus_vector)
 
 				-- pulling into the center
-				local vacuum_mag = TOOL.sparkVacuumMag.value * VALUES.PRESSURE_EFFECT_SCALE * #explosion.sparks * pressureDistance_n
+				local vacuum_mag = TOOL.sparkVacuumMag.value * VALUES.PRESSURE_EFFECT_SCALE * #fireball.sparks * pressureDistance_n
 				local vacuum_vector = VecScale(spark.lookOriginDir, vacuum_mag ^ 0.5)
 				pushSparkUniform(spark, vacuum_vector)
 
 				-- pushing out
-				local inflate_mag = TOOL.sparkInflateMag.value * VALUES.PRESSURE_EFFECT_SCALE * #explosion.sparks * pressureDistance_n * -1
+				local inflate_mag = TOOL.sparkInflateMag.value * VALUES.PRESSURE_EFFECT_SCALE * #fireball.sparks * pressureDistance_n * -1
 				local inflate_vector = VecScale(spark.lookOriginDir, inflate_mag)
 				pushSparkUniform(spark, inflate_vector)
 
 				-- hurt the player if too close
-				local player_pos = GetPlayerTransform().pos
 				local dist = VecLength(VecSub(player_pos, spark.pos))
 				local dist_n = dist / TOOL.ignitionRadius.value
 				local hurt_n = 1 - math.min(1, dist_n) ^ 0.5
@@ -197,105 +234,79 @@ function simulationTick(dt)
 				-- splitting into new sparks
 				if math.random(1, spark.splitFreq) == 1 or forceSplit then
 					for i=1, math.random(TOOL.sparkSpawnsLower.value, TOOL.sparkSpawnsUpper.value) do
-						if totalSparkNum <= TOOL.sparksSimulation.value and
-						spark.splitsRemaining ~= 0 and
-						#explosion.sparks < explosion.maxSparks then
+						if #allSparks <= TOOL.sparksSimulation.value and
+						spark.splitsRemaining ~= 0 then
 							local newDir = VecAdd(spark.dir, random_vec(TOOL.sparkSplitDirVariation.value))
 							newDir = VecNormalize(newDir)
-							local newSpark = createSparkInst(spark.options, 
-							spark.pos, 
-							newDir, 
+							local newSpark = createSparkInst(spark.options,
+							spark.pos,
+							newDir,
 							vary_by_percentage(TOOL.sparkSplitSpeed.value, TOOL.sparkSplitSpeedVariation.value))
 							newSpark.splitFreq = spark.splitFreq
-							table.insert(newSparks, newSpark)
+							table.insert(newSparks, newSpark) -- will be assigned to a fireball next tick
 						end
 					end
 				end
 			end
-			
+
 			if sparkStillAlive and spark.speed > TOOL.sparkDeathSpeed.value then
+				-- the old spark continues on
 				spark.pos = VecAdd(spark.pos, VecScale(spark.dir, spark.speed))
 				spark.splitFreq = math.floor(math.min(spark.splitFreq + TOOL.sparkSplitFreqInc.value, TOOL.sparkSplitFreqEnd.value))
-				table.insert(newSparks, spark)
-				local smokeVelocity = VecScale(spark.lookOriginDir, TOOL.blastSpeed.value)
+				table.insert(newSparks, spark) -- will be assigned to a fireball next tick
 				makeSparkEffect(spark)
-				table.insert(sparkSpeeds, spark.speed)
-				table.insert(positions, spark.pos)
-				table.insert(dirs, spark.dir)
-				table.insert(dists, spark.distanceFromOrigin)
 			else
 				-- dies into a puff of trailing smoke
-				table.insert(newSmoke, spark)
+				table.insert(smoke, spark)
 			end
 		end
-		explosion.sparks = newSparks
-		explosion.smoke = newSmoke
 
 		-- spawn fire
-		for probe=1, TOOL.ignitionProbes.value * #explosion.sparks do
+		for probe=1, TOOL.ignitionProbes.value * #fireball.sparks do
 			local ign_probe_dir = random_vec(1)
-			local ign_probe_hit, ign_probe_dist, ign_probe_normal, ign_probe_shape = QueryRaycast(explosion.center, ign_probe_dir, TOOL.ignitionRadius.value)
-			if ign_probe_hit then 
-				local ign_probe_pos = VecAdd(explosion.center, VecScale(ign_probe_dir, ign_probe_dist))
+			local ign_probe_hit, ign_probe_dist, ign_probe_normal, ign_probe_shape = QueryRaycast(fireball.center, ign_probe_dir, TOOL.ignitionRadius.value)
+			if ign_probe_hit then
+				local ign_probe_pos = VecAdd(fireball.center, VecScale(ign_probe_dir, ign_probe_dist))
 				local mat = GetShapeMaterialAtPosition(ign_probe_shape, ign_probe_pos)
-				if mat == "glass" then 
+				if mat == "glass" then
 					MakeHole(ign_probe_pos, 0.2)
 				else
 					SpawnFire(ign_probe_pos)
 					for ign=1, TOOL.ignitionCount.value do
 						local ign_dir = random_vec(1)
 						local ign_hit, ign_dist = QueryRaycast(ign_probe_pos, ign_dir, TOOL.ignitionRadius.value)
-						if ign_hit then 
+						if ign_hit then
 							local ign_pos = VecAdd(ign_probe_pos, VecScale(ign_dir, ign_dist))
-							SpawnFire(ign_pos) 
+							SpawnFire(ign_pos)
 						end
 					end
 				end
 			end
 		end
-
-		if (#explosion.sparks + #explosion.smoke) > 0 then
-			if #explosion.sparks > 0 then 
-				explosion.life_n = bracket_value(#explosion.sparks / explosion.maxSparks, 1, 0)
-				explosion.center = average_vec(positions)
-				explosion.averageDist = 0
-				for j=1, #dists do
-					explosion.averageDist = explosion.averageDist + dists[j]
-				end
-				explosion.averageDist = explosion.averageDist / #dists
-				explosion.dir = VecNormalize(average_vec(dirs))
-			end
-
-			table.insert(newExplosions, explosion)
-		end
 	end
-
-	impulseTick()
-	explosions = newExplosions
+	allSparks = newSparks
 end
 
-
-
-function impulseTick()
+function impulseTick(dt)
 	-- impulse the closest 100 shapes
-	for e=1, #explosions do
-		local explosion = explosions[e]
+	for e=1, #fireballs do
+		local fireball = fireballs[e]
 		local shapesFilter = {}
 		for i=1, TOOL.impulseTrials.value do
 			QueryRejectShapes(shapesFilter)
-			local imp_hit, imp_pos, imp_normal, imp_shape = QueryClosestPoint(explosion.center, TOOL.impulseRad.value)
-			if imp_hit == false then 
+			local imp_hit, imp_pos, imp_normal, imp_shape = QueryClosestPoint(fireball.center, TOOL.impulseRad.value)
+			if imp_hit == false then
 				break
 			end
 			table.insert(shapesFilter, imp_shape)
 			local imp_body = GetShapeBody(imp_shape)
-			if imp_body ~= nil then 
-				local imp_delta = VecSub(imp_pos, explosion.center)
+			if imp_body ~= nil then
+				local imp_delta = VecSub(imp_pos, fireball.center)
 				local imp_delta_mag = VecLength(imp_delta)
-				if imp_delta_mag <= TOOL.impulseRad.value then 
+				if imp_delta_mag <= TOOL.impulseRad.value then
 					local imp_dir = VecNormalize(imp_delta)
 					local imp_n = 1 - bracket_value(imp_delta_mag/TOOL.impulseRad.value, 1, 0)
-					local impulse_mag = imp_n * TOOL.impulsePower.value * #explosion.sparks * VALUES.SUCTION_IMPULSE_ADJUSTMENT
+					local impulse_mag = imp_n * TOOL.impulsePower.value * #fireball.sparks * VALUES.SUCTION_IMPULSE_ADJUSTMENT
 					local impulse = VecScale(imp_dir, impulse_mag)
 					ApplyBodyImpulse(imp_body, GetBodyCenterOfMass(imp_body), impulse)
 				end
@@ -305,34 +316,21 @@ function impulseTick()
 end
 
 function createExplosion(pos)
-	local sparkCount = 0
-	if TOOL.sparksPerExplosionMax ~= nil then 
-		sparkCount = math.random(TOOL.sparksPerExplosionMin.value, TOOL.sparksPerExplosionMax.value)
-	elseif TOOL.sparksPerExplosion ~= nil then
-		sparkCount = TOOL.sparksPerExplosion.value
+	local sparkCount = math.random(TOOL.sparksPerExplosionMin.value, TOOL.sparksPerExplosionMax.value)
+	for a=1, sparkCount do
+		local newSpark = createSparkInst(TOOL,
+		VecAdd(pos, random_vec(0.5)),
+		VecNormalize(random_vec(1)),
+		TOOL.blastSpeed.value)
+		table.insert(allSparks, newSpark)
 	end
-	local explosion = createFireballInst(TOOL, pos, sparkCount)
-	table.insert(explosions, explosion)
 end
 
-function createFireballInst(options, pos, maxSparks)
+function createFireballInst()
 	local inst = {}
-	inst.options = options or createOptionSetInst()
-	inst.maxSparks = maxSparks
-	-- all sparks assigned to this fireball
 	inst.sparks = {}
-	for a = 1, inst.maxSparks do
-		local newSpark = createSparkInst(TOOL, 
-		VecAdd(pos, random_vec(0.5)), 
-		VecNormalize(random_vec(1)), 
-		TOOL.blastSpeed.value)
-		table.insert(inst.sparks, newSpark)
-	end
-	inst.smoke = {}
-	inst.life_n = 1
-	inst.center = pos
+	inst.center = Vec()
 	inst.dir = Vec()
-	inst.averageDist = 0
 	return inst
 end
 
@@ -346,11 +344,12 @@ function createSparkInst(options, pos, dir, speed)
 	inst.lookOriginDir = nil
 	inst.distanceFromOrigin = 0
 	inst.distance_n = 1
-	inst.deltaFromOrigin = 0
-	inst.inverseDelta = 0
+	inst.vectorFromOrigin = 0
+	inst.inverseVector = Vec()
 	inst.smokeLife = TOOL.sparkPuffLife.value
 	-- this value gets deincremented over time
 	inst.splitFreq = TOOL.sparkSplitFreqStart.value
+	-- inst.life_n = 1
 	return inst
 end
 
@@ -363,15 +362,15 @@ end
 
 function pushSparkFromOrigin(spark, origin, radius, maxAmount, falloffExponent)
 	local distance = VecLength(VecSub(origin, spark.pos))
-	if distance < radius and distance > 0 then 
+	if distance < radius and distance > 0 then
 		local effect_n = (1 - (distance / radius)) ^ falloffExponent
 		local effectVector = VecScale(VecNormalize(VecSub(spark.pos, origin)), maxAmount * effect_n)
 		pushSparkUniform(spark, effectVector)
 	end
 end
 
-function getSparkLife(sparkSpeedValue)
-	local delta = TOOL.sparkSplitSpeed.value - sparkSpeedValue
+function getSparkLife(spark)
+	local delta = TOOL.sparkSplitSpeed.value - spark.speed
 	local value = delta/(TOOL.sparkSplitSpeed.value - TOOL.sparkDeathSpeed.value)
 	return bracket_value(value, 1, 0)
 end
@@ -413,10 +412,3 @@ function makeSmoke(spark)
 	SpawnParticle(VecAdd(spark.pos, random_vec(0.2)), VecScale(VecAdd(spark.dir, random_vec(0.5)), spark.speed), TOOL.sparkSmokeLife.value)
 end
 
-function totalSparks()
-	local sum = 0
-	for i = 1, #explosions do
-		sum = sum + #explosions[i].sparks
-	end
-	return sum
-end

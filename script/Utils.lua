@@ -136,6 +136,15 @@ function average_vec(values)
 	return Vec(sum_x / #values, sum_y / #values, sum_z / #values)
 end
 
+function copyTable(t)
+	local copy = {}
+	for i=1, #t do
+		table.insert(copy, t[i])
+	end
+	return copy
+end
+
+
 stringToBoolean={ ["true"]=true, ["false"]=false }
 
 

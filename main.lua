@@ -430,7 +430,10 @@ function tick(dt)
 	handleInput(dt)
 	scanBombsTick(dt)
 	detonationTick(dt)
+	analysisTick(dt)
+	smokeTick(dt)
 	simulationTick(dt)
+	impulseTick(dt)
 	if not canInteract(true, false) then 
 		-- anytime the tool is not available or interactable
 		plantTimer = 0.1
