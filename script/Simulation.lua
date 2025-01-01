@@ -64,8 +64,8 @@ end
 -- schedule for detonation
 function detonationTick(dt)
 	if #toDetonate == 0 then return end
-	while #toDetonate > 0 and 
-		(TOOL.detonationTrigger.value == -1 or #allSparks <= TOOL.detonationTrigger.value) do 
+	while #toDetonate > 0 do
+		if TOOL.detonationTrigger.value >= 0 and #allSparks > TOOL.detonationTrigger.value then break end
 		local bomb = toDetonate[1]
 		detonate(bomb)
 		table.remove(toDetonate, 1)
