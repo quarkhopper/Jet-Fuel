@@ -24,3 +24,27 @@ A spark that has died (from fizzling or running out of splits) becomes a smoke p
 The following options are described in the order of appearance in columns going left to right. 
 ### Spark color
 Color of fire sparks.
+### Smoke color
+### Sparks simulation limit
+### Bomb energy
+### Bomb sparks
+### Detotation trigger (sparks, next detonation)
+### Fireball sparks max (maximum number of sparks, fireball)
+### Fireball sparks min (minimum number of sparks, fireball)
+### Fireball radius (torus radius)
+### Blast power
+### Blast speed
+### Spark hurt (to the player)
+### Spark erosion soft
+### Spark erosion medium
+### Spark erosion hard
+### Ignition and hurt radius
+### Ignition probes
+### Ignition count
+### Impulse power
+### Impulse radius
+### Impulse trials (Nearest number of shapes to impulse)
+### Torus pressure (Fireball torus pressure)
+### Va
+
+
