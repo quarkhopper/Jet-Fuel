@@ -342,8 +342,8 @@ end
 function createBombInst(shape)
 	local inst = {}
 	inst.shape = shape
-	inst.splitCount = TOOL.bombEnergy.value
 	inst.sparkCount = TOOL.bombSparks.value
+	inst.splitCount = math.ceil((TOOL.bombEnergy.value * 10^2)/inst.sparkCount)
 	return inst
 end
 

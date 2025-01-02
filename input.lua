@@ -64,7 +64,7 @@ function handleInput(dt)
 			GetPlayerGrabShape() == 0 
 			and	plantTimer == 0 
 			then
-				if not stickyMode then
+				if not stickyMode and not infuseMode then
 					local drop_pos = VecAdd(camera.pos, VecScale(shoot_dir, 2))
 					bomb = createBombInst(Spawn("MOD/prefab/Decoder.xml", Transform(drop_pos), false, false)[2])
 					table.insert(bombs, bomb)
