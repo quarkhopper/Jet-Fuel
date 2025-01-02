@@ -302,14 +302,14 @@ function createDefaultOptions()
 		option_type.numeric, 
 		3,
 		"sparkTileRadMax",
-		"Spark size hot")
+		"Spark size max")
 	oSet.options[#oSet.options + 1] = oSet.sparkTileRadMax	
 
 	oSet.sparkTileRadMin = create_mode_option(
 		option_type.numeric, 
 		2,
 		"sparkTileRadMin",
-		"Spark size cool")
+		"Spark size min")
 	oSet.options[#oSet.options + 1] = oSet.sparkTileRadMin	
 	
 	oSet.sparkSmokeTileRadius = create_mode_option(
