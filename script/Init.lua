@@ -282,13 +282,6 @@ function createDefaultOptions()
 		"Spark dir jitter")
 	oSet.options[#oSet.options + 1] = oSet.sparkJitter	
 
-	oSet.sparkBlastPushAmount = create_mode_option(
-		option_type.numeric, 
-		0.5,
-		"sparkBlastPushAmount",
-		"Max blast speed transfer to existing sparks (multiple at nearest)")
-	oSet.options[#oSet.options + 1] = oSet.sparkBlastPushAmount	
-
 -- aesthetics
 
 	oSet.sparkPuffLife = create_mode_option(
