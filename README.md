@@ -45,7 +45,7 @@ Variables with `_n` at the end `likeThis_n` are normalized (guaranteed to be bet
 
 Variables with `_v` at the end `likeThis_v` are 3D vectors.
 
-Variables with `_Uv` at the end `likeThis_uv` are unit 3D vectors (length 1).
+Variables with `_uv` at the end `likeThis_uv` are unit 3D vectors (length 1).
 
 Variables in all caps with underscore spaces `LIKE_THIS` are constants that are defined in `/script/Defs.lua` for those who have copied the mod locally and wish to change them. 
 
@@ -132,8 +132,10 @@ For one spark:
 >			inflate_vector_v = lookDir_uv * vacuum_mag ^ 0.5
 For the value of `PRESSURE_EFFECT_SCALE`, see "other values" below.
 ### Spark spawns max
+When a spark splits, this is the upper limit of child sparks (spawns) that will be randomly generated.
 ### Spark spawns min
-### Spark split frequency start
+When a spark splits, this is the lower limit of child sparks (spawns) that will be randomly generated.
+### Spark split frequency start[s](url)
 ### Spark split frequency end
 ### Spark split frequency increment
 ### Spark split direction variation
