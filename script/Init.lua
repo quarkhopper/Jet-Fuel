@@ -95,29 +95,29 @@ function createDefaultOptions()
 		option_type.numeric, 
 		0.01,
 		"sparkHurt",
-		"Spark player hurt factor")
+		"Spark player hurt threshold")
 	oSet.options[#oSet.options + 1] = oSet.sparkHurt	
 
-	oSet.sparkHoleSoftRad = create_mode_option(
+	oSet.sparkHoleVoxelsSoft = create_mode_option(
 		option_type.numeric, 
-		0.5,
-		"sparkHoleSoftRad",
-		"Spark erosion, soft materials (0.1 per voxel)")
-	oSet.options[#oSet.options + 1] = oSet.sparkHoleSoftRad
+		5,
+		"sparkHoleVoxelsSoft",
+		"Spark erosion, soft materials (number of voxel)")
+	oSet.options[#oSet.options + 1] = oSet.sparkHoleVoxelsSoft
 
-	oSet.sparkHoleMediumRad = create_mode_option(
+	oSet.sparkHoleVoxelsMedium = create_mode_option(
 		option_type.numeric, 
-		0.3,
-		"sparkHoleMediumRad",
-		"Spark erosion, medium materials (0.1 per voxel)")
-	oSet.options[#oSet.options + 1] = oSet.sparkHoleMediumRad
+		3,
+		"sparkHoleVoxelsMedium",
+		"Spark erosion, medium materials (number of voxel)")
+	oSet.options[#oSet.options + 1] = oSet.sparkHoleVoxelsMedium
 
-	oSet.sparkHoleHardRad = create_mode_option(
+	oSet.sparkHoleVoxelsHard = create_mode_option(
 		option_type.numeric, 
-		0.1,
-		"sparkHoleHardRad",
-		"Spark erosion, hard materials (0.1 per voxel)")
-	oSet.options[#oSet.options + 1] = oSet.sparkHoleHardRad
+		1,
+		"sparkHoleVoxelsHard",
+		"Spark erosion, hard materials (number of voxel)")
+	oSet.options[#oSet.options + 1] = oSet.sparkHoleVoxelsHard
 
 	oSet.ignitionRadius = create_mode_option(
 		option_type.numeric, 

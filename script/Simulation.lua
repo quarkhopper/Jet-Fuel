@@ -147,7 +147,7 @@ function simulationTick(dt)
 			
 			if hit then
 				-- hit something, make hole
-				MakeHole(spark.pos, TOOL.sparkHoleSoftRad.value, TOOL.sparkHoleMediumRad.value, TOOL.sparkHoleHardRad.value)
+				MakeHole(spark.pos, TOOL.sparkHoleVoxelsSoft.value * 10, TOOL.sparkHoleVoxelsMedium.value * 10, TOOL.sparkHoleVoxelsHard.value * 10)
 				Paint(spark.pos, 0.8, "explosion")
 
 				-- hit following
