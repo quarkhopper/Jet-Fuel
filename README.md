@@ -67,16 +67,29 @@ A number that determines the point at which the player is hurt by proximity to a
 >         [new player heath] = [current player health] - (hurt_n * SPARK_HURT_ADJUSTMENT)
 >     }
 for the value of `SPARK_HURT_ADJUSTMENT`, see "other values" below. 
-
 ### Spark erosion soft
+The number of voxels removed from soft materials on hit by a spark (x10)
 ### Spark erosion medium
+The number of voxels removed from medium materials on hit by a spark (x10)
 ### Spark erosion hard
+The number of voxels removed from hard materials on hit by a spark (x10)
 ### Ignition and hurt radius
+Radius used in starting fires from the center of a fireball. Ignition occurs in two phases: a racast is done from the center of the fireball and, if it hits a surface, a second set of racasts are done from that point. If the second raycast hits an object then a fire is started at that point. Essentially, a raycast and a "bounce" is done to find the location to start a fire. This radius is also used to determine how far away a player can be hurt by a spark. 
 ### Ignition probes
+The number of initial raycasts done from the center of a fireball, per spark, to find a location to do a "bounce" and one further raycast to find locations to start a fire.
 ### Ignition count
+The number of secondary raycasts on "bounce" to find the location to start a fire. The total number of POTENTIAL fires started by a fireball is `[ignition probes] * [sparks in the fireball] * [ignition count]`.
 ### Impulse power
+The amount of impulse applied to a body by a fireball to surrounding objects.
+#### Calculation
+>     imp_n = 1 - bracket([distance to fireball center] / [impulse radius], 1, 0)
+>     imp_mag = imp_n * [impulse power] * [number of fireball sparks] * SUCTION_IMPULSE_ADJUSTMENT
+for the value of `SUCTION_IMPULSE_ADJUSTMENT`, see "other values" below.
+Note: negitive impulse pulls objects toward the center of the fireball, positive pushes objects away.
 ### Impulse radius
+The maximum radius from the center of the fireball to impulse objects. 
 ### Impulse trials (nearest number of shapes to attempt impulse)
+The maximum number of shapes that can be impulsed (within the radius above) by a fireball.
 ### Torus pressure (fireball)
 ### Vacuum pressure (fireball)
 ### Inflation pressure (fireball)
