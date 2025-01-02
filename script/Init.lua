@@ -312,12 +312,12 @@ function createDefaultOptions()
 		"Spark size min")
 	oSet.options[#oSet.options + 1] = oSet.sparkTileRadMin	
 	
-	oSet.sparkSmokeTileRadius = create_mode_option(
+	oSet.sparkSmokeTileSize = create_mode_option(
 		option_type.numeric, 
 		0.45,
-		"sparkSmokeTileRadius",
-		"Spark smoke tile radius")
-	oSet.options[#oSet.options + 1] = oSet.sparkSmokeTileRadius	
+		"sparkSmokeTileSize",
+		"Spark smoke tile size")
+	oSet.options[#oSet.options + 1] = oSet.sparkSmokeTileSize	
 
 	oSet.sparkLightIntensity = create_mode_option(
 		option_type.numeric, 
