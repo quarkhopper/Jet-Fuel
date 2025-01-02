@@ -305,27 +305,26 @@ function createDefaultOptions()
 		"Spark smoke particle life (lingering dark particles)")
 	oSet.options[#oSet.options + 1] = oSet.sparkSmokeLife	
 
-
 	oSet.sparkTileRadMax = create_mode_option(
 		option_type.numeric, 
 		3,
 		"sparkTileRadMax",
-		"Spark radius hot")
+		"Spark size hot")
 	oSet.options[#oSet.options + 1] = oSet.sparkTileRadMax	
 
+	oSet.sparkTileRadMin = create_mode_option(
+		option_type.numeric, 
+		2,
+		"sparkTileRadMin",
+		"Spark size cool")
+	oSet.options[#oSet.options + 1] = oSet.sparkTileRadMin	
+	
 	oSet.sparkSmokeTileRadius = create_mode_option(
 		option_type.numeric, 
 		0.45,
 		"sparkSmokeTileRadius",
 		"Spark smoke tile radius")
 	oSet.options[#oSet.options + 1] = oSet.sparkSmokeTileRadius	
-
-	oSet.sparkTileRadMin = create_mode_option(
-		option_type.numeric, 
-		2,
-		"sparkTileRadMin",
-		"Spark radius cool")
-	oSet.options[#oSet.options + 1] = oSet.sparkTileRadMin	
 
 	oSet.sparkLightIntensity = create_mode_option(
 		option_type.numeric, 
