@@ -128,16 +128,16 @@ function createDefaultOptions()
 
 	oSet.ignitionProbes = create_mode_option(
 		option_type.numeric, 
-		10,
+		1,
 		"ignitionProbes",
-		"Ignition raycasts per spark per explosion per tick")
+		"First ignition raycasts (pre-bounce) per fireball spark per tick")
 	oSet.options[#oSet.options + 1] = oSet.ignitionProbes
 
 	oSet.ignitionCount = create_mode_option(
 		option_type.numeric, 
 		1,
 		"ignitionCount",
-		"Ignitions from secondary raycasts on hit")
+		"Ignitions from secondary raycast (post-bounce) on hit")
 	oSet.options[#oSet.options + 1] = oSet.ignitionCount
 
 	oSet.impulsePower = create_mode_option(
