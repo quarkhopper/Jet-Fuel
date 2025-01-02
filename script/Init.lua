@@ -154,13 +154,6 @@ function createDefaultOptions()
 		"Impulse radius")
 	oSet.options[#oSet.options + 1] = oSet.impulseRad	
 
-	oSet.impulseFreq = create_mode_option(
-		option_type.numeric, 
-		200,
-		"impulseFreq",
-		"Impulse frequency (1 = always, + for less frequent)")
-	oSet.options[#oSet.options + 1] = oSet.impulseFreq	
-
 	oSet.impulseTrials = create_mode_option(
 		option_type.numeric, 
 		100,
@@ -172,21 +165,21 @@ function createDefaultOptions()
 		option_type.numeric, 
 		0.8,
 		"sparkTorusMag",
-		"Cloud torus pressure magnitude per spark x 10^-4")
+		"Fireball torus pressure magnitude per spark x 10^-4")
 	oSet.options[#oSet.options + 1] = oSet.sparkTorusMag
 
 	oSet.sparkVacuumMag = create_mode_option(
 		option_type.numeric, 
 		0.04,
 		"sparkVacuumMag",
-		"Cloud vacuum pressure magnitude per spark x 10^-4")
+		"Fireball vacuum pressure magnitude per spark x 10^-4")
 	oSet.options[#oSet.options + 1] = oSet.sparkVacuumMag
 
 	oSet.sparkInflateMag = create_mode_option(
 		option_type.numeric, 
 		0.46,
 		"sparkInflateMag",
-		"Cloud inflation pressure magnitude per spark x 10^-4")
+		"Fireball inflation pressure magnitude per spark x 10^-4")
 	oSet.options[#oSet.options + 1] = oSet.sparkInflateMag
 
 	-- explosion character
