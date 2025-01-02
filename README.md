@@ -61,13 +61,12 @@ The speed sparks are given at detonation. This affects the initial area of fire 
 ### Spark hurt (to the player)
 A number that determines the point at which the player is hurt by proximity to a spark. The ignition radius (see below) is used to calculate how much damage is given to the player by proximity to a spark. 
 #### Calculation 
-dist_n = [distance from spark] / [ignition radius]
-hurt_n = minimum(1, dist_n) ^ 0.5
-if hurt_n > [spark hurt] {
-  [new player heath] = [current player health] - (hurt_n * SPARK_HURT_ADJUSTMENT)
-}
-
-//for the value of SPARK_HURT_ADJUSTMENT, see "other values" below. 
+>     dist_n = [distance from spark] / [ignition radius]
+>     hurt_n = minimum(1, dist_n) ^ 0.5
+>     if hurt_n > [spark hurt] {
+>         [new player heath] = [current player health] - (hurt_n * SPARK_HURT_ADJUSTMENT)
+>     }
+for the value of `SPARK_HURT_ADJUSTMENT`, see "other values" below. 
 
 ### Spark erosion soft
 ### Spark erosion medium
