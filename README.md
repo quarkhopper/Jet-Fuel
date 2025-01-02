@@ -36,6 +36,20 @@ Toggles reverse detonation mode on and off. In reverse mode, the last bomb plant
 Toggles sticky mode on and off. In sticky mode (default, see control below), A canister will be attached with a joint to any surface under the players target reticule. When sticky mode is off, a cansiter will be spawned directly in front of the player. 
 ## Game options
 The following options are described in the order of appearance in columns going left to right. 
+
+All calculations are in psuedo-code for clarity. 
+
+Brackets around words `[like this]` should be treated as a single variable. 
+
+Variables with `_n` at the end `likeThis_n` are normalized (guaranteed to be between 0 and 1).
+
+Variables with `_v` at the end `likeThis_v` are 3D vectors.
+
+Variables with `_Uv` at the end `likeThis_uv` are unit 3D vectors (length 1).
+
+Variables in all caps with underscore spaces `LIKE_THIS` are constants that are defined in `/script/Defs.lua` for those who have copied the mod locally and wish to change them. 
+
+Vector math, where applicable: `(dot)` indicates the vector dot product operator, `(cross)` indicates a cross product operator
 ### Spark color
 Color of spark (fire) point lights illuminating white "puff" tiles. Essentially, the color of the fireballs.
 ### Smoke color
@@ -66,7 +80,7 @@ A number that determines the point at which the player is hurt by proximity to a
 >     if hurt_n > [spark hurt] {
 >         [new player heath] = [current player health] - (hurt_n * SPARK_HURT_ADJUSTMENT)
 >     }
-for the value of `SPARK_HURT_ADJUSTMENT`, see "other values" below. 
+For the value of `SPARK_HURT_ADJUSTMENT`, see "other values" below. 
 ### Spark erosion soft
 The number of voxels removed from soft materials on hit by a spark (x10)
 ### Spark erosion medium
@@ -84,15 +98,39 @@ The amount of impulse applied to a body by a fireball to surrounding objects.
 #### Calculation
 >     imp_n = 1 - bracket([distance to fireball center] / [impulse radius], 1, 0)
 >     imp_mag = imp_n * [impulse power] * [number of fireball sparks] * SUCTION_IMPULSE_ADJUSTMENT
-for the value of `SUCTION_IMPULSE_ADJUSTMENT`, see "other values" below.
+For the value of `SUCTION_IMPULSE_ADJUSTMENT`, see "other values" below.
 Note: negitive impulse pulls objects toward the center of the fireball, positive pushes objects away.
 ### Impulse radius
 The maximum radius from the center of the fireball to impulse objects. 
 ### Impulse trials (nearest number of shapes to attempt impulse)
 The maximum number of shapes that can be impulsed (within the radius above) by a fireball.
 ### Torus pressure (fireball)
+Pressure flowing through the fireball in the direction of travel, diminishing with distance. The calculation uses a vector dot product that creates more pressure when a spark is near the axis of travel. 
+NOTE: for the following three pressure variables the variable `pressureDistance_n` is defined as:
+>     sparkDistance_n = minimum(1, 1/(1 + [spark distance from origin]))
+>     pressureDistance_n = sparkDistance_n ^ 0.8
+#### Calculation
+For one spark:
+>     lookDir_uv = [Unit vector from spark to center of fireball]
+>     angleDot_n = lookDir_uv (dot) DIRECTIONAL_VECTOR
+>     torus_n = pressureDistance_n * angleDot_n
+>     torus_mag = [torus pressure] * PRESSURE_EFFECT_SCALE * [number of sparks in fireball] * torus_n
+>     torus_vector_v = lookDir_uv * torus_mag
+ For the values of `DIRECTIONAL_VECTOR` and `PRESSURE_EFFECT_SCALE`, see "other values" below.
 ### Vacuum pressure (fireball)
+Pressure pushing into the center of a fireball, regardless of the orientation of the spark to the fireball center.
+#### Calculation
+For one spark:
+>     vacuum_mag = [vacuum pressure] * PRESSURE_EFFECT_SCALE * [number of sparks in fireball] * pressureDistance_n
+>			vacuum_vector_v = lookDir_uv * vacuum_mag ^ 0.5
+For the value of `PRESSURE_EFFECT_SCALE`, see "other values" below.
 ### Inflation pressure (fireball)
+Pressure pushing away the center of a fireball, regardless of the orientation of the spark to the fireball center.
+#### Calculation
+For one spark:
+>     inflate_mag = [inflation pressure] * PRESSURE_EFFECT_SCALE * [number of sparks in fireball] * pressureDistance_n * -1
+>			inflate_vector_v = lookDir_uv * vacuum_mag ^ 0.5
+For the value of `PRESSURE_EFFECT_SCALE`, see "other values" below.
 ### Spark spawns max
 ### Spark spawns min
 ### Spark split frequency start
@@ -110,5 +148,5 @@ The maximum number of shapes that can be impulsed (within the radius above) by a
 ### Spark tile size min
 ### Smoke tile size
 ### Spark light intensity
-## Other values (found in /script/Defs.lua, must be edited in code)
+## Other values (found in `/script/Defs.lua`, must be edited in code)
 ### 
