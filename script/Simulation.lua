@@ -372,7 +372,7 @@ function makeSparkEffect(spark)
 	local colorHSV = spark.sparkColor
 	local color = HSVToRGB(colorHSV)
 	local intensity = TOOL.sparkLightIntensity.value
-	local puffColor = HSVToRGB(VALUES.DEFAULT_PUFF_COLOR)
+	local puffColor = HSVToRGB(Vec(0, 0, VALUES.PUFF_CONTRAST))
 	PointLight(spark.pos, color[1], color[2], color[3], intensity)
 
 	-- fire puff
