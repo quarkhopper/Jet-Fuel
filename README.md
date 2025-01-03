@@ -46,7 +46,7 @@ In one tick, the following sequence is executed (with some generalization):
 ### Detonate (default [X] key)
 Will create an explosion at the location of every bomb shape (provided any voxels of the original shape remain). Bombs are detonated in order that they were planted/infused unless the player has toggled reverse mode to on. Bombs will be detonated when the simulated number of sparks (see the lower left screen) goes below the detonation trigger value (see options below). Note: all sparks share the same simulation limit (see options below). An explosion releases a certain number of sparks into the simulation which is bound to this limit. Once this limit is exceeded, sparks are randomly removed. This means that if you detonate several bombs simultaneously there will be smaller amounts of fire associated with each one. Raise the simulation limit to allow for more total fire if this is desired. 
 ### Plant (default LMB)
-In sticky mode (default, see control below), A canister will be attached with a joint to any surface under the players target reticule. When sticky mode is off, a canister will be spawned directly in front of the player. 
+In sticky mode (default, see control below), A canister will be attached with a joint to any surface under the players target reticule. When sticky mode is off, a canister will be spawned directly in front of the player. In infuse mode, you can infuse any shape to __make it a bomb__. Clicking on an existing bomb will un-infuse it as well, including canisters (try it)!
 ### Clear (default [V] key)
 Clears all canisters, un-infuses all shapes, and removes all sparks (fire) from the simulation. Does NOT remove fires started by the simulation. 
 ### Options (default [O] key)
