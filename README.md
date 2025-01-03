@@ -80,7 +80,7 @@ Color of the smoke particles.
 ### Sparks simulation limit
 Total number of sparks allowed in the simulation at the same time. When this limit is exceeded sparks are removed at random until below the limit. This applies to ALL fire from ALL bombs in the simulation.
 ### Bomb energy
-The actual number of splits allowed per spark in the simulation. Every time a spark splits into new sparks, every child spark receives the decrementing split count of its parent. This effectively limits the lifespan of the fireball along with the fizzle frequency (see below).
+The actual number of spark splits __distributed among all sparks in one bomb explosion__. Every tick, there's a chance a spark will split into child sparks, and when that happens, the child sparks are initialized with the remaining split count of its parent. This effectively limits the lifespan of the fireball along with the fizzle frequency (see below). This number is the number of splits __distributed into all the sparks for one explosion__, meaning, depending on how many sparks are in the explosion (see "bomb sparks" option below), all these splits may be distributed into very few sparks making them very __long-lived__, or into many sparks making the overall explosion very __short-lived__.
 ### Bomb sparks
 The number of sparks that are spawned by a bomb explosion. 
 ### Detotation trigger (sparks, next detonation)
