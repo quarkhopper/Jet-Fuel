@@ -119,7 +119,7 @@ The number of initial raycasts done from the center of a fireball, per spark, to
 ### Ignition count
 The number of secondary raycasts on "bounce" to find the location to start a fire. The total number of POTENTIAL fires started by a fireball is `[ignition probes] * [sparks in the fireball] * [ignition count]`.
 ### Impulse power
-The amount of impulse applied to a body by a fireball to surrounding objects.
+The amount of impulse applied to a body by a fireball to surrounding objects. This is the power that sucks things up into the explosion and shoots them out. Some objects may even be held _inside_ of fireballs until they die and then dropped, flaming to the ground. 
 #### Calculation
 >     imp_n = 1 - bracket([distance to fireball center] / [impulse radius], 1, 0)
 >     imp_mag = imp_n * [impulse power] * [number of fireball sparks] * IMPULSE_SCALE
