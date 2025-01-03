@@ -37,7 +37,7 @@ function createDefaultOptions()
 
 	oSet.bombEnergy = create_mode_option(
 		option_type.numeric, 
-		200,
+		500,
 		"bombEnergy",
 		"Bomb energy at detonation (affects lifespan)")
 	oSet.options[#oSet.options + 1] = oSet.bombEnergy		
@@ -177,7 +177,7 @@ function createDefaultOptions()
 
 	oSet.sparkInflateMag = create_mode_option(
 		option_type.numeric, 
-		0.46,
+		0.5,
 		"sparkInflateMag",
 		"Fireball inflation pressure magnitude per spark x 10^-4")
 	oSet.options[#oSet.options + 1] = oSet.sparkInflateMag
@@ -214,7 +214,7 @@ function createDefaultOptions()
 
 	oSet.sparkSplitFreqEnd = create_mode_option(
 		option_type.numeric, 
-		300,
+		100,
 		"sparkSplitFreqEnd",
 		"Spark split frequency end (1 = always, + for less frequent)")
 	oSet.options[#oSet.options + 1] = oSet.sparkSplitFreqEnd	
