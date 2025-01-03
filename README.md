@@ -81,9 +81,9 @@ A number that determines the point at which the player is hurt by proximity to a
 >     dist_n = [distance from spark] / [ignition radius]
 >     hurt_n = minimum(1, dist_n) ^ 0.5
 >     if hurt_n > [spark hurt] {
->         [new player heath] = [current player health] - (hurt_n * SPARK_HURT_ADJUSTMENT)
+>         [new player heath] = [current player health] - (hurt_n * SPARK_HURT_SCALE)
 >     }
-For the value of `SPARK_HURT_ADJUSTMENT`, see "other values" below. 
+For the value of `SPARK_HURT_SCALE`, see "other values" below. 
 ### Spark erosion soft
 The number of voxels removed from soft materials on hit by a spark (x10)
 ### Spark erosion medium
@@ -100,8 +100,8 @@ The number of secondary raycasts on "bounce" to find the location to start a fir
 The amount of impulse applied to a body by a fireball to surrounding objects.
 #### Calculation
 >     imp_n = 1 - bracket([distance to fireball center] / [impulse radius], 1, 0)
->     imp_mag = imp_n * [impulse power] * [number of fireball sparks] * SUCTION_IMPULSE_ADJUSTMENT
-For the value of `SUCTION_IMPULSE_ADJUSTMENT`, see "other values" below.
+>     imp_mag = imp_n * [impulse power] * [number of fireball sparks] * IMPULSE_SCALE
+For the value of `IMPULSE_SCALE`, see "other values" below.
 Note: negitive impulse pulls objects toward the center of the fireball, positive pushes objects away.
 ### Impulse radius
 The maximum radius from the center of the fireball to impulse objects. 
@@ -171,4 +171,13 @@ The size of a smoke particle.
 ### Spark light intensity
 Light intensity of the point light in a spark "puff" particle. 
 ## Other values (found in `/script/Defs.lua`, must be edited in code)
-### 
+### The following values are constants that put the adjustable option within a convenient range
+- `SPARK_HURT_SCALE`
+- `IMPULSE_SCALE`
+- `PRESSURE_EFFECT_SCALE`
+
+### `DEFAULT_PUFF_COLOR`
+A 3D vector that holds the Hue, Saturation, and Value of the spark "puff" particle color. This puff is, by default, set to a monochromatic value in order to be illuminated by the associated point light. The point light color is set with the spark color option (see options above).
+### `DIRECTIONAL_VECTOR`
+The direction fireballs travel. This direction is used with the location of the spark in relation to the fireball center to determine toroidal motion. By default, this is set to (0,1,0) to set fireballs moving upward, as one would expect on Earth with a hot fireball. If another direction is desired, it can be set here. This can also be set to (0,0,0) to simulate explosions in zero gravity.
+
