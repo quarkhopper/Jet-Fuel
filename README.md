@@ -147,6 +147,7 @@ The split options are:
 - Spark split frequency start
 - Spark split frequency end
 - Spark split frequency increment
+
 Sparks each have an internal split frequecy number that increases over time, meaning that the spark is __less__ likely to split every tick. Every tick the number will continue to increase by the increment specified until it reaches the end frequency number. By default this goes from soemthing fairly frequent (say, 1/10) to something very infrequent (say, 1/300). The actual determination of whether the spark will split is a random number between 1 and the frequency number, and a split will occur if a 1 is randomly drawn. 
 ### Spark split direction variation
 A random vector is generated with components between `n` and `-n`, where `n` is the value of the option. This is then added to the directional vector of the spark at split spawn. 
@@ -157,10 +158,17 @@ A random number from 1 to `n` will be added to the sparks speed at split spawn.
 ### Spark speed reduction
 The amount of speed lost by a spark every tick. 
 ### Spark puff life
+The lifetime of an invidual spark "puff" particle __per tick__. Sparks are continuously simulated, but every tick a single particle "puff" and point light source is generated to marks its position. This lifetime is very short since it represents where a spark was at one point in time.
 ### Smoke life (Spark smoke life)
-### Spark tile size max
-### Spark tile size min
+The lifetime of a single smoke particle. This lifetime is typically longer than the spark puff lifetime because a smoke partical is generated once and follows a straight line until it fades.
+### Two options govorn the size of a spark "puff" particle:
+- Spark tile size max
+- Spark tile size min
+
+The size will be randomly determnined every tick to be between these two numbers, inclusive.
 ### Smoke tile size
+The size of a smoke particle. 
 ### Spark light intensity
+Light intensity of the point light in a spark "puff" particle. 
 ## Other values (found in `/script/Defs.lua`, must be edited in code)
 ### 
