@@ -81,9 +81,9 @@ A number that determines the point at which the player is hurt by proximity to a
 >     dist_n = [distance from spark] / [ignition radius]
 >     hurt_n = minimum(1, dist_n) ^ 0.5
 >     if hurt_n > [spark hurt] {
->         [new player heath] = [current player health] - (hurt_n * SPARK_HURT_ADJUSTMENT)
+>         [new player heath] = [current player health] - (hurt_n * SPARK_HURT_SCALE)
 >     }
-For the value of `SPARK_HURT_ADJUSTMENT`, see "other values" below. 
+For the value of `SPARK_HURT_SCALE`, see "other values" below. 
 ### Spark erosion soft
 The number of voxels removed from soft materials on hit by a spark (x10)
 ### Spark erosion medium
@@ -100,8 +100,8 @@ The number of secondary raycasts on "bounce" to find the location to start a fir
 The amount of impulse applied to a body by a fireball to surrounding objects.
 #### Calculation
 >     imp_n = 1 - bracket([distance to fireball center] / [impulse radius], 1, 0)
->     imp_mag = imp_n * [impulse power] * [number of fireball sparks] * SUCTION_IMPULSE_ADJUSTMENT
-For the value of `SUCTION_IMPULSE_ADJUSTMENT`, see "other values" below.
+>     imp_mag = imp_n * [impulse power] * [number of fireball sparks] * IMPULSE_SCALE
+For the value of `IMPULSE_SCALE`, see "other values" below.
 Note: negitive impulse pulls objects toward the center of the fireball, positive pushes objects away.
 ### Impulse radius
 The maximum radius from the center of the fireball to impulse objects. 

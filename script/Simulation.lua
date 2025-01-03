@@ -203,7 +203,7 @@ function simulationTick(dt)
 				local hurt_n = 1 - math.min(1, dist_n) ^ 0.5
 				if hurt_n > TOOL.sparkHurt.value then
 					local health = GetPlayerHealth()
-					SetPlayerHealth(health - (hurt_n * VALUES.SPARK_HURT_ADJUSTMENT))
+					SetPlayerHealth(health - (hurt_n * VALUES.SPARK_HURT_SCALE))
 				end
 
 				-- splitting into new sparks
@@ -289,7 +289,7 @@ function impulseTick(dt)
 				if imp_delta_mag <= TOOL.impulseRad.value then
 					local imp_dir = VecNormalize(imp_delta)
 					local imp_n = 1 - bracket_value(imp_delta_mag/TOOL.impulseRad.value, 1, 0)
-					local impulse_mag = imp_n * TOOL.impulsePower.value * #fireball.sparks * VALUES.SUCTION_IMPULSE_ADJUSTMENT
+					local impulse_mag = imp_n * TOOL.impulsePower.value * #fireball.sparks * VALUES.IMPULSE_SCALE
 					local impulse = VecScale(imp_dir, impulse_mag)
 					ApplyBodyImpulse(imp_body, GetBodyCenterOfMass(imp_body), impulse)
 				end

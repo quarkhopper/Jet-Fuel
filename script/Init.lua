@@ -244,7 +244,7 @@ function createDefaultOptions()
 		option_type.numeric, 
 		0.04,
 		"sparkDeathSpeed",
-		"Spark dead at speed")
+		"Spark death speed")
 	oSet.options[#oSet.options + 1] = oSet.sparkDeathSpeed	
 
 	oSet.sparkSplitSpeed = create_mode_option(
