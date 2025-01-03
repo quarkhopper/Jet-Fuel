@@ -74,8 +74,6 @@ end
 
 -- analyze all sparks to determine fireball centers
 function fireballCalcTick(dt)
-
-
 	fireballs = {}
 	newSparks = {}
 	local unassignedSparks = copyTable(allSparks)
@@ -332,7 +330,6 @@ function createSparkInst(options, pos, dir, speed)
 	inst.distance_n = 1
 	inst.vectorFromOrigin = 0
 	inst.inverseVector = Vec()
-	inst.smokeLife = TOOL.sparkPuffLife.value
 	-- this value gets deincremented over time
 	inst.splitFreq = TOOL.sparkSplitFreqStart.value
 	inst.splitsRemaining = 0
@@ -375,7 +372,6 @@ function makeSparkEffect(spark)
 	local colorHSV = spark.sparkColor
 	local color = HSVToRGB(colorHSV)
 	local intensity = TOOL.sparkLightIntensity.value
-	local lifetime = TOOL.sparkPuffLife.value
 	local puffColor = HSVToRGB(VALUES.DEFAULT_PUFF_COLOR)
 	PointLight(spark.pos, color[1], color[2], color[3], intensity)
 
@@ -389,7 +385,7 @@ function makeSparkEffect(spark)
 	ParticleRadius(math.random(TOOL.sparkTileRadMin.value, TOOL.sparkTileRadMax.value) * 0.1)
 	ParticleColor(puffColor[1], puffColor[2], puffColor[3])
 	ParticleGravity(gravity)
-	SpawnParticle(spark.pos, movement, lifetime)
+	SpawnParticle(spark.pos, movement, TOOL.sparkPuffLife.value)
 end
 
 function makeSmoke(spark)

@@ -233,13 +233,6 @@ function createDefaultOptions()
 		"Spark split dir variation")
 	oSet.options[#oSet.options + 1] = oSet.sparkSplitDirVariation	
 
-	oSet.sparkHitDirVariation = create_mode_option(
-		option_type.numeric, 
-		1,
-		"sparkHitDirVariation",
-		"Spark hit spawn dir variation")
-	oSet.options[#oSet.options + 1] = oSet.sparkHitDirVariation	
-
 	oSet.sparkHitFollowMaxSpeed = create_mode_option(
 		option_type.numeric, 
 		3,
@@ -275,13 +268,6 @@ function createDefaultOptions()
 		"Spark speed reduction over time")
 	oSet.options[#oSet.options + 1] = oSet.sparkSpeedReduction	
 	
-	oSet.sparkJitter = create_mode_option(
-		option_type.numeric, 
-		0.1,
-		"sparkJitter",
-		"Spark dir jitter")
-	oSet.options[#oSet.options + 1] = oSet.sparkJitter	
-
 -- aesthetics
 
 	oSet.sparkPuffLife = create_mode_option(
