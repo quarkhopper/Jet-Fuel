@@ -123,7 +123,6 @@ function handleInput(dt)
 
 		if InputPressed(KEY.REVERSE_MODE.key) then
 			reverseMode = not reverseMode
-			bombs = reverseTable(bombs)
 		end
 
 		if InputPressed(KEY.STICKY_MODE.key) then
@@ -132,12 +131,20 @@ function handleInput(dt)
 
 		if InputPressed(KEY.DETONATE.key) and
 		GetPlayerGrabShape() == 0 then
-			if singleMode then 
-				local bomb = bombs[1]
+			if singleMode then
+				local index = 1 
+				if reverseMode then
+					index = #bombs		 
+				end
+				local bomb = bombs[index]
 				detonate(bomb)
-				table.remove(bombs, 1)
+				table.remove(bombs, index)
 			else
-				detonateAll()
+				local detonateThese = bombs
+				if reverseMode then
+					detonateThese = reverseTable(bombs) 
+				end
+				detonateAll(detonateThese)
 			end
 		end
 
