@@ -1,5 +1,6 @@
-# Jet Fuel - A mod for Teardown
+# Jet Fuel - An explosive mod for Teardown
 ## Description
+I created this mod to produce evolving volumes of fire following an expanding tree and including psuedo-physics (physics with corners gruesomely cut) that make ballooning, mushrooming fire. 
 ## Definitions
 ### Bomb
 Any shape that can produce an explosion by breaking or on command.
@@ -17,6 +18,8 @@ The collection of all sparks and parameters affecting their behavior.
 A subgroup of sparks that are associated by distance and controlled as a group by the simulation separately from other groups. Fireballs are can be thought of as one group of fire sparks moving together in a toroidal motion upward (typically). The center of a fireball is used as an origin for measuring distance and relative motion to all sparks contained in that fireball, affecting their motion and lifespan. Sparks are assigned to fireballs dynamically as the simulation progresses.
 ### Smoke
 A spark that has died (from fizzling or running out of splits) becomes a smoke particle. Smoke particles continue in a straight line for a short period of time before disappearing.
+## General principles
+## Flow diagram
 ## Game controls
 ### Detonate (default [X] key)
 Will create an explosion at the location of every bomb shape (provided any voxels of the original shape remain). Bombs are detonated in order that they were planted/infused unless the player has toggled reverse mode to on. Bombs will be detonated when the simulated number of sparks (see the lower left screen) goes below the detonation trigger value (see options below). Note: all sparks share the same simulation limit (see options below). An explosions releases a certain number of sparks into the simulation which is bound to this limit. Once this limit is exceeded, sparks are randomly removed. This means that if you detonate several bombs simultaneously there will be smaller amounts of fire associated with each one. Raise the simulation limit to allow for more total fire if this is desired. 
@@ -104,46 +107,55 @@ Note: negitive impulse pulls objects toward the center of the fireball, positive
 The maximum radius from the center of the fireball to impulse objects. 
 ### Impulse trials (nearest number of shapes to attempt impulse)
 The maximum number of shapes that can be impulsed (within the radius above) by a fireball.
-### Torus pressure (fireball)
-Pressure flowing through the fireball in the direction of travel, diminishing with distance. The calculation uses a vector dot product that creates more pressure when a spark is near the axis of travel. 
+### Pressure options
+There are three options that deal with pressure within a fireball . They are:
+- Torus pressure
+- Vacuum pressure
+- Inflation pressure
+
+It is the balance of these forces that primarily affects fireball shape and movement, among other minor factors described in this document.
+- __Torus__ pressure describes the push that sparks experience moving them through the fireball in the direction of travel, diminishing with distance. The calculation uses a vector dot product that creates more pressure when a spark is near the axis of travel.
+- __Vacuum__ pressure pushes sparks into the center of a fireball, regardless of the orientation of the spark to the fireball center. Like torus pressure, the effect diminishes with distance.
+- __Inflation__ pressure pushes sparks away the center of a fireball, regardless of the orientation of the spark to the fireball center. This effect also diminishes with distance.
+
 NOTE: for the following three pressure variables the variable `pressureDistance_n` is defined as:
 >     sparkDistance_n = minimum(1, 1/(1 + [spark distance from origin]))
->     pressureDistance_n = sparkDistance_n ^ 0.8
-#### Calculation
+>     pressureDistance_n = sparkDistance_n ^ 0.8\
+In the following calculations, the values of `DIRECTIONAL_VECTOR` and `PRESSURE_EFFECT_SCALE`, see the section "other values" below.
+#### Torus pressure calculation
 For one spark:
 >     lookDir_uv = [Unit vector from spark to center of fireball]
 >     angleDot_n = lookDir_uv (dot) DIRECTIONAL_VECTOR
 >     torus_n = pressureDistance_n * angleDot_n
 >     torus_mag = [torus pressure] * PRESSURE_EFFECT_SCALE * [number of sparks in fireball] * torus_n
 >     torus_vector_v = lookDir_uv * torus_mag
- For the values of `DIRECTIONAL_VECTOR` and `PRESSURE_EFFECT_SCALE`, see "other values" below.
-### Vacuum pressure (fireball)
-Pressure pushing into the center of a fireball, regardless of the orientation of the spark to the fireball center.
-#### Calculation
+#### Vacuum pressure calculation
 For one spark:
 >     vacuum_mag = [vacuum pressure] * PRESSURE_EFFECT_SCALE * [number of sparks in fireball] * pressureDistance_n
->			vacuum_vector_v = lookDir_uv * vacuum_mag ^ 0.5
-For the value of `PRESSURE_EFFECT_SCALE`, see "other values" below.
-### Inflation pressure (fireball)
-Pressure pushing away the center of a fireball, regardless of the orientation of the spark to the fireball center.
-#### Calculation
+>     vacuum_vector_v = lookDir_uv * vacuum_mag ^ 0.5
+#### Inflation pressure calculation
 For one spark:
 >     inflate_mag = [inflation pressure] * PRESSURE_EFFECT_SCALE * [number of sparks in fireball] * pressureDistance_n * -1
->			inflate_vector_v = lookDir_uv * vacuum_mag ^ 0.5
-For the value of `PRESSURE_EFFECT_SCALE`, see "other values" below.
+>     inflate_vector_v = lookDir_uv * vacuum_mag ^ 0.5
 ### Spark spawns max
 When a spark splits, this is the upper limit of child sparks (spawns) that will be randomly generated.
 ### Spark spawns min
 When a spark splits, this is the lower limit of child sparks (spawns) that will be randomly generated.
-### Spark split frequency start[s](url)
-### Spark split frequency end
-### Spark split frequency increment
+### spark split frequency options:
+Three options govern the frequency that a spark may split at the beginning and end of its life. All three of these frequency variables affect things as a __denominator__ in the form `1/n`, meaning that the bigger the number, the less frequent the occurance. A value of 1 will, therefor, ensure something happens every tick. A very large value (say, in the hundreds or thousands) will happen very infrequently. 
+The split options are:
+- Spark split frequency start
+- Spark split frequency end
+- Spark split frequency increment
+Sparks each have an internal split frequecy number that increases over time, meaning that the spark is __less__ likely to split every tick. Every tick the number will continue to increase by the increment specified until it reaches the end frequency number. By default this goes from soemthing fairly frequent (say, 1/10) to something very infrequent (say, 1/300). The actual determination of whether the spark will split is a random number between 1 and the frequency number, and a split will occur if a 1 is randomly drawn. 
 ### Spark split direction variation
-### Spark hit direction variation
+A random vector is generated with components between `n` and `-n`, where `n` is the value of the option. This is then added to the directional vector of the spark at split spawn. 
 ### Spark split speed
+The base speed a spark travels at split spawn.
 ### Spark split speed variation
+A random number from 1 to `n` will be added to the sparks speed at split spawn.
 ### Spark speed reduction
-### Spark jitter
+The amount of speed lost by a spark every tick. 
 ### Spark puff life
 ### Smoke life (Spark smoke life)
 ### Spark tile size max
