@@ -200,7 +200,7 @@ Light intensity of the point light in a spark "puff" particle.
 - `IMPULSE_SCALE`
 - `PRESSURE_EFFECT_SCALE`
 
-### `DEFAULT_PUFF_COLOR`
-A 3D vector that holds the Hue, Saturation, and Value of the spark "puff" particle color. This puff is, by default, set to a monochromatic value in order to be illuminated by the associated point light. The point light color is set with the spark color option (see options above).
+### `PUFF_CONTRAST`
+A number between 0 and 1 that determines the contrast of the fireball, regardless of spark color. This number actully is the __saturation value__ of the HSV color of the spark "puff" particle color. This puff is, by default, set to a monochromatic color in order to be illuminated by the associated point light. The point light color is set with the spark color option (see options above). 
 ### `DIRECTIONAL_VECTOR`
 The direction fireballs travel. This direction is used with the location of the spark in relation to the fireball center to determine toroidal motion. By default, this is set to (0,1,0) to set fireballs moving upward, as one would expect on Earth with a hot fireball. If another direction is desired, it can be set here. This can also be set to (0,0,0) to simulate explosions in zero gravity.
