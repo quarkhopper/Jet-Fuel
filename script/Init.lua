@@ -44,7 +44,7 @@ function createDefaultOptions()
 
 	oSet.bombSparks = create_mode_option(
 		option_type.numeric, 
-		100,
+		500,
 		"bombSparks",
 		"Bomb sparks at detonation (affects size)")
 	oSet.options[#oSet.options + 1] = oSet.bombSparks		
@@ -58,14 +58,14 @@ function createDefaultOptions()
 
 	oSet.fireballSparksMin = create_mode_option(
 		option_type.numeric, 
-		10,
+		40,
 		"fireballSparksMin",
 		"Minimum sparks below which fireball dies")
 	oSet.options[#oSet.options + 1] = oSet.fireballSparksMin	
 
 	oSet.fireballSparksMax = create_mode_option(
 		option_type.numeric, 
-		600,
+		500,
 		"fireballSparksMax",
 		"Maximum number of sparks per one fireball")
 	oSet.options[#oSet.options + 1] = oSet.fireballSparksMax	
@@ -86,7 +86,7 @@ function createDefaultOptions()
 
 	oSet.blastSpeed = create_mode_option(
 		option_type.numeric, 
-		2.5,
+		4,
 		"blastSpeed",
 		"Blast speed at detonation (affects size)")
 	oSet.options[#oSet.options + 1] = oSet.blastSpeed	
