@@ -141,7 +141,7 @@ It is the balance of these forces that primarily affects fireball shape and move
 
 NOTE: for the following three pressure variables the variable `pressureDistance_n` is defined as:
 >     sparkDistance_n = minimum(1, 1/(1 + [spark distance from origin]))
->     pressureDistance_n = sparkDistance_n ^ 0.8\
+>     pressureDistance_n = sparkDistance_n ^ 0.8
 In the following calculations, the values of `DIRECTIONAL_VECTOR` and `PRESSURE_EFFECT_SCALE`, see the section "other values" below.
 #### Torus pressure calculation
 For one spark:
