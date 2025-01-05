@@ -102,20 +102,22 @@ function handleInput(dt)
 				end
 			end
 
-			if InputPressed(KEY.CLEAR.key) then
-				-- clear all bombs
-				local shapes = FindShapes("decoder", true)
-				for i=1, #shapes do
-					local shape = shapes[i]
-					Delete(shape)
-				end
-				bombs = {}
-				toDetonate = {}
-				sparklers = {}
-				allSparks = {}
-			end
+
 		end
 		-- commands you CAN do in a vehicle
+
+		if InputPressed(KEY.CLEAR.key) then
+			-- clear all bombs
+			local shapes = FindShapes("decoder", true)
+			for i=1, #shapes do
+				local shape = shapes[i]
+				Delete(shape)
+			end
+			bombs = {}
+			toDetonate = {}
+			sparklers = {}
+			allSparks = {}
+		end
 
 		if InputPressed(KEY.INFUSE_MODE.key) then
 			infuseMode = not infuseMode

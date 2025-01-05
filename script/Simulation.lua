@@ -200,7 +200,7 @@ function simulationTick(dt)
 					else
 						-- moving object, match the speed plus a little
 						local maxSpeedProperty = TOOL.sparkHitFollowMaxSpeed or TOOL.blastSpeed
-						local newSpeed = math.min(VecLength(velocity) + 0.1, maxSpeedProperty.value)
+						local newSpeed = math.min(VecLength(velocity), maxSpeedProperty.value)
 						spark.dir = VecNormalize(velocity)
 						spark.speed = newSpeed
 						forceSplit = true
