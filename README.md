@@ -41,7 +41,6 @@ In one tick, the following sequence is executed (with some generalization):
   - Sparks are turned into smoke particles if they are dead (fizzled or have dropped to "death" speed)
   - Spawn fires on objects near the fireball. If spawned on glass, a hole is made instead.
 - Objects are impulsed by fireballs
-- 
 ## Game controls
 ### Detonate (default [X] key)
 Will create an explosion at the location of every bomb shape (provided any voxels of the original shape remain). Bombs are detonated in order that they were planted/infused unless the player has toggled reverse mode to on. Bombs will be detonated when the simulated number of sparks (see the lower left screen) goes below the detonation trigger value (see options below). Note: all sparks share the same simulation limit (see options below). An explosion releases a certain number of sparks into the simulation which is bound to this limit. Once this limit is exceeded, sparks are randomly removed. This means that if you detonate several bombs simultaneously there will be smaller amounts of fire associated with each one. Raise the simulation limit to allow for more total fire if this is desired. 
@@ -105,11 +104,11 @@ A number that determines the point at which the player is hurt by proximity to a
 >     }
 For the value of `SPARK_HURT_SCALE`, see "other values" below. 
 ### Spark erosion soft
-The number of voxels removed from soft materials on hit by a spark (x10)
+The number of voxels removed from soft materials on hit by a spark
 ### Spark erosion medium
-The number of voxels removed from medium materials on hit by a spark (x10)
+The number of voxels removed from medium materials on hit by a spark
 ### Spark erosion hard
-The number of voxels removed from hard materials on hit by a spark (x10)
+The number of voxels removed from hard materials on hit by a spark
 ### Ignition and hurt radius
 Radius used in starting fires from the center of a fireball. Ignition occurs in two phases: a raycast is done from the center of the fireball and, if it hits a surface, a second set of raycasts are done from that point. If the second raycast hits an object then a fire is started at that point. Essentially, a raycast and a "bounce" is done to find the location to start a fire. This radius is also used to determine how far away a player can be hurt by a spark. 
 ### Ignition probes
@@ -140,7 +139,7 @@ It is the balance of these forces that primarily affects fireball shape and move
 
 NOTE: for the following three pressure variables the variable `pressureDistance_n` is defined as:
 >     sparkDistance_n = minimum(1, 1/(1 + [spark distance from origin]))
->     pressureDistance_n = sparkDistance_n ^ 0.8\
+>     pressureDistance_n = sparkDistance_n ^ 0.8
 In the following calculations, the values of `UP_VECTOR` and `PRESSURE_EFFECT_SCALE`, see the section "other values" below.
 #### Torus pressure calculation
 For one spark:
