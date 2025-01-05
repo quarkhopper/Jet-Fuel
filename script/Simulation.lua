@@ -6,6 +6,7 @@
 -- sounds used. Don't ask about the toilet.
 boomSound = LoadSound("MOD/snd/toiletBoom.ogg")
 rumbleSound = LoadSound("MOD/snd/rumble.ogg")
+thrower_sound = LoadLoop("MOD/snd/thrower.ogg")
 
 -- any shape that can explode
 bombs = {}
@@ -40,6 +41,7 @@ end
 -- create an explosion at the location of the bomb - creates a bunch of new
 -- sparks
 function detonate(bomb)
+	bomb.dir = nil -- don't want to have a directionality with detonations
 	-- inject sparks into the simulation at this position, if 
 	-- not totally destroyed already
 	if not createExplosion(bomb) then return end
@@ -105,6 +107,7 @@ function sparklerTick(dt)
 			throwSpark(sparkler)
 			table.insert(newSparklers, sparkler)
 		end
+		PlayLoop(thrower_sound, sparkler.position, 50)
 	end
 	sparklers = newSparklers
 end
@@ -280,17 +283,17 @@ function simulationTick(dt)
 		end
 
 		-- spawn fire
-		for probe=1, TOOL.ignitionProbes.value * #fireball.sparks do
-			local ign_probe_dir = random_vec(1)
-			local ign_probe_hit, ign_probe_dist, ign_probe_normal, ign_probe_shape = QueryRaycast(fireball.center, ign_probe_dir, TOOL.ignitionRadius.value)
-			if ign_probe_hit then
-				local ign_probe_pos = VecAdd(fireball.center, VecScale(ign_probe_dir, ign_probe_dist))
-				local mat = GetShapeMaterialAtPosition(ign_probe_shape, ign_probe_pos)
-				if mat == "glass" then
-					MakeHole(ign_probe_pos, 0.2)
-				else
-					SpawnFire(ign_probe_pos)
-					for ign=1, TOOL.ignitionCount.value do
+		for probe=1, #fireball.sparks do
+			if math.random(1, TOOL.ignitionFreq.value) == 1 then
+				local ign_probe_dir = random_vec(1)
+				local ign_probe_hit, ign_probe_dist, ign_probe_normal, ign_probe_shape = QueryRaycast(fireball.center, ign_probe_dir, TOOL.ignitionRadius.value)
+				if ign_probe_hit then
+					local ign_probe_pos = VecAdd(fireball.center, VecScale(ign_probe_dir, ign_probe_dist))
+					local mat = GetShapeMaterialAtPosition(ign_probe_shape, ign_probe_pos)
+					if mat == "glass" then
+						MakeHole(ign_probe_pos, 0.2)
+					else
+						SpawnFire(ign_probe_pos)
 						local ign_dir = random_vec(1)
 						local ign_hit, ign_dist = QueryRaycast(ign_probe_pos, ign_dir, TOOL.ignitionRadius.value)
 						if ign_hit then

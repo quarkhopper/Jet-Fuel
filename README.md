@@ -113,10 +113,10 @@ The number of voxels removed from medium materials on hit by a spark
 The number of voxels removed from hard materials on hit by a spark
 ### Ignition and hurt radius
 Radius used in starting fires from the center of a fireball. Ignition occurs in two phases: a raycast is done from the center of the fireball and, if it hits a surface, a second set of raycasts are done from that point. If the second raycast hits an object then a fire is started at that point. Essentially, a raycast and a "bounce" is done to find the location to start a fire. This radius is also used to determine how far away a player can be hurt by a spark. 
-### Ignition probes
-The number of initial raycasts done from the center of a fireball, per spark, to find a location to do a "bounce" and one further raycast to find locations to start a fire.
-### Ignition count
-The number of secondary raycasts on "bounce" to find the location to start a fire. The total number of POTENTIAL fires started by a fireball is `[ignition probes] * [sparks in the fireball] * [ignition count]`.
+### Ignition freq
+Governs the frequency that an ignition raycast will trigger that will spark fires. This frequency variable affects things as a __denominator__ in the form `1/n`, meaning that the bigger the number, the less frequent the occurrence. A value of 1 will, therefore, ensure a raycast is sent every tick. A very large value (say, in the hundreds or thousands) will happen very infrequently. 
+
+An initial raycast is made from the center of a fireball, to find a location to do a "bounce" and one further raycast to find locations to start a fire.
 ### Impulse power
 The amount of impulse applied to a body by a fireball to surrounding objects. This is the power that sucks things up into the explosion and shoots them out. Some objects may even be held _inside_ of fireballs until they die and then dropped, flaming to the ground. 
 #### Calculation

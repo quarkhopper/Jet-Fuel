@@ -119,19 +119,12 @@ function createDefaultOptions()
 		"Fire ignition and player hurt radius")
 	oSet.options[#oSet.options + 1] = oSet.ignitionRadius	
 
-	oSet.ignitionProbes = create_mode_option(
+	oSet.ignitionFreq = create_mode_option(
 		option_type.numeric, 
-		1,
-		"ignitionProbes",
-		"First ignition raycasts (pre-bounce) per fireball spark per tick")
-	oSet.options[#oSet.options + 1] = oSet.ignitionProbes
-
-	oSet.ignitionCount = create_mode_option(
-		option_type.numeric, 
-		1,
-		"ignitionCount",
-		"Ignitions from secondary raycast (post-bounce) on hit")
-	oSet.options[#oSet.options + 1] = oSet.ignitionCount
+		10,
+		"ignitionFreq",
+		"First ignition frequency (1 = every hit, + for less frequent)")
+	oSet.options[#oSet.options + 1] = oSet.ignitionFreq
 
 	oSet.impulsePower = create_mode_option(
 		option_type.numeric, 
