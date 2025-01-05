@@ -58,7 +58,7 @@ function createDefaultOptions()
 
 	oSet.fireballSparksMax = create_mode_option(
 		option_type.numeric, 
-		500,
+		300,
 		"fireballSparksMax",
 		"Maximum number of sparks per one fireball")
 	oSet.options[#oSet.options + 1] = oSet.fireballSparksMax	
