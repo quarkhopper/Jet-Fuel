@@ -56,13 +56,6 @@ function createDefaultOptions()
 		"Spark when next detonation (-1 for simultaneous explosions)")
 	oSet.options[#oSet.options + 1] = oSet.detonationTrigger
 
-	oSet.fireballSparksMin = create_mode_option(
-		option_type.numeric, 
-		40,
-		"fireballSparksMin",
-		"Minimum sparks below which fireball dies")
-	oSet.options[#oSet.options + 1] = oSet.fireballSparksMin	
-
 	oSet.fireballSparksMax = create_mode_option(
 		option_type.numeric, 
 		500,

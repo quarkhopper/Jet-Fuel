@@ -23,25 +23,48 @@ fireballs = {}
 -- shapes actually waiting to be detonated when appropriate
 toDetonate = {}
 
+-- shapes that are now sparklers YAY!
+sparklers = {}
+
 -- schedule all bombs for detonation
-function detonateAll()
-	toDetonate = copyTable(bombs)
+function detonateAll(reverse)
+	reverse = reverse or false
+	local armed = copyTable(bombs)
+	if reverse then armed = reverseTable(armed) end
+	for i=1, #armed do
+		table.insert(toDetonate, armed[i])
+	end
 	bombs = {}
 end
 
 -- create an explosion at the location of the bomb - creates a bunch of new
 -- sparks
 function detonate(bomb)
-	if bomb == nil then return end
-	local position = get_shape_center(bomb.shape)
-	if position == nil then return end -- shape totally destroyed - no explosion
-	-- inject sparks into the simulation at this position
-	createExplosion(bomb)
+	-- inject sparks into the simulation at this position, if 
+	-- not totally destroyed already
+	if not createExplosion(bomb) then return end
 	-- actual Teardown concussion
-	Explosion(position, TOOL.blastPowerPrimary.value)
+	Explosion(bomb.position, TOOL.blastPowerPrimary.value)
 	-- BOOM!
 	PlaySound(boomSound, position, 5)
 	PlaySound(rumbleSound, position, 5)
+end
+
+function sparkle(bomb)
+	local position = getBombPosition(bomb)
+	if position == nil then return end
+	bomb.sparkler = true
+	table.insert(sparklers, bomb)
+end
+
+function sparkleAll()
+	local armed = copyTable(bombs)
+	for i=1, #armed do
+		local sparkler = armed[i]
+		sparkler.sparkler = true
+		table.insert(sparklers, sparkler)
+	end
+	bombs = {}
 end
 
 -- bombs that are still alive (intact shapes). If bombs
@@ -70,6 +93,20 @@ function detonationTick(dt)
 		detonate(bomb)
 		table.remove(toDetonate, 1)
 	end
+end
+
+function sparklerTick(dt)
+	if #sparklers == 0 then return end
+	local newSparklers = {}
+	for i=1, #sparklers do
+		local sparkler = sparklers[i]
+		sparkler.position = getBombPosition(sparkler)
+		if sparkler.position ~= nil then 
+			throwSpark(sparkler)
+			table.insert(newSparklers, sparkler)
+		end
+	end
+	sparklers = newSparklers
 end
 
 -- analyze all sparks to determine fireball centers
@@ -101,13 +138,11 @@ function fireballCalcTick(dt)
 				table.insert(newUnassigned, spark)
 			end
 		end
-		if #fireball.sparks > TOOL.fireballSparksMin.value then 
-			fireball.center = average_vec(positions)
-			fireball.dir = VecNormalize(average_vec(dirs))
-			table.insert(fireballs, fireball)
-			for s=1, #fireball.sparks do
-				table.insert(newSparks, fireball.sparks[s])
-			end
+		fireball.center = average_vec(positions)
+		fireball.dir = VecNormalize(average_vec(dirs))
+		table.insert(fireballs, fireball)
+		for s=1, #fireball.sparks do
+			table.insert(newSparks, fireball.sparks[s])
 		end
 		unassignedSparks = newUnassigned
 	end
@@ -181,7 +216,7 @@ function simulationTick(dt)
 				-- pressure effects.
 				-- Torus effects - Pulling from behind the cloud and pushing from the front
 				local pressureDistance_n = spark.distance_n  ^ 0.8
-				local angleDot_n = VecDot(spark.lookOriginDir, VALUES.DIRECTIONAL_VECTOR)
+				local angleDot_n = VecDot(spark.lookOriginDir, VALUES.UP_VECTOR)
 				local torus_n = pressureDistance_n * angleDot_n
 				local torus_mag = TOOL.sparkTorusMag.value * VALUES.PRESSURE_EFFECT_SCALE * #fireball.sparks * torus_n
 				local torus_vector = VecScale(spark.lookOriginDir, torus_mag)
@@ -299,15 +334,25 @@ function impulseTick(dt)
 end
 
 function createExplosion(bomb)
+	bomb.position = getBombPosition(bomb)
+	-- check if the bomb can no longer be 
+	-- positioned due to be completely destroyed
+	if bomb.position == nil then return false end
 	for a=1, bomb.sparkCount do
-		local pos = get_shape_center(bomb.shape)
-		local newSpark = createSparkInst(TOOL,
-		VecAdd(pos, random_vec(0.5)),
-		VecNormalize(random_vec(1)),
-		TOOL.blastSpeed.value)
-		newSpark.splitsRemaining = bomb.splitCount
-		table.insert(allSparks, newSpark)
+		throwSpark(bomb)
 	end
+	return true
+end
+
+function throwSpark(bomb)
+	local dir = bomb.dir or random_vec(1)
+	local newSpark = createSparkInst(
+		TOOL,
+		VecAdd(bomb.position, random_vec(0.5)),
+		dir,
+		TOOL.blastSpeed.value)
+	newSpark.splitsRemaining = bomb.splitCount
+	table.insert(allSparks, newSpark)
 end
 
 function createFireballInst()
@@ -322,7 +367,7 @@ function createSparkInst(options, pos, dir, speed)
 	local inst = {}
 	inst.options = options or createOptionSetInst()
 	inst.pos = pos
-	inst.dir = dir
+	inst.dir = VecNormalize(dir)
 	inst.speed = speed or vary_by_percentage(TOOL.sparkSplitSpeed.value, TOOL.sparkSplitSpeedVariation.value)
 	inst.sparkColor = options.sparkColor.value
 	inst.lookOriginDir = nil
@@ -338,7 +383,10 @@ end
 
 function createBombInst(shape)
 	local inst = {}
+	inst.position = Vec() -- set when ready to detonate
 	inst.shape = shape
+	inst.sparkler = false
+	inst.dir = nil -- used if a sparkler
 	inst.sparkCount = TOOL.bombSparks.value
 	inst.splitCount = math.ceil((TOOL.bombEnergy.value * 10^2)/inst.sparkCount)
 	return inst
@@ -400,5 +448,12 @@ function makeSmoke(spark)
 	ParticleColor(smokeColor[1], smokeColor[2], smokeColor[3])
 	ParticleGravity(0)
 	SpawnParticle(VecAdd(spark.pos, random_vec(0.2)), VecScale(VecAdd(spark.dir, random_vec(0.5)), spark.speed), TOOL.sparkSmokeLife.value)
+end
+
+function getBombPosition(bomb)
+	if bomb == nil then return nil end
+	local position = get_shape_center(bomb.shape)
+	if position == nil then return end -- shape totally destroyed
+	return position
 end
 

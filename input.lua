@@ -72,8 +72,11 @@ function handleInput(dt)
 				elseif hit then 
 					local bomb = nil
 					if not infuseMode then 
+						-- stick it to a surface
+						local normal_q = quat_between_vecs(Vec(0,1,0), normal)
 						local drop_pos = VecAdd(camera.pos, VecScale(shoot_dir, dist))
-						bomb = createBombInst(Spawn("MOD/prefab/Decoder.xml", Transform(drop_pos), false, true)[2])
+						bomb = createBombInst(Spawn("MOD/prefab/Decoder.xml", Transform(drop_pos, normal_q), false, true)[2])
+						bomb.dir = normal
 						table.insert(bombs, bomb)
 						plantTimer = plantRate
 					elseif infuseInProgress == false then -- unlocked on key up
@@ -107,8 +110,9 @@ function handleInput(dt)
 					Delete(shape)
 				end
 				bombs = {}
-				allSparks = {}
 				toDetonate = {}
+				sparklers = {}
+				allSparks = {}
 			end
 		end
 		-- commands you CAN do in a vehicle
@@ -130,21 +134,28 @@ function handleInput(dt)
 		end
 
 		if InputPressed(KEY.DETONATE.key) and
-		GetPlayerGrabShape() == 0 then
+		GetPlayerGrabShape() == 0 and 
+		#bombs > 0 then
 			if singleMode then
 				local index = 1 
 				if reverseMode then
 					index = #bombs		 
 				end
 				local bomb = bombs[index]
-				detonate(bomb)
+				if InputDown("shift") then 
+					sparkle(bomb)
+				else
+					detonate(bomb)
+				end
 				table.remove(bombs, index)
 			else
-				local detonateThese = bombs
-				if reverseMode then
-					detonateThese = reverseTable(bombs) 
+				if InputDown("shift") then 
+					sparkleAll()
+				elseif reverseMode then
+					detonateAll(true)
+				else
+					detonateAll()
 				end
-				detonateAll(detonateThese)
 			end
 		end
 

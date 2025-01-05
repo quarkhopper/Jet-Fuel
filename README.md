@@ -89,8 +89,6 @@ The number of sparks that are spawned by a bomb explosion.
 The number of sparks that will allow the simulation to trigger the next explosion. When the total simulated number of sparks falls below this number, the next bomb, if any, will detonate. A value of -1 will cause the simulation to ignore triggering and detonate all bombs simultaneously.
 ### Fireball sparks max (maximum number of sparks, fireball)
 The maximum number of sparks that can be assigned together in a fireball before a new fireball is defined. The pressure variables (torus, vacuum, inflation - see below) apply to only one fireball and the sparks assigned to it. 
-### Fireball sparks min (minimum number of sparks, fireball)
-The minimum number of sparks that can be assigned together in a fireball before the fireball, and all sparks assigned to it, die. 
 ### Fireball radius (torus radius)
 When sparks are dynamically assigned to a fireball, a random spark is chosen and any other sparks within this radius are considered part of that fireball unless the upper limit (see above) is reached.
 ### Blast power
@@ -143,11 +141,11 @@ It is the balance of these forces that primarily affects fireball shape and move
 NOTE: for the following three pressure variables the variable `pressureDistance_n` is defined as:
 >     sparkDistance_n = minimum(1, 1/(1 + [spark distance from origin]))
 >     pressureDistance_n = sparkDistance_n ^ 0.8\
-In the following calculations, the values of `DIRECTIONAL_VECTOR` and `PRESSURE_EFFECT_SCALE`, see the section "other values" below.
+In the following calculations, the values of `UP_VECTOR` and `PRESSURE_EFFECT_SCALE`, see the section "other values" below.
 #### Torus pressure calculation
 For one spark:
 >     lookDir_uv = [Unit vector from spark to center of fireball]
->     angleDot_n = lookDir_uv (dot) DIRECTIONAL_VECTOR
+>     angleDot_n = lookDir_uv (dot) UP_VECTOR
 >     torus_n = pressureDistance_n * angleDot_n
 >     torus_mag = [torus pressure] * PRESSURE_EFFECT_SCALE * [number of sparks in fireball] * torus_n
 >     torus_vector_v = lookDir_uv * torus_mag
@@ -204,5 +202,5 @@ Light intensity of the point light in a spark "puff" particle.
 
 ### `PUFF_CONTRAST`
 A number between 0 and 1 that determines the contrast of the fireball, regardless of spark color. This number actully is the __saturation value__ of the HSV color of the spark "puff" particle color. This puff is, by default, set to a monochromatic color in order to be illuminated by the associated point light. The point light color is set with the spark color option (see options above). 
-### `DIRECTIONAL_VECTOR`
+### `UP_VECTOR`
 The direction fireballs travel. This direction is used with the location of the spark in relation to the fireball center to determine toroidal motion. By default, this is set to (0,1,0) to set fireballs moving upward, as one would expect on Earth with a hot fireball. If another direction is desired, it can be set here. This can also be set to (0,0,0) to simulate explosions in zero gravity.

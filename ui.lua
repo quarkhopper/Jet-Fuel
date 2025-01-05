@@ -66,7 +66,7 @@ function drawLegend()
 	UiPush()
 		UiTranslate(UiWidth() - 5, UiHeight() - 2)
 		UiAlign("right")
-	UiText("Explosive count: "..(#bombs + #toDetonate))
+	UiText("Explosive count: "..(#bombs + #toDetonate + #sparklers))
 UiPop()
 
 end

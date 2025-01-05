@@ -72,6 +72,12 @@ function vecs_equal(a, b)
 	and a[3] == b[3]
 end 
 
+function quat_between_vecs(v1, v2)
+    local a = VecCross(v1, v2)
+    local w = (VecLength(v1)^2 * VecLength(v2)^2) ^ 0.5 + VecDot(v1, v2)
+    return Quat(a[1], a[2], a[3], w)
+end
+
 function get_shape_center(shape)
 	if GetShapeVoxelCount(shape) == 0 then return nil end
 	local lower, upper = GetShapeBounds(shape)
