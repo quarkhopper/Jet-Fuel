@@ -44,6 +44,7 @@ function detonate(bomb)
 	bomb.dir = nil -- don't want to have a directionality with detonations
 	-- inject sparks into the simulation at this position, if 
 	-- not totally destroyed already
+	bomb.impulse = TOOL.impulsePower.value
 	if not createExplosion(bomb) then return end
 	-- actual Teardown concussion
 	Explosion(bomb.position, TOOL.blastPowerPrimary.value)
@@ -56,15 +57,14 @@ function sparkle(bomb)
 	local position = getBombPosition(bomb)
 	if position == nil then return end
 	bomb.sparkler = true
+	bomb.impulse = 0
 	table.insert(sparklers, bomb)
 end
 
 function sparkleAll()
 	local armed = copyTable(bombs)
 	for i=1, #armed do
-		local sparkler = armed[i]
-		sparkler.sparkler = true
-		table.insert(sparklers, sparkler)
+		sparkle(armed[i])
 	end
 	bombs = {}
 end
@@ -126,6 +126,7 @@ function fireballCalcTick(dt)
 			local spark = unassignedSparks[i]
 			if #fireball.sparks == 0 then 
 				fireball.center = spark.pos
+				fireball.impulse = spark.impulse
 			end
 			spark.vectorFromOrigin = VecSub(spark.pos, fireball.center)
 			spark.distanceFromOrigin = VecLength(spark.vectorFromOrigin)
@@ -253,12 +254,11 @@ function simulationTick(dt)
 							spark.splitsRemaining = spark.splitsRemaining - 1
 							local newDir = VecAdd(spark.dir, random_vec(TOOL.sparkSplitDirVariation.value))
 							newDir = VecNormalize(newDir)
-							local newSpark = createSparkInst(spark.options,
-							spark.pos,
-							newDir,
+							local newSpark = createSparkInst(spark.pos,	newDir,
 							vary_by_percentage(TOOL.sparkSplitSpeed.value, TOOL.sparkSplitSpeedVariation.value))
 							newSpark.splitFreq = spark.splitFreq
 							newSpark.splitsRemaining = spark.splitsRemaining
+							newSpark.impulse = spark.impulse
 							table.insert(newSparks, newSpark) -- will be assigned to a fireball next tick
 						end
 					end
@@ -312,24 +312,26 @@ function impulseTick(dt)
 	-- impulse the closest 100 shapes
 	for e=1, #fireballs do
 		local fireball = fireballs[e]
-		local shapesFilter = {}
-		for i=1, TOOL.impulseTrials.value do
-			QueryRejectShapes(shapesFilter)
-			local imp_hit, imp_pos, imp_normal, imp_shape = QueryClosestPoint(fireball.center, TOOL.impulseRad.value)
-			if imp_hit == false then
-				break
-			end
-			table.insert(shapesFilter, imp_shape)
-			local imp_body = GetShapeBody(imp_shape)
-			if imp_body ~= nil then
-				local imp_delta = VecSub(imp_pos, fireball.center)
-				local imp_delta_mag = VecLength(imp_delta)
-				if imp_delta_mag <= TOOL.impulseRad.value then
-					local imp_dir = VecNormalize(imp_delta)
-					local imp_n = 1 - bracket_value(imp_delta_mag/TOOL.impulseRad.value, 1, 0)
-					local impulse_mag = imp_n * TOOL.impulsePower.value * #fireball.sparks * VALUES.IMPULSE_SCALE
-					local impulse = VecScale(imp_dir, impulse_mag)
-					ApplyBodyImpulse(imp_body, GetBodyCenterOfMass(imp_body), impulse)
+		if fireball.impulse ~= 0 then 
+			local shapesFilter = {}
+			for i=1, TOOL.impulseTrials.value do
+				QueryRejectShapes(shapesFilter)
+				local imp_hit, imp_pos, imp_normal, imp_shape = QueryClosestPoint(fireball.center, TOOL.impulseRad.value)
+				if imp_hit == false then
+					break
+				end
+				table.insert(shapesFilter, imp_shape)
+				local imp_body = GetShapeBody(imp_shape)
+				if imp_body ~= nil then
+					local imp_delta = VecSub(imp_pos, fireball.center)
+					local imp_delta_mag = VecLength(imp_delta)
+					if imp_delta_mag <= TOOL.impulseRad.value then
+						local imp_dir = VecNormalize(imp_delta)
+						local imp_n = 1 - bracket_value(imp_delta_mag/TOOL.impulseRad.value, 1, 0)
+						local impulse_mag = imp_n * fireball.impulse * #fireball.sparks * VALUES.IMPULSE_SCALE
+						local impulse = VecScale(imp_dir, impulse_mag)
+						ApplyBodyImpulse(imp_body, GetBodyCenterOfMass(imp_body), impulse)
+					end
 				end
 			end
 		end
@@ -349,12 +351,13 @@ end
 
 function throwSpark(bomb)
 	local dir = bomb.dir or random_vec(1)
-	local newSpark = createSparkInst(
-		TOOL,
-		VecAdd(bomb.position, random_vec(0.5)),
-		dir,
-		TOOL.blastSpeed.value)
+	local position = bomb.position
+	if not bomb.sparkler then 
+		position = VecAdd(position, random_vec(0.5))
+	end
+	local newSpark = createSparkInst(position, dir)
 	newSpark.splitsRemaining = bomb.splitCount
+	newSpark.impulse = bomb.impulse
 	table.insert(allSparks, newSpark)
 end
 
@@ -363,16 +366,17 @@ function createFireballInst()
 	inst.sparks = {}
 	inst.center = Vec()
 	inst.dir = Vec()
+	inst.impulse = nil
 	return inst
 end
 
-function createSparkInst(options, pos, dir, speed)
+function createSparkInst(pos, dir, speed)
 	local inst = {}
-	inst.options = options or createOptionSetInst()
 	inst.pos = pos
 	inst.dir = VecNormalize(dir)
-	inst.speed = speed or vary_by_percentage(TOOL.sparkSplitSpeed.value, TOOL.sparkSplitSpeedVariation.value)
-	inst.sparkColor = options.sparkColor.value
+	inst.speed = speed or TOOL.blastSpeed.value
+	inst.impulse = nil
+	inst.sparkColor = TOOL.sparkColor.value
 	inst.lookOriginDir = nil
 	inst.distanceFromOrigin = 0
 	inst.distance_n = 1
@@ -389,6 +393,7 @@ function createBombInst(shape)
 	inst.position = Vec() -- set when ready to detonate
 	inst.shape = shape
 	inst.sparkler = false
+	inst.impulse = TOOL.impulsePower.value
 	inst.dir = nil -- used if a sparkler
 	inst.sparkCount = TOOL.bombSparks.value
 	inst.splitCount = math.ceil((TOOL.bombEnergy.value * 10^2)/inst.sparkCount)
