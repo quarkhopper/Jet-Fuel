@@ -4,6 +4,8 @@ I created this mod to produce evolving volumes of fire following an expanding tr
 ## Definitions
 ### Bomb
 Any shape that can produce an explosion by breaking or on command.
+### Jet mode (hold [ALT] with detonation key)
+Causes fire to spray in a jet from the bomb instead of the bomb detonating, and will continue until the bomb is cleared or the shape is completely destroyed. If a bomb is attached to an object (sticky mode) sparks will spray only out of the top of the canister. When sticky mode is off, or an object it infused, sparks spray in all directions from the center of the object/bomb. 
 ### Canister
 An object the player can spawn that functions as a bomb.
 ### Infused shape
@@ -42,10 +44,10 @@ In one tick, the following sequence is executed (with some generalization):
   - Spawn fires on objects near the fireball. If spawned on glass, a hole is made instead.
 - Objects are impulsed by fireballs
 ## Game controls
-### Detonate (default [X] key, [SHIFT] for sparkler)
+### Detonate (default [X] key, [ALT] for jet mode)
 Will create an explosion at the location of every bomb shape (provided any voxels of the original shape remain). Bombs are detonated in order that they were planted/infused unless the player has toggled reverse mode to on. Bombs will be detonated when the simulated number of sparks (see the lower left screen) goes below the detonation trigger value (see options below). Note: all sparks share the same simulation limit (see options below). An explosion releases a certain number of sparks into the simulation which is bound to this limit. Once this limit is exceeded, sparks are randomly removed. This means that if you detonate several bombs simultaneously there will be smaller amounts of fire associated with each one. Raise the simulation limit to allow for more total fire if this is desired. 
 
-SPARKLER MODE: Holding shift and pressing/clicking the delete key will cause the bomb to shoot sparks out of the top of the shape (orientation it was attached) if sticky, or in all directions if the shape was not sticky or infuse. Yes, you can create a wall of fire or watching something burn from the center outward. You'll have to clear bombs if you want it to stop. 
+SPARKLER MODE: Holding alt and pressing/clicking the delete key will cause the bomb to shoot a jet of sparks out of the top of the shape (orientation it was attached) if sticky, or in all directions if the shape was not sticky or infuse. Yes, you can create a wall of fire or watching something burn from the center outward. You'll have to clear bombs if you want it to stop. 
 ### Plant (default LMB)
 In sticky mode (default, see control below), A canister will be attached with a joint to any surface under the players target reticule. When sticky mode is off, a canister will be spawned directly in front of the player. In infuse mode, you can infuse any shape to __make it a bomb__. Clicking on an existing bomb will un-infuse it as well, including canisters (try it)!
 ### Clear (default [V] key)
@@ -96,6 +98,8 @@ When sparks are dynamically assigned to a fireball, a random spark is chosen and
 The explosion power (as defined by Teardown: 0-4) that is triggered for each bomb detonation. 
 ### Blast speed
 The speed sparks are given at detonation. This affects the initial area of fire surrounding the blast. 
+### Jet speed
+The speed sparks are ejected from a bomb in jet mode.
 ### Spark hurt (to the player)
 A number that determines the point at which the player is hurt by proximity to a spark. The ignition radius (see below) is used to calculate how much damage is given to the player by proximity to a spark. 
 #### Calculation 
@@ -158,6 +162,10 @@ For one spark:
 For one spark:
 >     inflate_mag = [inflation pressure] * PRESSURE_EFFECT_SCALE * [number of sparks in fireball] * pressureDistance_n * -1
 >     inflate_vector_v = lookDir_uv * vacuum_mag ^ 0.5
+### Spark fizzle frequency
+Denominator that determines the frequency at which a spark may fizzle per tick. A value of 1 will cause the spark to immediately fizzle (possibly before even splitting). A large number will cause the spark to never fizzle.
+#### Jet fizzle frequency
+Same as spark fizzle frequency but for bombs in jet mode.
 ### Spark spawns max
 When a spark splits, this is the upper limit of child sparks (spawns) that will be randomly generated.
 ### Spark spawns min
@@ -178,6 +186,8 @@ A spark can "follow" a moving object when it hits it, as though it is sticking t
 Speed at which a spark is considered "dead" and turns into a smoke particle. The age of a particle can be thought of as its speed value between split speed at birth and death speed as it slows down.
 ### Spark split speed
 The base speed a spark travels at split spawn.
+### Jet split speed
+The base speed a spark travels at split spawn while in jet mode.
 ### Spark split speed variation
 A random number from 1 to `n` will be added to the sparks speed at split spawn.
 ### Spark speed reduction
@@ -185,7 +195,7 @@ The amount of speed lost by a spark every tick.
 ### Spark puff life
 The lifetime of an individual spark "puff" particle __per tick__. Sparks are continuously simulated, but every tick a single particle "puff" and point light source is generated to marks its position. This lifetime is very short since it represents where a spark was at one point in time.
 ### Smoke life (Spark smoke life)
-The lifetime of a single smoke particle. This lifetime is typically longer than the spark puff lifetime because a smoke particle is generated once and follows a straight line until it fades.
+The lifetime of a single smoke particle. This lifetime is typically longer than the spark puff lifetime because a smoke particle is generated once and follows a straight line until it fades. NOTE: this does not apply to jet mode. 
 ### Two options govern the size of a spark "puff" particle:
 - Spark tile size max
 - Spark tile size min

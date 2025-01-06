@@ -115,7 +115,7 @@ function handleInput(dt)
 			end
 			bombs = {}
 			toDetonate = {}
-			sparklers = {}
+			jets = {}
 			allSparks = {}
 		end
 
@@ -135,6 +135,8 @@ function handleInput(dt)
 			stickyMode = not stickyMode
 		end
 
+		local jetMode = InputDown("alt")
+
 		if InputPressed(KEY.DETONATE.key) and
 		GetPlayerGrabShape() == 0 and 
 		#bombs > 0 then
@@ -144,15 +146,15 @@ function handleInput(dt)
 					index = #bombs		 
 				end
 				local bomb = bombs[index]
-				if InputDown("shift") then 
-					sparkle(bomb)
+				if jetMode then 
+					activateJet(bomb)
 				else
 					detonate(bomb)
 				end
 				table.remove(bombs, index)
 			else
-				if InputDown("shift") then 
-					sparkleAll()
+				if jetMode then 
+					activateAllJets()
 				elseif reverseMode then
 					detonateAll(true)
 				else
