@@ -302,7 +302,7 @@ function createDefaultOptions()
 
 	oSet.jetSpeed = create_mode_option(
 		option_type.numeric, 
-		6,
+		3,
 		"jetSpeed",
 		"jet mode speed at detonation (affects jet plume)")
 	oSet.options[#oSet.options + 1] = oSet.jetSpeed	
@@ -316,7 +316,7 @@ function createDefaultOptions()
 
 	oSet.jetFireballRadius = create_mode_option(
 		option_type.numeric, 
-		1,
+		1.5,
 		"jetFireballRadius",
 		"jet mode fireball radius")
 	oSet.options[#oSet.options + 1] = oSet.jetFireballRadius	
@@ -337,7 +337,7 @@ function createDefaultOptions()
 
 	oSet.jetTorusMag = create_mode_option(
 		option_type.numeric, 
-		1,
+		3,
 		"jetTorusMag",
 		"Jet mode fireball torus pressure magnitude per spark x 10^-4")
 	oSet.options[#oSet.options + 1] = oSet.jetTorusMag
