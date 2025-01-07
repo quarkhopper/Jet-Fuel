@@ -1,4 +1,4 @@
-CURRENT_VERSION = "5.1"
+CURRENT_VERSION = "5.3"
 TOOL_NAME = "Jet Fuel"
 
 -- delimeters
@@ -32,16 +32,16 @@ end
 
 KEY = {}
 KEY.DETONATE = setup_keybind("detonate/toggle jet", "detonate", "X")
-KEY.PLANT = setup_keybind("plant/infuse", "plant", "LMB")
+KEY.PLANT = setup_keybind("plant/infuse/make jet", "plant", "LMB")
 KEY.CLEAR = setup_keybind("clear all", "clear", "V")
 KEY.OPTIONS = setup_keybind("options", "options", "O")
 KEY.INFUSE_MODE = setup_keybind("infuse on/off", "infuse_mode", "I")
 KEY.SINGLE_MODE = setup_keybind("single on/off", "single_mode", "B")
 KEY.REVERSE_MODE = setup_keybind("reverse on/off", "reverse_mode", "N")
 KEY.STICKY_MODE = setup_keybind("sticky on/off", "sticky_mode", "M")
-KEY.JET_MODE = setup_keybind("Jet mode (hold)", "jet_mode", "ALT")
+KEY.JET_MODE = setup_keybind("Jet plant mode (hold)", "jet_mode", "ALT")
 
-keybind_options = {KEY.DETONATE, KEY.PLANT, KEY.CLEAR, KEY.OPTIONS, KEY.INFUSE_MODE, KEY.SINGLE_MODE, KEY.REVERSE_MODE, KEY.STICKY_MODE, KEY.JET_MODE }
+keybind_options = {KEY.DETONATE, KEY.PLANT, KEY.JET_MODE, KEY.CLEAR, KEY.OPTIONS, KEY.INFUSE_MODE, KEY.SINGLE_MODE, KEY.REVERSE_MODE, KEY.STICKY_MODE }
 
 -- set on init
 TOOL = {}
