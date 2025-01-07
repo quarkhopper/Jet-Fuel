@@ -59,6 +59,8 @@ function handleInput(dt)
 				editingOptions = true
 			end
 
+			local jetMode = InputDown(KEY.JET_MODE.key)
+
 			-- plant bomb / infuse item. NOTE: you can hold it down
 			if InputDown(KEY.PLANT.key) and 
 			GetPlayerGrabShape() == 0 
@@ -66,8 +68,13 @@ function handleInput(dt)
 			then
 				if not stickyMode and not infuseMode then
 					local drop_pos = VecAdd(camera.pos, VecScale(shoot_dir, 2))
-					bomb = createBombInst(Spawn("MOD/prefab/Decoder.xml", Transform(drop_pos), false, false)[2])
-					table.insert(bombs, bomb)
+					if jetMode then
+						local jet = createJetInst(Spawn("MOD/prefab/Jet.xml", Transform(drop_pos), false, false)[2])
+						table.insert(jets, jet)
+					else
+						local bomb = createBombInst(Spawn("MOD/prefab/Decoder.xml", Transform(drop_pos), false, false)[2])
+						table.insert(bombs, bomb)
+					end
 					plantTimer = plantRate
 				elseif hit then 
 					local bomb = nil
@@ -75,27 +82,41 @@ function handleInput(dt)
 						-- stick it to a surface
 						local normal_q = quat_between_vecs(Vec(0,1,0), normal)
 						local drop_pos = VecAdd(camera.pos, VecScale(shoot_dir, dist))
-						bomb = createBombInst(Spawn("MOD/prefab/Decoder.xml", Transform(drop_pos, normal_q), false, true)[2])
-						bomb.dir = normal
-						table.insert(bombs, bomb)
+						if jetMode then 
+							local jet = createJetInst(Spawn("MOD/prefab/Jet.xml", Transform(drop_pos, normal_q), false, true)[2])
+							jet.dir = normal
+							table.insert(jets, jet)
+						else
+							local bomb = createBombInst(Spawn("MOD/prefab/Decoder.xml", Transform(drop_pos, normal_q), false, true)[2])
+							bomb.dir = normal
+							table.insert(bombs, bomb)
+						end
 						plantTimer = plantRate
 					elseif infuseInProgress == false then -- unlocked on key up
 						-- sabotaging a shape
-						local existingIndex = getIndexByShape(shape, bombs)
-						if existingIndex == nil then
+						local index = getIndexByShape(shape, bombs) or getIndexByShape(shape, jets)
+						if index == nil then
 							if not IsShapeBroken(shape) then 
 								-- infuse it
-								bomb = createBombInst(shape)
-								table.insert(bombs, bomb)
+								if jetMode then 
+									local jet = createJetInst(shape)
+									table.insert(jets, jet)
+								else
+									local bomb = createBombInst(shape)
+									table.insert(bombs, bomb)
+								end
 								infuseInProgress = true
 							end
 						else 
 							-- un-infuse it
-							local removeBomb = bombs[existingIndex]
-							if HasTag(removeBomb, "decoder") then 
-								Delete(removeBomb)
+							local removeMe = bombs[index]
+							if HasTag(removeMe, "decoder") then 
+								Delete(removeMe)
+								table.remove(bombs, index)
+							elseif HasTag(removeMe, "jet") then
+								Delete(removeMe)
+								table.remove(jets, index)
 							end
-							table.remove(bombs, existingIndex)
 							infuseInProgress = true
 						end
 					end
@@ -107,8 +128,13 @@ function handleInput(dt)
 		-- commands you CAN do in a vehicle
 
 		if InputPressed(KEY.CLEAR.key) then
-			-- clear all bombs
+			-- clear all bombs and jets
 			local shapes = FindShapes("decoder", true)
+			for i=1, #shapes do
+				local shape = shapes[i]
+				Delete(shape)
+			end
+			shapes = FindShapes("jet", true)
 			for i=1, #shapes do
 				local shape = shapes[i]
 				Delete(shape)
@@ -116,6 +142,7 @@ function handleInput(dt)
 			bombs = {}
 			toDetonate = {}
 			jets = {}
+			activeJets = {}
 			allSparks = {}
 		end
 
@@ -135,8 +162,6 @@ function handleInput(dt)
 			stickyMode = not stickyMode
 		end
 
-		local jetMode = InputDown("alt")
-
 		if InputPressed(KEY.DETONATE.key) and
 		GetPlayerGrabShape() == 0 then
 			if singleMode and #bombs > 0 then
@@ -148,9 +173,8 @@ function handleInput(dt)
 				table.insert(toDetonate, bombs[index])
 				table.remove(bombs, index)
 			else
-				if jetMode then 
-					toggleAllJets()
-				elseif reverseMode then
+				toggleAllJets()
+				if reverseMode then
 					detonateAll(true)
 				else
 					detonateAll()

@@ -51,8 +51,14 @@ function tick(dt)
 			for i=1, #bombs do
 				DrawShapeOutline(bombs[i].shape, 1, 1, 0, 1)
 			end
+			for i=1, #jets do
+				DrawShapeOutline(jets[i].shape, 1, 1, 0, 1)
+			end
 			for i=1, #toDetonate do
 				DrawShapeOutline(toDetonate[i].shape, 1, 0, 0, 1)
+			end
+			for i=1, #activeJets do
+				DrawShapeOutline(activeJets[i].shape, 1, 0, 0, 1)
 			end
 		end
 	end

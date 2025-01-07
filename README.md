@@ -4,10 +4,12 @@ I created this mod to produce evolving volumes of fire following an expanding tr
 ## Definitions
 ### Bomb
 Any shape that can produce an explosion by breaking or on command.
-### Jet mode (hold [ALT] with detonation key to toggle jets on and off)
-Causes fire to spray in a jet from the bomb instead of the bomb detonating, and will continue until the bomb is cleared or the shape is completely destroyed. If a bomb is attached to an object (sticky mode) sparks will spray only out of the top of the canister. When sticky mode is off, or an object it infused, sparks spray in all directions from the center of the object/bomb. 
+### Jet mode (hold [ALT] with plant key to plant a jet instead of a bomb)
+Causes fire to spray in a jet from the shape instead, and will continue until the jet is cleared or deactivated with the detonate/activate key, or the shape is  completely destroyed. If a jet is attached to an object (sticky mode) sparks will spray only out of the top of the canister. When sticky mode is off, or an object it infused, sparks spray in all directions from the center of the object/jet. 
 ### Canister
 An object the player can spawn that functions as a bomb.
+### Jet
+An object the player can spawn that functions as a source in jet mode. May also be an object desig
 ### Infused shape
 A shape that has been infused by the player and becomes a bomb.
 ### Spark
@@ -44,14 +46,14 @@ In one tick, the following sequence is executed (with some generalization):
   - Spawn fires on objects near the fireball. If spawned on glass, a hole is made instead.
 - Objects are impulsed by fireballs
 ## Game controls
-### Detonate (default [X] key, [ALT] for jet mode)
-Will create an explosion at the location of every bomb shape (provided any voxels of the original shape remain). Bombs are detonated in order that they were planted/infused unless the player has toggled reverse mode to on. Bombs will be detonated when the simulated number of sparks (see the lower left screen) goes below the detonation trigger value (see options below). Note: all sparks share the same simulation limit (see options below). An explosion releases a certain number of sparks into the simulation which is bound to this limit. Once this limit is exceeded, sparks are randomly removed. This means that if you detonate several bombs simultaneously there will be smaller amounts of fire associated with each one. Raise the simulation limit to allow for more total fire if this is desired. 
+### Detonate / Toggle Jet (default [X] key)
+Will create an explosion at the location of every bomb shape (provided any voxels of the original shape remain) or toggle a jet (or a shape "infused" as a jet) on and off. Bombs are detonated in order that they were planted/infused unless the player has toggled reverse mode to on. Bombs will be detonated when the simulated number of sparks (see the lower left screen) goes below the detonation trigger value (see options below). Note: all sparks share the same simulation limit (see options below). An explosion releases a certain number of sparks into the simulation which is bound to this limit. Once this limit is exceeded, sparks are randomly removed. This means that if you detonate several bombs simultaneously there will be smaller amounts of fire associated with each one. Raise the simulation limit to allow for more total fire if this is desired. 
 
 JET MODE: Holding alt and pressing/clicking the delete key will cause the bomb to shoot a jet of sparks out of the top of the shape (orientation it was attached) if sticky, or in all directions if the shape was not sticky or infuse. Yes, you can create a wall of fire or watching something burn from the center outward. You'll have to clear bombs if you want it to stop. 
-### Plant (default LMB)
-In sticky mode (default, see control below), A canister will be attached with a joint to any surface under the players target reticule. When sticky mode is off, a canister will be spawned directly in front of the player. In infuse mode, you can infuse any shape to __make it a bomb__. Clicking on an existing bomb will un-infuse it as well, including canisters (try it)!
+### Plant (default [LMB], hold [ALT] to plant jet)
+In sticky mode (default, see control below), A canister/jet will be attached with a joint to any surface under the players target reticule. When sticky mode is off, a canister/jet will be spawned directly in front of the player. In infuse mode, you can infuse any shape to __make it a bomb or a jet__. Clicking on an existing bomb/jet will un-infuse it as well, including canisters (try it)!
 ### Clear (default [V] key)
-Clears all canisters, un-infuses all shapes, and removes all sparks (fire) from the simulation. Does NOT remove fires started by the simulation. 
+Clears all canisters and jets, un-infuses all shapes, and removes all sparks (fire) from the simulation. Does NOT remove fires started by the simulation. 
 ### Options (default [O] key)
 Opens the options menu for the simulation.
 ### Infuse on/off (default [I] key)
@@ -62,6 +64,8 @@ Toggles single detonation mode on and off. In this mode, pressing the detonation
 Toggles reverse detonation mode on and off. In reverse mode, the last bomb planted will be detonated first.
 ### Sticky on/off (default [M] key)
 Toggles sticky mode on and off. In sticky mode (default, see control below), A canister will be attached with a joint to any surface under the player's target reticule. When sticky mode is off, a canister will be spawned directly in front of the player. 
+### Jet mode (hold) (default [ALT] key)
+Holding this will plant a jet instead of a bomb.
 ## Game options
 The following options are described in the order of appearance in columns going left to right. 
 

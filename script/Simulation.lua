@@ -2,6 +2,7 @@
 #include "Types.lua"
 #include "Defs.lua"
 #include "HSVRGB.lua"
+#include "Instances.lua"
 
 -- sounds used. Don't ask about the toilet.
 boomSound = LoadSound("MOD/snd/toiletBoom.ogg")
@@ -21,11 +22,14 @@ smoke = {}
 -- heat centers with sparks assigned to them. One center potentialy forms one torus.
 fireballs = {}
 
--- shapes actually waiting to be detonated when appropriate
+-- bombs actually waiting to be detonated when appropriate
 toDetonate = {}
 
--- shapes that are now jets YAY!
+-- Jets waiting to ignite 
 jets = {}
+
+-- jets that are active
+activeJets = {}
 
 -- schedule all bombs for detonation
 function detonateAll(reverse)
@@ -53,13 +57,9 @@ function detonate(bomb)
 end
 
 function toggleAllJets()
-	local turnOn = copyTable(bombs)
-	jets = {}
-	for i=1, #turnOn do
-		local jet = convertBombToJet(turnOn[i])
-		table.insert(jets, jet)
-	end
-	bombs = {}
+	local deactivateThese = copyTable(activeJets)
+	activeJets = copyTable(jets)
+	jets = deactivateThese
 end
 
 -- bombs that are still alive (intact shapes). If bombs
@@ -91,10 +91,10 @@ function detonationTick(dt)
 end
 
 function jetTick(dt)
-	if #jets == 0 then return end
+	if #activeJets == 0 then return end
 	local newJets = {}
-	for i=1, #jets do
-		local jet = jets[i]
+	for i=1, #activeJets do
+		local jet = activeJets[i]
 		jet.position = getBombPosition(jet)
 		if jet.position ~= nil then 
 			throwSpark(jet)
@@ -102,7 +102,7 @@ function jetTick(dt)
 		end
 		PlayLoop(thrower_sound, jet.position, 50)
 	end
-	jets = newJets
+	activeJets = newJets
 end
 
 -- analyze all sparks to determine fireball centers
