@@ -67,7 +67,7 @@ function createDefaultOptions()
 		option_type.numeric, 
 		6,
 		"fireballRadius",
-		"Torus radius (affects lumpiness)")
+		"Fireball radius (affects lumpiness)")
 	oSet.options[#oSet.options + 1] = oSet.fireballRadius
 
 	oSet.blastPowerPrimary = create_mode_option(
@@ -83,13 +83,6 @@ function createDefaultOptions()
 		"blastSpeed",
 		"Blast speed at detonation (affects size)")
 	oSet.options[#oSet.options + 1] = oSet.blastSpeed	
-
-	oSet.jetSpeed = create_mode_option(
-		option_type.numeric, 
-		6,
-		"jetSpeed",
-		"jet mode speed at detonation (affects jet plume)")
-	oSet.options[#oSet.options + 1] = oSet.jetSpeed	
 
 	oSet.sparkHurt = create_mode_option(
 		option_type.numeric, 
@@ -184,13 +177,6 @@ function createDefaultOptions()
 		"Spark fizzle frequency (1 = always, + for less frequent)")
 	oSet.options[#oSet.options + 1] = oSet.sparkFizzleFreq	
 
-	oSet.jetFizzleFreq = create_mode_option(
-		option_type.numeric, 
-		5,
-		"jetFizzleFreq",
-		"jet fizzle frequency (1 = always, + for less frequent)")
-	oSet.options[#oSet.options + 1] = oSet.jetFizzleFreq	
-
 	oSet.sparkSpawnsUpper = create_mode_option(
 		option_type.numeric, 
 		14,
@@ -254,13 +240,6 @@ function createDefaultOptions()
 		"Spark speed at split")
 	oSet.options[#oSet.options + 1] = oSet.sparkSplitSpeed	
 
-	oSet.jetSplitSpeed = create_mode_option(
-		option_type.numeric, 
-		0.8,
-		"jetSplitSpeed",
-		"Jet mode split speed (affects speed of jet)")
-	oSet.options[#oSet.options + 1] = oSet.jetSplitSpeed	
-
 	oSet.sparkSplitSpeedVariation = create_mode_option(
 		option_type.numeric, 
 		0.5,
@@ -286,7 +265,7 @@ function createDefaultOptions()
 
 	oSet.sparkSmokeLife = create_mode_option(
 		option_type.numeric, 
-		2,
+		1,
 		"sparkSmokeLife",
 		"Spark smoke particle life (lingering dark particles)")
 	oSet.options[#oSet.options + 1] = oSet.sparkSmokeLife	
@@ -319,5 +298,63 @@ function createDefaultOptions()
 		"Spark light intensity")
 	oSet.options[#oSet.options + 1] = oSet.sparkLightIntensity	
 	
+	-- jet options
+
+	oSet.jetSpeed = create_mode_option(
+		option_type.numeric, 
+		6,
+		"jetSpeed",
+		"jet mode speed at detonation (affects jet plume)")
+	oSet.options[#oSet.options + 1] = oSet.jetSpeed	
+
+	oSet.jetFireballSparksMax = create_mode_option(
+		option_type.numeric, 
+		200,
+		"jetFireballSparksMax",
+		"maximum number of sparks in a fireball in jet mode.")
+	oSet.options[#oSet.options + 1] = oSet.jetFireballSparksMax	
+
+	oSet.jetFireballRadius = create_mode_option(
+		option_type.numeric, 
+		1,
+		"jetFireballRadius",
+		"jet mode fireball radius")
+	oSet.options[#oSet.options + 1] = oSet.jetFireballRadius	
+
+	oSet.jetFizzleFreq = create_mode_option(
+		option_type.numeric, 
+		5,
+		"jetFizzleFreq",
+		"jet fizzle frequency (1 = always, + for less frequent)")
+	oSet.options[#oSet.options + 1] = oSet.jetFizzleFreq	
+
+	oSet.jetSplitSpeed = create_mode_option(
+		option_type.numeric, 
+		0.6,
+		"jetSplitSpeed",
+		"Jet mode split speed (affects speed of jet)")
+	oSet.options[#oSet.options + 1] = oSet.jetSplitSpeed	
+
+	oSet.jetTorusMag = create_mode_option(
+		option_type.numeric, 
+		1,
+		"jetTorusMag",
+		"Jet mode fireball torus pressure magnitude per spark x 10^-4")
+	oSet.options[#oSet.options + 1] = oSet.jetTorusMag
+
+	oSet.jetVacuumMag = create_mode_option(
+		option_type.numeric, 
+		0.04,
+		"jetVacuumMag",
+		"Jet mode fireball vacuum pressure magnitude per spark x 10^-4")
+	oSet.options[#oSet.options + 1] = oSet.jetVacuumMag
+
+	oSet.jetInflateMag = create_mode_option(
+		option_type.numeric, 
+		0.5,
+		"jetInflateMag",
+		"Jet mode fireball inflation pressure magnitude per spark x 10^-4")
+	oSet.options[#oSet.options + 1] = oSet.jetInflateMag
+
     return oSet
 end

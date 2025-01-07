@@ -81,7 +81,7 @@ function handleInput(dt)
 						plantTimer = plantRate
 					elseif infuseInProgress == false then -- unlocked on key up
 						-- sabotaging a shape
-						local existingIndex = getBombIndex(shape)
+						local existingIndex = getIndexByShape(shape, bombs)
 						if existingIndex == nil then
 							if not IsShapeBroken(shape) then 
 								-- infuse it
@@ -138,23 +138,18 @@ function handleInput(dt)
 		local jetMode = InputDown("alt")
 
 		if InputPressed(KEY.DETONATE.key) and
-		GetPlayerGrabShape() == 0 and 
-		#bombs > 0 then
-			if singleMode then
+		GetPlayerGrabShape() == 0 then
+			if singleMode and #bombs > 0 then
 				local index = 1 
 				if reverseMode then
 					index = #bombs		 
 				end
 				local bomb = bombs[index]
-				if jetMode then 
-					activateJet(bomb)
-				else
-					detonate(bomb)
-				end
+				table.insert(toDetonate, bombs[index])
 				table.remove(bombs, index)
 			else
 				if jetMode then 
-					activateAllJets()
+					toggleAllJets()
 				elseif reverseMode then
 					detonateAll(true)
 				else
@@ -167,16 +162,4 @@ function handleInput(dt)
 			infuseInProgress = false
 		end
 	end
-end
-
--------------------------------------------------
--- Support functions
--------------------------------------------------
-
-function getBombIndex(shape)
-	for i=1, #bombs do
-		local bomb = bombs[i]
-		if bomb.shape == shape then return i end
-	end
-	return nil
 end

@@ -44,10 +44,6 @@ function detonate(bomb)
 	bomb.dir = nil -- don't want to have a directionality with detonations
 	-- inject sparks into the simulation at this position, if 
 	-- not totally destroyed already
-	bomb.impulse = TOOL.impulsePower.value
-	bomb.splitSpeed = TOOL.sparkSplitSpeed.value
-	bomb.fizzleFreq = TOOL.sparkFizzleFreq.value
-	bomb.smokeLife = TOOL.sparkSmokeLife.value
 	if not createExplosion(bomb) then return end
 	-- actual Teardown concussion
 	Explosion(bomb.position, TOOL.blastPowerPrimary.value)
@@ -56,22 +52,12 @@ function detonate(bomb)
 	PlaySound(rumbleSound, position, 5)
 end
 
-function activateJet(bomb)
-	local position = getBombPosition(bomb)
-	if position == nil then return end
-	bomb.jet = true
-	bomb.impulse = 0
-	bomb.splitSpeed = TOOL.jetSplitSpeed.value
-	bomb.sourceSpeed = TOOL.jetSpeed.value
-	bomb.fizzleFreq = TOOL.jetFizzleFreq.value
-	bomb.smokeLife = 1
-	table.insert(jets, bomb)
-end
-
-function activateAllJets()
-	local armed = copyTable(bombs)
-	for i=1, #armed do
-		activateJet(armed[i])
+function toggleAllJets()
+	local turnOn = copyTable(bombs)
+	jets = {}
+	for i=1, #turnOn do
+		local jet = convertBombToJet(turnOn[i])
+		table.insert(jets, jet)
 	end
 	bombs = {}
 end
@@ -134,11 +120,13 @@ function fireballCalcTick(dt)
 			if #fireball.sparks == 0 then 
 				fireball.center = spark.pos
 				fireball.impulse = spark.impulse
+				fireball.radius = spark.fireballRadius
+				fireball.sparksMax = spark.fireballSparksMax
 			end
 			spark.vectorFromOrigin = VecSub(spark.pos, fireball.center)
 			spark.distanceFromOrigin = VecLength(spark.vectorFromOrigin)
-			if #fireball.sparks <= TOOL.fireballSparksMax.value and
-			spark.distanceFromOrigin < TOOL.fireballRadius.value then 
+			if #fireball.sparks <= fireball.sparksMax and
+			spark.distanceFromOrigin < fireball.radius then 
 				spark.distance_n = math.min(1, 1/(1 + spark.distanceFromOrigin))
 				spark.inverseVector = VecScale(spark.vectorFromOrigin, -1)
 				spark.lookOriginDir = VecNormalize(spark.inverseVector)
@@ -228,17 +216,17 @@ function simulationTick(dt)
 				local pressureDistance_n = spark.distance_n  ^ 0.8
 				local angleDot_n = VecDot(spark.lookOriginDir, VALUES.UP_VECTOR)
 				local torus_n = pressureDistance_n * angleDot_n
-				local torus_mag = TOOL.sparkTorusMag.value * VALUES.PRESSURE_EFFECT_SCALE * #fireball.sparks * torus_n
+				local torus_mag = spark.torusMag * VALUES.PRESSURE_EFFECT_SCALE * #fireball.sparks * torus_n
 				local torus_vector = VecScale(spark.lookOriginDir, torus_mag)
 				pushSparkUniform(spark, torus_vector)
 
 				-- pulling into the center
-				local vacuum_mag = TOOL.sparkVacuumMag.value * VALUES.PRESSURE_EFFECT_SCALE * #fireball.sparks * pressureDistance_n
+				local vacuum_mag = spark.vacuumMag * VALUES.PRESSURE_EFFECT_SCALE * #fireball.sparks * pressureDistance_n
 				local vacuum_vector = VecScale(spark.lookOriginDir, vacuum_mag ^ 0.5)
 				pushSparkUniform(spark, vacuum_vector)
 
 				-- pushing out
-				local inflate_mag = TOOL.sparkInflateMag.value * VALUES.PRESSURE_EFFECT_SCALE * #fireball.sparks * pressureDistance_n * -1
+				local inflate_mag = spark.inflationMag * VALUES.PRESSURE_EFFECT_SCALE * #fireball.sparks * pressureDistance_n * -1
 				local inflate_vector = VecScale(spark.lookOriginDir, inflate_mag)
 				pushSparkUniform(spark, inflate_vector)
 
@@ -260,14 +248,10 @@ function simulationTick(dt)
 							spark.splitsRemaining = spark.splitsRemaining - 1
 							local newDir = VecAdd(spark.dir, random_vec(TOOL.sparkSplitDirVariation.value))
 							newDir = VecNormalize(newDir)
-							local newSpark = createSparkInst(spark.pos,	newDir,
-							vary_by_percentage(spark.splitSpeed, TOOL.sparkSplitSpeedVariation.value))
-							newSpark.splitFreq = spark.splitFreq
-							newSpark.splitsRemaining = spark.splitsRemaining
-							newSpark.impulse = spark.impulse
-							newSpark.splitSpeed = spark.splitSpeed
-							newSpark.fizzleFreq = spark.fizzleFreq
-							newSpark.smokeLife = spark.smokeLife
+							local newSpark = createSparkInst(spark)
+							newSpark.pos = spark.pos
+							newSpark.dir = newDir
+							newSpark.speed = vary_by_percentage(spark.splitSpeed, TOOL.sparkSplitSpeedVariation.value)
 							table.insert(newSparks, newSpark) -- will be assigned to a fireball next tick
 						end
 					end
@@ -359,22 +343,14 @@ function createExplosion(bomb)
 end
 
 function throwSpark(bomb)
-	local dir = bomb.dir or random_vec(1)
-	local position = nil
-	local speed = nil
+	local newSpark = createSparkInst(bomb)
 	if bomb.jet then 
-		position = bomb.position
-		speed = TOOL.jetSpeed.value
+		newSpark.pos = bomb.position
+		newSpark.speed = TOOL.jetSpeed.value
 	else
-		position = VecAdd(bomb.position, random_vec(0.5))
-		speed = TOOL.blastSpeed.value
+		newSpark.pos = VecAdd(bomb.position, random_vec(0.5))
+		newSpark.speed = TOOL.blastSpeed.value
 	end
-	local newSpark = createSparkInst(position, dir, speed)
-	newSpark.splitsRemaining = bomb.splitCount
-	newSpark.impulse = bomb.impulse
-	newSpark.splitSpeed = bomb.splitSpeed
-	newSpark.fizzleFreq = bomb.fizzleFreq
-	newSpark.smokeLife = bomb.smokeLife
 	table.insert(allSparks, newSpark)
 end
 
@@ -384,27 +360,33 @@ function createFireballInst()
 	inst.center = Vec()
 	inst.dir = Vec()
 	inst.impulse = nil
+	inst.sparksMax = nil
+	inst.radius = nil
 	return inst
 end
 
-function createSparkInst(pos, dir, speed)
+function createSparkInst(source)
 	local inst = {}
-	inst.pos = pos
-	inst.dir = VecNormalize(dir)
-	inst.speed = speed or TOOL.blastSpeed.value
-	inst.sparkColor = TOOL.sparkColor.value
+	inst.pos = Vec() -- set on init
+	inst.speed = 0 -- set on init
+	inst.dir = source.dir or random_vec(1)
+	inst.splitsRemaining = source.splitCount or source.splitsRemaining
+	inst.impulse = source.impulse
+	inst.fizzleFreq = source.fizzleFreq
+	inst.splitSpeed = source.splitSpeed
+	inst.splitFreq = source.splitFreq or TOOL.sparkSplitFreqStart.value
+	inst.fireballRadius = source.fireballRadius
+	inst.fireballSparksMax = source.fireballSparksMax
+	inst.torusMag = source.torusMag
+	inst.vacuumMag = source.vacuumMag
+	inst.inflationMag = source.inflationMag
+
+	-- below are set per tick
 	inst.distanceFromOrigin = 0
 	inst.distance_n = 1
 	inst.vectorFromOrigin = 0
 	inst.inverseVector = Vec()
-	-- this value gets deincremented over time
-	inst.splitFreq = TOOL.sparkSplitFreqStart.value
-	inst.splitsRemaining = 0
-	inst.impulse = nil
-	inst.splitSpeed = nil
 	inst.lookOriginDir = nil
-	inst.fizzleFreq = nil
-	inst.smokeLife = nil
 	return inst
 end
 
@@ -413,14 +395,46 @@ function createBombInst(shape)
 	inst.position = Vec() -- set when ready to detonate
 	inst.shape = shape
 	inst.jet = false
-	inst.dir = nil -- used if a jet
-	inst.smokeLife = TOOL.sparkSmokeLife.value
+	inst.dir = nil -- used if a jet, set when planted for convenience
 	inst.impulse = TOOL.impulsePower.value
 	inst.sparkCount = TOOL.bombSparks.value
-	inst.splitCount = math.ceil((TOOL.bombEnergy.value * 10^2)/inst.sparkCount)
+	inst.splitSpeed = TOOL.sparkSplitSpeed.value
 	inst.fizzleFreq = TOOL.sparkFizzleFreq.value
-	inst.sourceSpeed = TOOL.sparkSplitSpeed.value
+	inst.splitCount = math.ceil((TOOL.bombEnergy.value * 10^2)/inst.sparkCount)
+	inst.fireballRadius = TOOL.fireballRadius.value
+	inst.fireballSparksMax = TOOL.fireballSparksMax.value
+	inst.torusMag = TOOL.sparkTorusMag.value
+	inst.vacuumMag = TOOL.sparkVacuumMag.value
+	inst.inflationMag = TOOL.sparkInflateMag.value
 	return inst
+end
+
+function convertBombToJet(bomb)
+	-- converts a bomb to a jet
+	local jet = bomb
+	local position = getBombPosition(jet)
+	if position == nil then return nil end
+	jet.jet = true
+	jet.impulse = 0
+	jet.splitSpeed = TOOL.jetSplitSpeed.value
+	jet.fizzleFreq = TOOL.jetFizzleFreq.value
+	jet.fireballRadius = TOOL.jetFireballRadius.value
+	jet.fireballSparksMax = TOOL.jetFireballSparksMax.value
+	jet.torusMag = TOOL.jetTorusMag.value
+	jet.vacuumMag = TOOL.jetVacuumMag.value
+	jet.inflationMag = TOOL.jetInflateMag.value
+	return jet
+end
+
+function debugBomb(bomb)
+	DebugPrint("dir: "..tostring(bomb.dir))
+	DebugPrint("impulse: "..bomb.impulse)
+	DebugPrint("sparkCount: "..bomb.sparkCount)
+	DebugPrint("splitSpeed: "..bomb.splitSpeed)
+	DebugPrint("fizzleFreq: "..bomb.fizzleFreq)
+	DebugPrint("splitCount: "..bomb.splitCount)
+	DebugPrint("fireballRadius: "..bomb.fireballRadius)
+	DebugPrint("fireballSparksMax: "..bomb.fireballSparksMax)
 end
 
 function pushSparkUniform(spark, effectVector)
@@ -448,7 +462,7 @@ end
 function makeSparkEffect(spark)
 	local movement = random_vec(1)
 	local gravity = 0
-	local colorHSV = spark.sparkColor
+	local colorHSV = TOOL.sparkColor.value
 	local color = HSVToRGB(colorHSV)
 	local intensity = TOOL.sparkLightIntensity.value
 	local puffColor = HSVToRGB(Vec(0, 0, VALUES.PUFF_CONTRAST))
@@ -478,7 +492,7 @@ function makeSmoke(spark)
 	ParticleRadius(TOOL.sparkSmokeTileSize.value)
 	ParticleColor(smokeColor[1], smokeColor[2], smokeColor[3])
 	ParticleGravity(0)
-	SpawnParticle(VecAdd(spark.pos, random_vec(0.2)), VecScale(VecAdd(spark.dir, random_vec(0.5)), spark.speed), spark.smokeLife)
+	SpawnParticle(VecAdd(spark.pos, random_vec(0.2)), VecScale(VecAdd(spark.dir, random_vec(0.5)), spark.speed), TOOL.sparkSmokeLife.value)
 end
 
 function getBombPosition(bomb)
@@ -488,3 +502,10 @@ function getBombPosition(bomb)
 	return position
 end
 
+function getIndexByShape(shape, thingTable)
+	for i=1, #thingTable do
+		local thing = thingTable[i]
+		if thing.shape == shape then return i end
+	end
+	return nil
+end
