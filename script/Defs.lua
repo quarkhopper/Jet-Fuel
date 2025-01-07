@@ -1,4 +1,4 @@
-CURRENT_VERSION = "4.7"
+CURRENT_VERSION = "4.8"
 TOOL_NAME = "Jet Fuel"
 
 -- delimeters
