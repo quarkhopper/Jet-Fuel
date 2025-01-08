@@ -31,6 +31,7 @@ When you blow up bombs, you're really creating centers of fire, but once the fir
 In one tick, the following sequence is executed (with some generalization):
 - All explosive items (bombs) are checked for having broken shapes. If the shape is broken, the bomb is added to the list of bombs to detonate (at the appropriate time, see "detonation trigger" option below).
 - All bombs that are due to be detonated are either detonated or added to the list to be considered on the next tick (see "detonation trigger" option below)
+- All jets that are active (on) will emit one spark either in one dorection (if a nozzle is stuck to something), or in a random direction.
 - Fireball determination and calculations. All sparks, regardless of their source, are grouped into "fireballs" for the purposes of determining hot centers of pressure effects. This is the unit of the simulation that produces toroidal effects and mushrooming fire. Fireballs are grouped via proximity to an arbitrarily selected spark. 
 - For every spark that has died in the last tick and become "smoke" has a smoke particle generated for it.
 - Spark behavior and motion simulated
