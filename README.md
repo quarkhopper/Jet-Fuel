@@ -5,11 +5,11 @@ I created this mod to produce evolving volumes of fire following an expanding tr
 ### Bomb
 Any shape that can produce an explosion by breaking or on command.
 ### Jet mode
-Allows the user to plant flame jet nozzles insted of bomb canisters, or infuse objects to spray fire from their centers."Jets" will continue until the jet is cleared or deactivated with the detonate/activate key, or the shape is  completely destroyed. If a jet is attached to an object (sticky mode) sparks will spray only out of the top of the canister. When sticky mode is off, or an object it infused, sparks spray in all directions from the center of the object/jet. 
+Allows the user to plant flame jet nozzles insted of bomb canisters, or infuse objects to spray fire from their centers. "Jets" will continue until the jet is cleared or deactivated with the detonate/activate key, or the shape is  completely destroyed. If a jet is attached to an object (sticky mode) sparks will spray only out of the top of the canister. When sticky mode is off, or an object it infused, sparks spray in all directions from the center of the object/jet. 
 ### Canister
 An object the player can spawn that functions as a bomb.
 ### Jet
-An object the player can spawn that functions as a source in jet mode. May also be an object desig
+An object the player can spawn that functions as a source in jet mode. May also be an object designated by infusing.
 ### Infused shape
 A shape that has been infused by the player and becomes a bomb.
 ### Spark
