@@ -51,7 +51,7 @@ function createDefaultOptions()
 	
 	oSet.detonationTrigger = create_mode_option(
 		option_type.numeric, 
-		-1,
+		100,
 		"detonationTrigger",
 		"Spark when next detonation (-1 for simultaneous explosions)")
 	oSet.options[#oSet.options + 1] = oSet.detonationTrigger
@@ -302,9 +302,9 @@ function createDefaultOptions()
 
 	oSet.jetSpeed = create_mode_option(
 		option_type.numeric, 
-		3,
+		0.3,
 		"jetSpeed",
-		"jet mode speed at detonation (affects jet plume)")
+		"jet mode speed at activation (affects jet plume)")
 	oSet.options[#oSet.options + 1] = oSet.jetSpeed	
 
 	oSet.jetFireballSparksMax = create_mode_option(
