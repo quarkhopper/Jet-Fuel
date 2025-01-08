@@ -4,8 +4,8 @@ I created this mod to produce evolving volumes of fire following an expanding tr
 ## Definitions
 ### Bomb
 Any shape that can produce an explosion by breaking or on command.
-### Jet mode (hold [ALT] with plant key to plant a jet instead of a bomb)
-Causes fire to spray in a jet from the shape instead, and will continue until the jet is cleared or deactivated with the detonate/activate key, or the shape is  completely destroyed. If a jet is attached to an object (sticky mode) sparks will spray only out of the top of the canister. When sticky mode is off, or an object it infused, sparks spray in all directions from the center of the object/jet. 
+### Jet mode
+Allows the user to plant flame jet nozzles insted of bomb canisters, or infuse objects to spray fire from their centers."Jets" will continue until the jet is cleared or deactivated with the detonate/activate key, or the shape is  completely destroyed. If a jet is attached to an object (sticky mode) sparks will spray only out of the top of the canister. When sticky mode is off, or an object it infused, sparks spray in all directions from the center of the object/jet. 
 ### Canister
 An object the player can spawn that functions as a bomb.
 ### Jet
