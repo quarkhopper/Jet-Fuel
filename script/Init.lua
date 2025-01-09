@@ -58,14 +58,14 @@ function createDefaultOptions()
 
 	oSet.fireballSparksMax = create_mode_option(
 		option_type.numeric, 
-		300,
+		400,
 		"fireballSparksMax",
 		"Maximum number of sparks per one fireball")
 	oSet.options[#oSet.options + 1] = oSet.fireballSparksMax	
 
 	oSet.fireballRadius = create_mode_option(
 		option_type.numeric, 
-		2,
+		3,
 		"fireballRadius",
 		"Fireball radius (affects lumpiness)")
 	oSet.options[#oSet.options + 1] = oSet.fireballRadius
@@ -149,7 +149,7 @@ function createDefaultOptions()
 
 	oSet.sparkTorusMag = create_mode_option(
 		option_type.numeric, 
-		3,
+		1,
 		"sparkTorusMag",
 		"Fireball torus pressure magnitude per spark x 10^-4")
 	oSet.options[#oSet.options + 1] = oSet.sparkTorusMag
@@ -172,7 +172,7 @@ function createDefaultOptions()
 
 	oSet.sparkFizzleFreq = create_mode_option(
 		option_type.numeric, 
-		5,
+		8,
 		"sparkFizzleFreq",
 		"Spark fizzle frequency (1 = always, + for less frequent)")
 	oSet.options[#oSet.options + 1] = oSet.sparkFizzleFreq	
