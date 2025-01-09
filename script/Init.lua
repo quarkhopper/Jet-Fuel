@@ -337,7 +337,7 @@ function createDefaultOptions()
 
 	oSet.jetTorusMag = create_mode_option(
 		option_type.numeric, 
-		3,
+		5,
 		"jetTorusMag",
 		"Jet mode fireball torus pressure magnitude per spark x 10^-4")
 	oSet.options[#oSet.options + 1] = oSet.jetTorusMag
