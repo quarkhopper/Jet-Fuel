@@ -65,7 +65,7 @@ function createDefaultOptions()
 
 	oSet.fireballRadius = create_mode_option(
 		option_type.numeric, 
-		1.5,
+		2,
 		"fireballRadius",
 		"Fireball radius (affects lumpiness)")
 	oSet.options[#oSet.options + 1] = oSet.fireballRadius
