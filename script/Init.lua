@@ -330,7 +330,7 @@ function createDefaultOptions()
 
 	oSet.jetSplitSpeed = create_mode_option(
 		option_type.numeric, 
-		0.6,
+		0.5,
 		"jetSplitSpeed",
 		"Jet mode split speed (affects speed of jet)")
 	oSet.options[#oSet.options + 1] = oSet.jetSplitSpeed	
