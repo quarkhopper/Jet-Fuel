@@ -53,7 +53,7 @@ function createDefaultOptions()
 		option_type.numeric, 
 		100,
 		"detonationTrigger",
-		"Spark when next detonation (-1 for simultaneous explosions)")
+		"Detonation trigger (Spark count. -1 for simultaneous explosions)")
 	oSet.options[#oSet.options + 1] = oSet.detonationTrigger
 
 	oSet.fireballSparksMax = create_mode_option(
@@ -88,28 +88,28 @@ function createDefaultOptions()
 		option_type.numeric, 
 		0.01,
 		"sparkHurt",
-		"Spark player hurt threshold")
+		"Player hurt threshold")
 	oSet.options[#oSet.options + 1] = oSet.sparkHurt	
 
 	oSet.sparkHoleVoxelsSoft = create_mode_option(
 		option_type.numeric, 
 		5,
 		"sparkHoleVoxelsSoft",
-		"Spark erosion, soft materials (number of voxel)")
+		"Erosion, soft materials (number of voxel)")
 	oSet.options[#oSet.options + 1] = oSet.sparkHoleVoxelsSoft
 
 	oSet.sparkHoleVoxelsMedium = create_mode_option(
 		option_type.numeric, 
 		3,
 		"sparkHoleVoxelsMedium",
-		"Spark erosion, medium materials (number of voxel)")
+		"Erosion, medium materials (number of voxel)")
 	oSet.options[#oSet.options + 1] = oSet.sparkHoleVoxelsMedium
 
 	oSet.sparkHoleVoxelsHard = create_mode_option(
 		option_type.numeric, 
 		1,
 		"sparkHoleVoxelsHard",
-		"Spark erosion, hard materials (number of voxel)")
+		"Erosion, hard materials (number of voxel)")
 	oSet.options[#oSet.options + 1] = oSet.sparkHoleVoxelsHard
 
 	oSet.ignitionRadius = create_mode_option(
@@ -156,7 +156,7 @@ function createDefaultOptions()
 
 	oSet.sparkVacuumMag = create_mode_option(
 		option_type.numeric, 
-		0.01,
+		0.02,
 		"sparkVacuumMag",
 		"Fireball vacuum pressure magnitude per spark x 10^-4")
 	oSet.options[#oSet.options + 1] = oSet.sparkVacuumMag
@@ -174,49 +174,49 @@ function createDefaultOptions()
 		option_type.numeric, 
 		8,
 		"sparkFizzleFreq",
-		"Spark fizzle frequency (1 = always, + for less frequent)")
+		"Fizzle frequency (1 = always, + for less frequent)")
 	oSet.options[#oSet.options + 1] = oSet.sparkFizzleFreq	
 
 	oSet.sparkSpawnsUpper = create_mode_option(
 		option_type.numeric, 
 		14,
 		"sparkSpawnsUpper",
-		"Spark spawns max")
+		"Spawns max")
 	oSet.options[#oSet.options + 1] = oSet.sparkSpawnsUpper	
 
 	oSet.sparkSpawnsLower = create_mode_option(
 		option_type.numeric, 
 		3,
 		"sparkSpawnsLower",
-		"Spark spawns min")
+		"Spawns min")
 	oSet.options[#oSet.options + 1] = oSet.sparkSpawnsLower	
 
 	oSet.sparkSplitFreqStart = create_mode_option(
 		option_type.numeric, 
 		10,
 		"sparkSplitFreqStart",
-		"Spark split frequency start (1 = always, + for less frequent)")
+		"Split frequency start (1 = always, + for less frequent)")
 	oSet.options[#oSet.options + 1] = oSet.sparkSplitFreqStart	
 
 	oSet.sparkSplitFreqEnd = create_mode_option(
 		option_type.numeric, 
 		100,
 		"sparkSplitFreqEnd",
-		"Spark split frequency end (1 = always, + for less frequent)")
+		"Split frequency end (1 = always, + for less frequent)")
 	oSet.options[#oSet.options + 1] = oSet.sparkSplitFreqEnd	
 
 	oSet.sparkSplitFreqInc = create_mode_option(
 		option_type.numeric, 
 		1,
 		"sparkSplitFreqInc",
-		"Spark split 1/freq increase")
+		"Split 1/freq increase")
 	oSet.options[#oSet.options + 1] = oSet.sparkSplitFreqInc	
 
 	oSet.sparkSplitDirVariation = create_mode_option(
 		option_type.numeric, 
 		0.8,
 		"sparkSplitDirVariation",
-		"Spark split dir variation")
+		"Split dir variation")
 	oSet.options[#oSet.options + 1] = oSet.sparkSplitDirVariation	
 
 	oSet.sparkHitFollowMaxSpeed = create_mode_option(
@@ -228,30 +228,30 @@ function createDefaultOptions()
 
 	oSet.sparkDeathSpeed = create_mode_option(
 		option_type.numeric, 
-		0.04,
+		0.02,
 		"sparkDeathSpeed",
-		"Spark death speed")
+		"Death speed")
 	oSet.options[#oSet.options + 1] = oSet.sparkDeathSpeed	
 
 	oSet.sparkSplitSpeed = create_mode_option(
 		option_type.numeric, 
-		0.6,
+		0.5,
 		"sparkSplitSpeed",
-		"Spark speed at split")
+		"Split speed")
 	oSet.options[#oSet.options + 1] = oSet.sparkSplitSpeed	
 
 	oSet.sparkSplitSpeedVariation = create_mode_option(
 		option_type.numeric, 
-		0.5,
+		0.1,
 		"sparkSplitSpeedVariation",
-		"Spark split speed variation")
+		"Split speed variation")
 	oSet.options[#oSet.options + 1] = oSet.sparkSplitSpeedVariation	
 
 	oSet.sparkSpeedReduction = create_mode_option(
 		option_type.numeric, 
 		0.5,
 		"sparkSpeedReduction",
-		"Spark speed reduction over time")
+		"Speed reduction over time")
 	oSet.options[#oSet.options + 1] = oSet.sparkSpeedReduction	
 	
 -- aesthetics
@@ -267,7 +267,7 @@ function createDefaultOptions()
 		option_type.numeric, 
 		1,
 		"sparkSmokeLife",
-		"Spark smoke particle life (lingering dark particles)")
+		"Smoke particle life (lingering dark particles)")
 	oSet.options[#oSet.options + 1] = oSet.sparkSmokeLife	
 
 	oSet.sparkTileRadMax = create_mode_option(
@@ -288,7 +288,7 @@ function createDefaultOptions()
 		option_type.numeric, 
 		0.45,
 		"sparkSmokeTileSize",
-		"Spark smoke tile size")
+		"Smoke tile size")
 	oSet.options[#oSet.options + 1] = oSet.sparkSmokeTileSize	
 
 	oSet.sparkLightIntensity = create_mode_option(
@@ -304,28 +304,28 @@ function createDefaultOptions()
 		option_type.numeric, 
 		0.3,
 		"jetSpeed",
-		"jet mode speed at activation (affects jet plume)")
+		"Jet mode speed at activation (affects jet plume)")
 	oSet.options[#oSet.options + 1] = oSet.jetSpeed	
 
 	oSet.jetFireballSparksMax = create_mode_option(
 		option_type.numeric, 
 		200,
 		"jetFireballSparksMax",
-		"maximum number of sparks in a fireball in jet mode.")
+		"Maximum number of sparks in a fireball in jet mode.")
 	oSet.options[#oSet.options + 1] = oSet.jetFireballSparksMax	
 
 	oSet.jetFireballRadius = create_mode_option(
 		option_type.numeric, 
 		1.5,
 		"jetFireballRadius",
-		"jet mode fireball radius")
+		"Jet mode fireball radius")
 	oSet.options[#oSet.options + 1] = oSet.jetFireballRadius	
 
 	oSet.jetFizzleFreq = create_mode_option(
 		option_type.numeric, 
 		5,
 		"jetFizzleFreq",
-		"jet fizzle frequency (1 = always, + for less frequent)")
+		"Jet fizzle frequency (1 = always, + for less frequent)")
 	oSet.options[#oSet.options + 1] = oSet.jetFizzleFreq	
 
 	oSet.jetSplitSpeed = create_mode_option(
