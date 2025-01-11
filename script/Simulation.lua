@@ -65,17 +65,27 @@ end
 -- bombs that are still alive (intact shapes). If bombs
 -- are found to be broken shapes, they're added to the
 -- toDetonate table
-function scanBombsTick(dt)
-	local unbroken = {}
+function scanBrokenTick(dt)
+	local unbrokenBombs = {}
 	for i=1, #bombs do
 		local bomb = bombs[i]
 		if IsShapeBroken(bomb.shape) then
 			table.insert(toDetonate, bomb)
 		else
-			table.insert(unbroken, bomb)
+			table.insert(unbrokenBombs, bomb)
 		end
 	end
-	bombs = unbroken
+	bombs = unbrokenBombs
+	local unbrokenJets = {}
+	for i=1, #jets do
+		local jet = jets[i]
+		if IsShapeBroken(jet.shape) then
+			table.insert(activeJets, jet)
+		else
+			table.insert(unbrokenJets, jet)
+		end
+	end
+	jets = unbrokenJets
 end
 
 -- determine whether it is appropriate to detonate the next bomb

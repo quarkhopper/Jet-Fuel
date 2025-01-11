@@ -32,7 +32,7 @@ end
 
 function tick(dt)
 	handleInput(dt)
-	scanBombsTick(dt)
+	scanBrokenTick(dt)
 	detonationTick(dt)
 	jetTick(dt)
 	fireballCalcTick(dt)
