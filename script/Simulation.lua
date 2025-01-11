@@ -76,16 +76,6 @@ function scanBrokenTick(dt)
 		end
 	end
 	bombs = unbrokenBombs
-	local unbrokenJets = {}
-	for i=1, #jets do
-		local jet = jets[i]
-		if IsShapeBroken(jet.shape) then
-			table.insert(activeJets, jet)
-		else
-			table.insert(unbrokenJets, jet)
-		end
-	end
-	jets = unbrokenJets
 end
 
 -- determine whether it is appropriate to detonate the next bomb
