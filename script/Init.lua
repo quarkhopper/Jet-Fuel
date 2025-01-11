@@ -221,7 +221,7 @@ function createDefaultOptions()
 
 	oSet.sparkHitFollowMaxSpeed = create_mode_option(
 		option_type.numeric, 
-		3,
+		1,
 		"sparkHitFollowMaxSpeed",
 		"Hit following max spark speed")
 	oSet.options[#oSet.options + 1] = oSet.sparkHitFollowMaxSpeed	
