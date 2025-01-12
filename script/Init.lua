@@ -79,7 +79,7 @@ function createDefaultOptions()
 
 	oSet.blastPowerPrimary = create_mode_option(
 		option_type.numeric, 
-		3,
+		2,
 		"blastPowerPrimary",
 		"Blast power")
 	oSet.options[#oSet.options + 1] = oSet.blastPowerPrimary
@@ -100,14 +100,14 @@ function createDefaultOptions()
 
 	oSet.sparkHoleVoxelsSoft = create_mode_option(
 		option_type.numeric, 
-		5,
+		3,
 		"sparkHoleVoxelsSoft",
 		"Erosion, soft materials (number of voxel)")
 	oSet.options[#oSet.options + 1] = oSet.sparkHoleVoxelsSoft
 
 	oSet.sparkHoleVoxelsMedium = create_mode_option(
 		option_type.numeric, 
-		3,
+		2,
 		"sparkHoleVoxelsMedium",
 		"Erosion, medium materials (number of voxel)")
 	oSet.options[#oSet.options + 1] = oSet.sparkHoleVoxelsMedium

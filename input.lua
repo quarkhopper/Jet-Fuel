@@ -95,6 +95,7 @@ function handleInput(dt)
 					elseif infuseInProgress == false then -- unlocked on key up
 						-- sabotaging a shape
 						local index = getIndexByShape(shape, bombs) or getIndexByShape(shape, jets)
+						local isBomb = index ~= nil and bombs[index] ~= nil and bombs[index].shape == shape
 						if index == nil then
 							if not IsShapeBroken(shape) then 
 								-- infuse it
@@ -109,11 +110,12 @@ function handleInput(dt)
 							end
 						else 
 							-- un-infuse it
-							local removeMe = bombs[index]
-							if HasTag(removeMe, "decoder") then 
+							if isBomb then 
+								local removeMe = bombs[index]
 								Delete(removeMe)
 								table.remove(bombs, index)
-							elseif HasTag(removeMe, "jet") then
+							else
+								local removeMe = jets[index]
 								Delete(removeMe)
 								table.remove(jets, index)
 							end
