@@ -35,7 +35,7 @@ function createDefaultOptions()
 
 	oSet.sparksSimulation = create_mode_option(
 		option_type.numeric, 
-		850,
+		1000,
 		"sparksSimulation",
 		"Sparks simulation limit, all fireballs together")
 	oSet.options[#oSet.options + 1] = oSet.sparksSimulation	
@@ -51,7 +51,7 @@ function createDefaultOptions()
 
 	oSet.bombSparks = create_mode_option(
 		option_type.numeric, 
-		500,
+		800,
 		"bombSparks",
 		"Bomb sparks at detonation (affects size)")
 	oSet.options[#oSet.options + 1] = oSet.bombSparks		
@@ -163,7 +163,7 @@ function createDefaultOptions()
 
 	oSet.sparkVacuumMag = create_mode_option(
 		option_type.numeric, 
-		0.02,
+		0.03,
 		"sparkVacuumMag",
 		"Fireball vacuum pressure magnitude per spark x 10^-4")
 	oSet.options[#oSet.options + 1] = oSet.sparkVacuumMag
