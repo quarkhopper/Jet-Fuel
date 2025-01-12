@@ -24,6 +24,13 @@ function createDefaultOptions()
 		"Smoke color")
 	oSet.options[#oSet.options + 1] = oSet.smokeColor
 
+	oSet.fireballDirection = create_mode_option(
+		option_type.vec,
+		Vec(0, 1, 0),
+		"fireballDirection",
+		"Fireball travel direction")
+	oSet.options[#oSet.options + 1] = oSet.fireballDirection
+
 	-- simulation
 
 	oSet.sparksSimulation = create_mode_option(

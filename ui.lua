@@ -148,7 +148,7 @@ function drawOptionModal()
 				newOptionValue ~= "-" and 
 				newOptionValue ~= "-." and 
 				newOptionValue ~= ".-" then 
-				if selectedOption.type == option_type.color then 
+				if selectedOption.type == option_type.color or selectedOption.type == option_type.vec then 
 					selectedOption.value[selectedIndex] = tonumber(newOptionValue)
 				else
 					selectedOption.value = tonumber(newOptionValue)
@@ -221,6 +221,44 @@ function drawOption(option, borderColor)
 			local sampleColor = HSVToRGB(option.value) 
 			UiColor(sampleColor[1], sampleColor[2], sampleColor[3])
 			UiRect(UI.OPTION_CONTROL_WIDTH, 20)
+			UiPop()
+			UiTranslate(95 + labelWidth,0)
+			UiWordWrap(UI.OPTION_CONTROL_WIDTH - 95)
+		elseif option.type == option_type.vec then
+			UiPush()
+			local label = "(X,Y,Z)"
+			UiText(label)
+			local labelWidth = UiGetTextSize(label)
+			UiTranslate(labelWidth, 0)
+			UiPush()
+				UiTranslate(22,-4)
+				drawBorder(30,20,4)
+			UiPop()
+			if UiTextButton(round_to_place(option.value[1],2)) then 
+				selectedOption = option
+				selectedIndex = 1
+				editingValue = option.value[1]
+			end
+			UiTranslate(30,0)
+			UiPush()
+				UiTranslate(22,-4)
+				drawBorder(30,20,4)
+			UiPop()
+			if UiTextButton(round_to_place(option.value[2],2)) then 
+				selectedOption = option
+				selectedIndex = 2
+				editingValue = option.value[2]
+			end
+			UiTranslate(30,0)
+			UiPush()
+				UiTranslate(22,-4)
+				drawBorder(30,20,4)
+			UiPop()
+			if UiTextButton(round_to_place(option.value[3],2)) then 
+				selectedOption = option
+				selectedIndex = 3
+				editingValue = option.value[3]
+			end
 			UiPop()
 			UiTranslate(95 + labelWidth,0)
 			UiWordWrap(UI.OPTION_CONTROL_WIDTH - 95)

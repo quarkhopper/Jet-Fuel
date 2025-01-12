@@ -76,7 +76,7 @@ end
 function mode_option_to_string(inst)
 	local parts = {}
 	parts[1] = tostring(inst.type)
-	if inst.type == option_type.color then
+	if inst.type == option_type.color or inst.type == option_type.vec then
 		parts[2] = vec_to_string(inst.value)
 	else
 		parts[2] = inst.value
@@ -91,7 +91,7 @@ function mode_option_from_string(ser)
 	local option = create_mode_option()
 	local parts = split_string(ser, DELIM.OPTION)
 	option.type = tonumber(parts[1])
-	if option.type == option_type.color then
+	if option.type == option_type.color or option.type == option_type.vec then
 		option.value = string_to_vec(parts[2])
 	else
 		option.value = tonumber(parts[2])

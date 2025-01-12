@@ -214,7 +214,7 @@ function simulationTick(dt)
 				-- pressure effects.
 				-- Torus effects - Pulling from behind the cloud and pushing from the front
 				local pressureDistance_n = spark.distance_n  ^ 0.8
-				local angleDot_n = VecDot(spark.lookOriginDir, VALUES.UP_VECTOR)
+				local angleDot_n = VecDot(spark.lookOriginDir, TOOL.fireballDirection.value)
 				local torus_n = pressureDistance_n * angleDot_n
 				local torus_mag = spark.torusMag * VALUES.PRESSURE_EFFECT_SCALE * #fireball.sparks * torus_n
 				local torus_vector = VecScale(spark.lookOriginDir, torus_mag)

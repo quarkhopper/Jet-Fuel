@@ -53,6 +53,7 @@ end
 
 option_type = enum {
 	"numeric",
-	"color"
+	"color",
+	"vec"
 }
 

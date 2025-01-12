@@ -87,6 +87,8 @@ Vector math, where applicable: `(dot)` indicates the vector dot product operator
 Color of spark (fire) point lights illuminating white "puff" tiles. Essentially, the color of the fireballs.
 ### Smoke color
 Color of the smoke particles.
+### Fireball direction
+The direction fireballs travel. This direction is used with the location of the spark in relation to the fireball center to determine toroidal motion. By default, this is set to (0,1,0) to set fireballs moving upward, as one would expect on Earth with a hot fireball. If another direction is desired, it can be set here. This can also be set to (0,0,0) to simulate explosions in zero gravity.
 ### Sparks simulation limit
 Total number of sparks allowed in the simulation at the same time. When this limit is exceeded sparks are removed at random until below the limit. This applies to ALL fire from ALL bombs in the simulation.
 ### Bomb energy
@@ -149,11 +151,11 @@ It is the balance of these forces that primarily affects fireball shape and move
 NOTE: for the following three pressure variables the variable `pressureDistance_n` is defined as:
 >     sparkDistance_n = minimum(1, 1/(1 + [spark distance from origin]))
 >     pressureDistance_n = sparkDistance_n ^ 0.8
-In the following calculations, the values of `UP_VECTOR` and `PRESSURE_EFFECT_SCALE`, see the section "other values" below.
+In the following calculations, the value of `PRESSURE_EFFECT_SCALE`, see the section "other values" below.
 #### Torus pressure calculation
 For one spark:
 >     lookDir_uv = [Unit vector from spark to center of fireball]
->     angleDot_n = lookDir_uv (dot) UP_VECTOR
+>     angleDot_n = lookDir_uv (dot) [fireball direction]
 >     torus_n = pressureDistance_n * angleDot_n
 >     torus_mag = [torus pressure] * PRESSURE_EFFECT_SCALE * [number of sparks in fireball] * torus_n
 >     torus_vector_v = lookDir_uv * torus_mag
@@ -220,7 +222,6 @@ Vacuum pressure for jet mode.
 ### Jet inflation pressure
 Inflation pressure for jet mode.
 
-
 ## Other values (found in `/script/Defs.lua`, must be edited in code)
 ### The following values are constants that put the adjustable option within a convenient range
 - `SPARK_HURT_SCALE`
@@ -229,5 +230,3 @@ Inflation pressure for jet mode.
 
 ### `PUFF_CONTRAST`
 A number between 0 and 1 that determines the contrast of the fireball, regardless of spark color. This number actully is the __saturation value__ of the HSV color of the spark "puff" particle color. This puff is, by default, set to a monochromatic color in order to be illuminated by the associated point light. The point light color is set with the spark color option (see options above). 
-### `UP_VECTOR`
-The direction fireballs travel. This direction is used with the location of the spark in relation to the fireball center to determine toroidal motion. By default, this is set to (0,1,0) to set fireballs moving upward, as one would expect on Earth with a hot fireball. If another direction is desired, it can be set here. This can also be set to (0,0,0) to simulate explosions in zero gravity.
