@@ -51,7 +51,7 @@ function createDefaultOptions()
 
 	oSet.bombSparks = create_mode_option(
 		option_type.numeric, 
-		400,
+		200,
 		"bombSparks",
 		"Bomb sparks at detonation (affects size)")
 	oSet.options[#oSet.options + 1] = oSet.bombSparks		
