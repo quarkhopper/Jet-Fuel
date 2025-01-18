@@ -29,6 +29,7 @@ function createSparkInst(source)
 	inst.torusMag = source.torusMag
 	inst.vacuumMag = source.vacuumMag
 	inst.inflationMag = source.inflationMag
+	inst.fromJet = false
 
 	-- below are set per tick
 	inst.distanceFromOrigin = 0
@@ -68,6 +69,7 @@ function createJetInst(shape)
 	jet.torusMag = TOOL.jetTorusMag.value
 	jet.vacuumMag = TOOL.jetVacuumMag.value
 	jet.inflationMag = TOOL.jetInflateMag.value
+	jet.fromJet = true
 	return jet
 end
 

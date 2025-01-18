@@ -35,6 +35,7 @@ keypadKeybinds =
 function handleInput(dt)
 	if editingOptions == true then return end
 	plantTimer = math.max(plantTimer - dt, 0)
+	local jetMode = InputDown(KEY.JET_MODE.key)
 
 	if GetString("game.player.tool") == REG.TOOL_KEY then
 		-- commands you can't do in a vehicle
@@ -59,7 +60,6 @@ function handleInput(dt)
 				editingOptions = true
 			end
 
-			local jetMode = InputDown(KEY.JET_MODE.key)
 
 			-- plant bomb / infuse item. NOTE: you can hold it down
 			if InputDown(KEY.PLANT.key) and 
@@ -174,8 +174,9 @@ function handleInput(dt)
 				local bomb = bombs[index]
 				table.insert(toDetonate, bombs[index])
 				table.remove(bombs, index)
-			else
+			elseif jetMode then 
 				toggleAllJets()
+			else
 				if reverseMode then
 					detonateAll(true)
 				else

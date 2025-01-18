@@ -58,7 +58,7 @@ function createDefaultOptions()
 	
 	oSet.detonationTrigger = create_mode_option(
 		option_type.numeric, 
-		100,
+		-1,
 		"detonationTrigger",
 		"Detonation trigger (Spark count. -1 for simultaneous explosions)")
 	oSet.options[#oSet.options + 1] = oSet.detonationTrigger
