@@ -35,7 +35,7 @@ function createDefaultOptions()
 
 	oSet.sparksSimulation = create_mode_option(
 		option_type.numeric, 
-		800,
+		500,
 		"sparksSimulation",
 		"Sparks simulation limit, all fireballs together")
 	oSet.options[#oSet.options + 1] = oSet.sparksSimulation	
