@@ -179,7 +179,7 @@ function createDefaultOptions()
 
 	oSet.sparkFizzleFreq = create_mode_option(
 		option_type.numeric, 
-		8,
+		6,
 		"sparkFizzleFreq",
 		"Fizzle frequency (1 = always, + for less frequent)")
 	oSet.options[#oSet.options + 1] = oSet.sparkFizzleFreq	
