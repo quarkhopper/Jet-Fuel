@@ -49,7 +49,7 @@ function drawLegend()
 
 		UiPush()
 			UiAlign("right")
-			UiTranslate(UiWidth() - 5, 0)
+			UiTranslate(UiWidth() - 5, 60)
 			UiText("[INFUSE: "..infuseString.."]", true)
 			UiText("[SINGLE: "..singleString.."]", true)
 			UiText("[ORDER: "..orderString.."]", true)
